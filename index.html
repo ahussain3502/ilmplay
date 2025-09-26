@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>SafaPlay — Safe Islamic Videos for Kids</title>
+<title>IlmPlay — Safe Islamic Videos for Kids</title>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -59,6 +59,7 @@ main{padding:14px;max-width:1280px;margin:0 auto;transition:padding-top .12s}
 /* ---------- Scrollable row style (applied by JS in landscape mobile) ---------- */
 .tile-row.scrollable{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:12px;padding-bottom:6px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
 .tile-row.scrollable::-webkit-scrollbar{display:none}
+/* For landscape mobile we want 2 visible at once (each ~50% minus gap) */
 .tile-row.scrollable .tile{flex:0 0 calc(50% - 6px);scroll-snap-align:start}
 
 /* ---------- Desktop: horizontal rows showing 4 tiles at once, 8 items per row (3 rows per section) ---------- */
@@ -74,7 +75,6 @@ main{padding:14px;max-width:1280px;margin:0 auto;transition:padding-top .12s}
     scroll-snap-type:x mandatory;
     -webkit-overflow-scrolling:touch;
     align-items:stretch;
-    /* keep the visual divider consistent — border stays */
   }
   .tile-row::-webkit-scrollbar{display:none}
   /* 4 tiles visible at once: each tile takes (100% - 3*gap)/4 */
@@ -138,10 +138,10 @@ footer{padding:18px;text-align:center;color:var(--muted);font-size:13px}
 
 <header id="mainHeader">
   <div class="left">
-    <div class="logo"><img src="Untitled design(3).png" alt="SafaPlay logo" id="logoImg"></div>
+    <div class="logo"><img src="Untitled design(5).png" alt="IlmPlay logo" id="logoImg"></div>
     <div>
-      <div class="brand" id="brandText">SafaPlay</div>
-      <div style="font-size:12px;color:var(--muted)">Safe, ad-free Islamic videos for kids 4–11</div>
+      <div class="brand" id="brandText">IlmPlay</div>
+      <div style="font-size:12px;color:var(--muted)">Safe, Islamic videos for kids 4–11</div>
     </div>
   </div>
 
@@ -157,7 +157,7 @@ footer{padding:18px;text-align:center;color:var(--muted);font-size:13px}
 
 <main id="mainContent">
   <!-- kept visible under header: Welcome box -->
-  <section class="hero" id="heroBox"><h1>Welcome to SafaPlay</h1><p>Tap a category and pick a big thumbnail — safe, ad-free content for kids.</p></section>
+  <section class="hero" id="heroBox"><h1>Welcome to IlmPlay</h1><p>Choose a section, pick a video and enjoy today — safe content for kids</p></section>
 
   <section id="Stories" class="page active"><div class="sectionTitle">Stories</div><div class="tiles" id="t-Stories"></div></section>
   <section id="Nasheeds" class="page"><div class="sectionTitle">Nasheeds</div><div class="tiles" id="t-Nasheeds"></div></section>
@@ -165,14 +165,13 @@ footer{padding:18px;text-align:center;color:var(--muted);font-size:13px}
   <section id="Cartoons" class="page"><div class="sectionTitle">Cartoons</div><div class="tiles" id="t-Cartoons"></div></section>
 </main>
 
-<footer>© SafaPlay — Safe Islamic Videos for Kids</footer>
+<footer>© IlmPlay — Safe Islamic Videos for Kids</footer>
 
 <div id="modal" class="modal" aria-hidden="true">
   <div class="player" role="dialog" aria-label="Video player">
     <iframe id="playerFrame" src="" allow="autoplay; fullscreen; picture-in-picture"></iframe>
     <div class="controls">
       <button class="btn" onclick="closePlayer()">Close</button>
-      <button class="btn yt" id="openYT">Open on YouTube</button>
       <button class="btn alt" id="reportBtn">Report</button>
     </div>
   </div>
@@ -183,13 +182,14 @@ footer{padding:18px;text-align:center;color:var(--muted);font-size:13px}
    Full original video lists
    ------------------------- */
 const VIDEOS = {
-  Stories: ['7ygd_iChqZY','c2I-MdrBkUY','T8GrguVA1zM','F-ZgxRR4VZ4','dlA_UuwzL54','ROx9i2Sc52Y','aYDHGWJS4TI','U7af2isLy0E','PyWPFZlNa-E','vAA7OSWUFsA','yGrDEioXc-k','7pBK8vE6_g0','1qSy36w_Vck','QjNCj6oBDmk','7zUIsx342nE','9g4IrfSqG0c',"fzOBRSvmSC8", "l7s8R9ugb98", "o4tcfC9LArs", "_nKqgSky4Sg", "aZYiMp_vpgU", "7B7ZT3tPAq4", "SvcSVsgy09M", "Tyv8yvFYyGA"],
-  Nasheeds: ['JzzjOXQ-G8I','Qz-hDyYxa4Q','UE7h60tXD_g','7-dG0wjd8P8','FgbRWef_v4k','71hi9H6fZuc','ezi5zLBsaLU','o2W8_mvLuxU','VamZ-Jr8o5o','fiT-WWaH5bc','CuXHj1jQbvI','Nipm5KVLlFU','QLPvZ6LordQ','71hi9H6fZuc','5BRc_eGKNBA','jvoz273QkBk',"x5cw4EiYUWo", "HXyuweIbhpk", "Q_hyCryvyuk", "oEJsflgauqQ", "BlSXxA1o1-Y", "QWvv0GZWY8A", "B7bjfyxTD-c", "KeYVelb22r0"],
-  Duas: ['UKmZLEEexiQ','UFp3YakLFuQ','R6hLVHbGSH8','PQmkaUlKzpk','KHNJ6LKmC0k','nK-XaF779Qg','mdGFkWDP6uc','I_rx06PSWrk','waBCUU-Tdho','WFhuHuC2LK8','sxm6EollTvk','zi5s5EfHkWo','60z20-hYQkI','RRa477FQfhs','WFhuHuC2LK8','OQFMU0Lp5p4',"UXYjxswqDxA", "aR7j9o1l3dY", "cBGEn_L_fxs", "i0g1cm2EVIw", "yFRMrWafbOw", "PQmkaUlKzpk", "KA63AoDlV4I", "xxE7So44oOk"],
-  Cartoons: ['AwW8s_r4g4w','RPL7HNerqZY','H86i72hNAUk','bpvNfqWTXhw','mQwgJ2-9lVI','1TJNdq0PtFk','Gc-HTK-cZ-4','3EaHOg7_WbU','DHVPFNWrLwE','0HVH-KWSC8c','ePMdS25VBto','NbIG26OvMRI','BUz9mexF83A','AQiX-HvjC5o','XBCQK9dTGRI','AnKFO_FRYFY', "vTvUjjimHEc", "_jwHjDl0mU0", "RkOz_Gg2nqw", "cDjvqur2IIE", "xPwmqbpipS4","9cQ-nEc2UeQ","lRSxlnBL8eY","neaZg92Dl2k"]
+  Stories: ['7ygd_iChqZY','c2I-MdrBkUY','T8GrguVA1zM','F-ZgxRR4VZ4','dlA_UuwzL54','ROx9i2Sc52Y','CLuGMjcu_fI','U7af2isLy0E','PyWPFZlNa-E','vAA7OSWUFsA','yGrDEioXc-k','7pBK8vE6_g0','1qSy36w_Vck','QjNCj6oBDmk','7zUIsx342nE','9g4IrfSqG0c',"fzOBRSvmSC8", "l7s8R9ugb98", "o4tcfC9LArs", "_nKqgSky4Sg", "aZYiMp_vpgU", "VAmXKBSF6Zs", "SvcSVsgy09M", "Tyv8yvFYyGA", "7B7ZT3tPAq4", "oEBUuNXf2R8","d2D6WuKlymM","_RUNc_lZBVA", "I9pLrzaHpvY","Xh2M6lxu1BI","aZYiMp_vpgU","oPENjZ7D8pY"],
+  Nasheeds: ['JzzjOXQ-G8I','Mx9BjUJKE14','UE7h60tXD_g','7-dG0wjd8P8','FgbRWef_v4k','71hi9H6fZuc','ezi5zLBsaLU','o2W8_mvLuxU','VamZ-Jr8o5o','fiT-WWaH5bc','CuXHj1jQbvI','Nipm5KVLlFU','QLPvZ6LordQ','71hi9H6fZuc','5BRc_eGKNBA','jvoz273QkBk',"x5cw4EiYUWo", "HXyuweIbhpk", "pXna06Hv1GU", "oEJsflgauqQ", "BlSXxA1o1-Y", "QWvv0GZWY8A", "B7bjfyxTD-c", "KeYVelb22r0", "HiM3hGpCPTM","4DcolrBCErQ","iIxT0Zp8xaI","W7pNrDZghkg", "cUqcQ16pijk","U98HOEXZfks","Qz-hDyYxa4Q","Q_hyCryvyuk"],
+  Duas: ['UKmZLEEexiQ','UFp3YakLFuQ','R6hLVHbGSH8','PQmkaUlKzpk','KHNJ6LKmC0k','nK-XaF779Qg','mdGFkWDP6uc','I_rx06PSWrk','waBCUU-Tdho','WFhuHuC2LK8','sxm6EollTvk','zi5s5EfHkWo','60z20-hYQkI','RRa477FQfhs','WFhuHuC2LK8','OQFMU0Lp5p4',"UXYjxswqDxA", "aR7j9o1l3dY", "cBGEn_L_fxs", "i0g1cm2EVIw", "yFRMrWafbOw", "PQmkaUlKzpk", "KA63AoDlV4I", "xxE7So44oOk","u4IRxi4jyAs","2Mq2gvBV3RE","TjXhqrFrh-0","d55pHbj-QPA","_zZmKMac8wE","ZOtuJrwx9-o","y1TUN9ivr-Q","_2b73KAzx1c"],
+  Cartoons: ['AwW8s_r4g4w','RPL7HNerqZY','H86i72hNAUk','bpvNfqWTXhw','mQwgJ2-9lVI','1TJNdq0PtFk','Gc-HTK-cZ-4','3EaHOg7_WbU','DHVPFNWrLwE','0HVH-KWSC8c','ePMdS25VBto','NbIG26OvMRI','BUz9mexF83A','AQiX-HvjC5o','XBCQK9dTGRI','AnKFO_FRYFY', "vTvUjjimHEc", "_jwHjDl0mU0", "RkOz_Gg2nqw", "cDjvqur2IIE", "xPwmqbpipS4","9cQ-nEc2UeQ","lRSxlnBL8eY","neaZg92Dl2k","lZ40R_rxT6Y","gKXwvroOI88","0W_CC4_qZl0","uuSI4idbjOU","pvT6XdqLYWk","T3DuAFu2ZoY","YOOQ_hCiCjs","mvrtGfwY5LM"]
 };
 
 const PLACEHOLDER = 'data:image/svg+xml;base64,'+btoa(`<svg xmlns='http://www.w3.org/2000/svg' width='480' height='270'><rect width='100%' height='100%' fill='#f3f3f3'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='#999' font-size='18'>No image</text></svg>`);
+
 /* ---------- mode detection & header reveal settings ---------- */
 const MAX_MOBILE_WIDTH = 820;
 const REVEAL_THRESHOLD = 120; // only begin revealing header when within this px from top
@@ -258,38 +258,57 @@ function updateModeClasses(){
 }
 
 /* Apply transform based on absolute scroll position:
-   - If scrollY > REVEAL_THRESHOLD -> fully hidden
-   - If scrollY <= REVEAL_THRESHOLD -> headerTranslate = headerHeight * (scrollY / REVEAL_THRESHOLD)
-   This avoids the header peeking in early on small upward scrolls.
+   - clamp values so we never leave header permanently offscreen
+   - always reset transform when not in landscape-mobile
 */
 function applyHeaderTransform(scrollY){
-  if (!headerHeight) headerHeight = Math.ceil(headerEl.getBoundingClientRect().height || 0);
-  if (scrollY > REVEAL_THRESHOLD) {
-    headerEl.style.transform = `translateY(-${headerHeight}px)`;
-  } else {
-    const t = Math.round(headerHeight * (scrollY / Math.max(REVEAL_THRESHOLD, 1)));
-    headerEl.style.transform = `translateY(-${t}px)`;
+  // recalc header height frequently (safer when fonts/images change or when orientation changes)
+  headerHeight = Math.ceil(headerEl.getBoundingClientRect().height || 0);
+
+  // if not in landscape-mobile mode, always ensure header visible
+  if (!bodyEl.classList.contains('landscape-mobile')) {
+    headerEl.style.transform = 'translateY(0)';
+    return;
   }
+
+  // clamp between 0 and REVEAL_THRESHOLD
+  const clamped = Math.max(0, Math.min(scrollY, REVEAL_THRESHOLD));
+
+  // if at very top, show it
+  if (clamped <= 1) {
+    headerEl.style.transform = 'translateY(0)';
+    return;
+  }
+
+  // compute translate proportionally — when scroll >= REVEAL_THRESHOLD it's fully hidden
+  const t = Math.round(headerHeight * (clamped / Math.max(REVEAL_THRESHOLD, 1)));
+  headerEl.style.transform = `translateY(-${t}px)`;
 }
 
 /* scroll handler for landscape: calls applyHeaderTransform with absolute position */
 function onScrollHandler(){
-  const cur = window.pageYOffset || document.documentElement.scrollTop || 0;
+  // only active during landscape-mobile
+  if (!bodyEl.classList.contains('landscape-mobile')) return;
+  const cur = Math.max(0, window.pageYOffset || document.documentElement.scrollTop || 0);
   applyHeaderTransform(cur);
 }
 
 function attachHeaderScroll(){
   if (headerScrollAttached) return;
+  // set headerHeight now
   headerHeight = Math.ceil(headerEl.getBoundingClientRect().height || 0);
-  last = window.pageYOffset || document.documentElement.scrollTop || 0;
   window.addEventListener('scroll', onScrollHandler, {passive:true});
   headerScrollAttached = true;
 }
 function detachHeaderScroll(){
-  if (!headerScrollAttached) return;
+  if (!headerScrollAttached) {
+    // ensure header visible in case transform was left behind
+    headerEl.style.transform = 'translateY(0)';
+    return;
+  }
   window.removeEventListener('scroll', onScrollHandler);
   headerScrollAttached = false;
-  headerEl.style.transform = '';
+  headerEl.style.transform = 'translateY(0)';
 }
 
 /* ---------- render tiles and scroll indicators ---------- */
@@ -307,8 +326,8 @@ function renderAll(){
     const ids = VIDEOS[section] || [];
 
     if (isDesktop) {
-      // Desktop: create 3 horizontal rows, 8 items per row (showing 4 at a time due to CSS)
-      const rowsWanted = 3;
+      // Desktop: create 4 horizontal rows, 8 items per row (showing 4 at a time due to CSS)
+      const rowsWanted = 4; // keep same number of wrappers as before
       const perRow = 8;
       for (let r = 0; r < rowsWanted; r++){
         const wrapper = document.createElement('div');
@@ -325,14 +344,12 @@ function renderAll(){
           const id = ids[k];
           if (id){
             tile.innerHTML = `<img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="thumb">`;
-            // create closure with id
             tile.addEventListener('click', (function(videoId){
               return function(){ openPlayer(videoId); };
             })(id));
             const img = tile.querySelector('img');
             img.onerror = ()=> img.src = PLACEHOLDER;
           } else {
-            // If no video available for this slot, show placeholder (keeps 8-per-row layout consistent)
             tile.innerHTML = `<img src="${PLACEHOLDER}" alt="No video">`;
             tile.style.opacity = '0.65';
           }
@@ -354,6 +371,7 @@ function renderAll(){
 
         // Enable/disable indicators based on scroll position
         const updateBtns = ()=> {
+          // small timeout to allow layout to settle in some browsers
           setTimeout(()=> {
             const atLeft = row.scrollLeft <= 2;
             const atRight = Math.ceil(row.scrollLeft + row.clientWidth) >= row.scrollWidth - 2;
@@ -363,13 +381,15 @@ function renderAll(){
         };
         row.addEventListener('scroll', updateBtns, {passive:true});
         setTimeout(updateBtns, 60);
-        window.addEventListener('resize', updateBtns);
 
         container.appendChild(wrapper);
       }
     } else {
-      // Mobile / tablet behavior (original): group into rows of 4; if landscape-mobile make them scrollable
-      for (let i=0;i<ids.length;i+=4){
+      // Mobile / tablet behavior:
+      // - portrait: group into rows of 4
+      // - landscape-mobile: group into rows of 8 and make each row scrollable with 2 visible at once
+      const step = landscape ? 8 : 4;
+      for (let i=0;i<ids.length;i+=step){
         const wrapper = document.createElement('div');
         wrapper.className = 'tile-row-wrapper';
 
@@ -377,7 +397,7 @@ function renderAll(){
         row.className = 'tile-row';
         if (landscape) row.classList.add('scrollable');
 
-        for (let j=i;j<i+4 && j<ids.length;j++){
+        for (let j=i;j<i+step && j<ids.length;j++){
           const id = ids[j];
           const tile = document.createElement('div');
           tile.className = 'tile';
@@ -395,6 +415,7 @@ function renderAll(){
           indicator.className = 'scroll-indicator';
           const leftBtn = document.createElement('button'); leftBtn.type='button'; leftBtn.innerHTML='&#8249;';
           const rightBtn = document.createElement('button'); rightBtn.type='button'; rightBtn.innerHTML='&#8250;';
+          // scroll by half the row width to move ~2 tiles (since 2 visible)
           leftBtn.addEventListener('click', ()=> row.scrollBy({left: -Math.round(row.clientWidth/2), behavior:'smooth'}));
           rightBtn.addEventListener('click', ()=> row.scrollBy({left: Math.round(row.clientWidth/2), behavior:'smooth'}));
           indicator.appendChild(leftBtn); indicator.appendChild(rightBtn);
@@ -410,7 +431,6 @@ function renderAll(){
           };
           row.addEventListener('scroll', updateBtns, {passive:true});
           setTimeout(updateBtns, 60);
-          window.addEventListener('resize', updateBtns);
         }
 
         container.appendChild(wrapper);
@@ -425,12 +445,10 @@ function renderAll(){
 /* ---------- player modal ---------- */
 const modal = document.getElementById('modal');
 const playerFrame = document.getElementById('playerFrame');
-const openYT = document.getElementById('openYT');
 const reportBtn = document.getElementById('reportBtn');
 
 function openPlayer(id){
   playerFrame.src = `https://www.youtube.com/embed/${id}?rel=0&playsinline=1&autoplay=1`;
-  openYT.onclick = ()=> window.open(`https://www.youtube.com/watch?v=${id}`,'_blank');
   reportBtn.onclick = ()=> location.href = `mailto:parents@safaplay.example?subject=${encodeURIComponent('Report video')}&body=${encodeURIComponent('Video ID: '+id)}`;
   modal.classList.add('open'); modal.setAttribute('aria-hidden','false');
 }
@@ -457,20 +475,16 @@ function updateThemeToggleIcon(){
   const current = htmlTheme || bodyTheme || 'light';
   // show sun when dark mode active, moon when light mode active
   themeToggleBtn.textContent = current === 'dark' ? '☀️' : '🌙';
-  // update aria-label for clarity
   themeToggleBtn.setAttribute('aria-label', current === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
 }
 
-/* replace existing listener with icon update on toggle */
 themeToggleBtn.addEventListener('click', ()=>{
   const html = document.documentElement;
   const current = html.getAttribute('data-theme') || document.body.getAttribute('data-theme') || 'light';
   const next = current === 'dark' ? 'light' : 'dark';
   html.setAttribute('data-theme', next);
   localStorage.setItem('safaplay_theme', next);
-  // update the icon to reflect the new theme
   updateThemeToggleIcon();
-  // indicator colors update via CSS variables automatically
 });
 
 /* ---------- init & listeners ---------- */
@@ -487,6 +501,10 @@ function init(){
   let rt = null;
   window.addEventListener('resize', ()=> { clearTimeout(rt); rt = setTimeout(()=> renderAll(), 120); });
   window.addEventListener('orientationchange', ()=> { setTimeout(()=> renderAll(), 160); });
+
+  // also ensure mode classes update on scroll end (small safeguard)
+  let st = null;
+  window.addEventListener('scroll', ()=> { clearTimeout(st); st = setTimeout(()=> applyHeaderTransform(window.pageYOffset || document.documentElement.scrollTop || 0), 50); }, {passive:true});
 }
 window.addEventListener('load', init);
 </script>
