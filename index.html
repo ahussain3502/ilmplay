@@ -1,137 +1,53 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>IlmPlay — Safe Islamic Videos for Kids</title>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#f0f8ff; --card:#fff; --text:#0b1720;
-  --accent:#2a9d8f; --accent2:#ff8c42; --heading:#ff9900; --muted:#6b7280;
-  --indicator-bg:#e5e7eb; --indicator-fg:#111; --divider-height:6px;
-}
-[data-theme="dark"]{
-  --bg:#12061f; --card:#1f1030; --text:#f1f5f9;
-  --accent:#ffd93d; --accent2:#ff6b6b; --heading:#ff9900; --muted:#bbb;
-  --indicator-bg:#374151; --indicator-fg:#fff;
-}
+:root{--bg:#f0f8ff;--card:#fff;--text:#0b1720;--accent:#2a9d8f;--accent2:#ff8c42;--heading:#ff9900;--muted:#6b7280;--indicator-bg:#e5e7eb;--indicator-fg:#111;--divider-height:6px}
+[data-theme=dark]{--bg:#12061f;--card:#1f1030;--text:#f1f5f9;--accent:#ffd93d;--accent2:#ff6b6b;--muted:#bbb;--indicator-bg:#374151;--indicator-fg:#fff}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{font-family:"Baloo 2",cursive;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;transition:background .18s,color .18s}
-
-/* ---------- Header (defaults) ---------- */
-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 16px;background:var(--card);
-  box-shadow:0 6px 18px rgba(0,0,0,.08);
-  position:relative; z-index:200; flex-wrap:wrap;
-  transition:transform .18s ease, padding .18s ease;
-  will-change:transform;
-}
+header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:12px 16px;background:var(--card);box-shadow:0 6px 18px rgba(0,0,0,.08);z-index:200;transition:transform .18s ease,padding .18s ease;will-change:transform}
 .left{display:flex;gap:14px;align-items:center;min-width:0}
-.logo img{height:200px;width:auto;display:block;transition:height .18s ease, transform .18s ease}
+.logo img{height:200px;width:auto;display:block;transition:height .18s ease,transform .18s ease}
 .brand{font-weight:900;font-size:34px;color:var(--accent);transition:font-size .18s ease}
 nav{display:grid;grid-template-columns:repeat(4,auto);gap:12px;margin-left:12px;justify-items:center}
 nav a{background:var(--heading);color:#fff;padding:8px 14px;border-radius:12px;font-weight:800;text-decoration:none;cursor:pointer;transition:all .18s}
 #themeToggle{background:var(--accent2);color:#fff;border:0;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:800;transition:all .18s}
-
-/* ---------- Hero (kept inside main so header padding affects it) ---------- */
 .hero{margin:8px 8px 18px 8px;padding:12px;border-radius:12px;text-align:center;background:linear-gradient(135deg,#c8e6c9,#fffde7);transition:all .18s}
-[data-theme="dark"] .hero{background:linear-gradient(135deg,#2a1b3c,#12061f)}
+[data-theme=dark] .hero{background:linear-gradient(135deg,#2a1b3c,#12061f)}
 .hero h1{font-size:24px;color:var(--accent)}
 .hero p{color:var(--muted);margin-top:6px}
-
-/* ---------- Main / Tiles ---------- */
 main{padding:14px;max-width:1280px;margin:0 auto;transition:padding-top .12s}
 .page{display:none}.page.active{display:block}
 .sectionTitle{display:inline-block;background:var(--heading);color:#fff;padding:10px 12px;border-radius:12px;font-weight:800;margin-bottom:12px}
-.tiles{display:block}
-
-/* default desktop / tablet grid: 4-up rows (kept as fallback for narrow screens)
-   We will override .tile-row on desktop to be horizontally scrollable with 8 items per row. */
 .tile-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:14px 0;border-bottom:8px solid var(--heading);align-items:stretch}
-.tiles > .tile-row:last-child{border-bottom:none}
-.tile{aspect-ratio:16/9;overflow:hidden;background:var(--card);border:4px solid rgba(0,0,0,0.06);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.12);cursor:pointer;transition:transform .14s,border-color .18s,box-shadow .18s;display:flex;flex-direction:column}
+.tiles>.tile-row:last-child{border-bottom:none}
+.tile{aspect-ratio:16/9;overflow:hidden;background:var(--card);border:4px solid rgba(0,0,0,.06);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.12);cursor:pointer;transition:transform .14s,border-color .18s,box-shadow .18s;display:flex;flex-direction:column}
 .tile:hover{transform:translateY(-6px);border-color:var(--accent);box-shadow:0 10px 28px rgba(0,0,0,0.16)}
 .tile img{width:100%;height:100%;object-fit:cover;display:block}
-
-/* ---------- Scrollable row style (applied by JS in landscape mobile) ---------- */
 .tile-row.scrollable{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:12px;padding-bottom:6px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
 .tile-row.scrollable::-webkit-scrollbar{display:none}
-/* For landscape mobile we want 2 visible at once (each ~50% minus gap) */
 .tile-row.scrollable .tile{flex:0 0 calc(50% - 6px);scroll-snap-align:start}
-
-/* ---------- Desktop: horizontal rows showing 4 tiles at once, 8 items per row (3 rows per section) ---------- */
-@media (min-width:821px){
-  /* On desktop, make each tile-row a horizontal scroll container.
-     Each tile will be 1/4 of the visible width so 4 show at once; with 8 tiles total the user scrolls to see the rest. */
-  .tile-row{
-    display:flex !important;
-    flex-wrap:nowrap;
-    overflow-x:auto;
-    gap:12px;
-    padding-bottom:12px;
-    scroll-snap-type:x mandatory;
-    -webkit-overflow-scrolling:touch;
-    align-items:stretch;
-  }
-  .tile-row::-webkit-scrollbar{display:none}
-  /* 4 tiles visible at once: each tile takes (100% - 3*gap)/4 */
-  .tile-row .tile{
-    flex:0 0 calc((100% - 36px) / 4);
-    scroll-snap-align:start;
-    min-width:0; /* avoid overflow due to content */
-  }
-  /* spacing under each wrapper row */
-  .tile-row-wrapper{margin-bottom:8px}
-}
-
-/* ---------- Small scroll indicators under rows ---------- */
+@media (min-width:821px){.tile-row{display:flex !important;flex-wrap:nowrap;overflow-x:auto;gap:12px;padding-bottom:12px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;align-items:stretch}.tile-row .tile{flex:0 0 calc((100% - 36px)/4);scroll-snap-align:start;min-width:0}.tile-row-wrapper{margin-bottom:8px}}
 .scroll-indicator{display:flex;justify-content:center;gap:10px;margin-top:8px;margin-bottom:8px;align-items:center}
 .scroll-indicator button{background:var(--indicator-bg);color:var(--indicator-fg);border:0;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;cursor:pointer;opacity:.95;box-shadow:0 4px 10px rgba(0,0,0,0.06);transition:transform .12s,opacity .12s}
 .scroll-indicator button:active{transform:scale(.96)}
 .scroll-indicator button:disabled{opacity:.45;cursor:default}
-
-/* ---------- Portrait mobile layout: nav 2x2, theme under nav, orange divider under tile ---------- */
-@media (max-width:720px) and (orientation:portrait){
-  body.portrait-mobile header{flex-direction:column;align-items:center}
-  body.portrait-mobile .left{order:0;margin-bottom:6px}
-  body.portrait-mobile #themeToggle{order:2;margin-top:8px;align-self:center}
-  body.portrait-mobile nav{order:1;margin-top:8px;display:grid;grid-template-columns:repeat(2,1fr);gap:10px;width:100%;max-width:460px;padding:0 8px;justify-items:stretch}
-  body.portrait-mobile nav a{width:100%;text-align:center}
-  body.portrait-mobile .tile-row{display:grid;grid-template-columns:1fr;gap:10px;padding:10px 0}
-  body.portrait-mobile .tile::after{content:"";display:block;height:var(--divider-height);background:var(--heading);margin-top:8px;border-radius:4px}
-}
-
-/* ---------- Landscape mobile: JS will add .landscape-mobile & .landscape-fixed classes ---------- */
-@media (max-width:820px) and (orientation:landscape){
-  /* no forced styles here — JS sets needed classes and inline sizes */
-}
-
-/* when header fixed by JS */
-body.landscape-fixed header{position:fixed;left:0;right:0;top:0;z-index:600;background:var(--card);will-change:transform}
-
-/* position adjustments for landscape (applied when body.landscape-mobile is set) */
-body.landscape-mobile header{display:flex;align-items:center;justify-content:space-between}
-body.landscape-mobile .left{flex:0 0 auto}
-body.landscape-mobile nav{flex:1 1 auto;display:flex;justify-content:center;gap:10px;margin-left:8px;margin-right:8px}
-body.landscape-mobile #themeToggle{order:3;margin-left:auto;flex:0 0 auto}
-
-/* ---------- Modal / player ---------- */
-.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.85);z-index:999;padding:16px}
-.modal.open{display:flex}
+@media (max-width:720px) and (orientation:portrait){body.portrait-mobile header{flex-direction:column;align-items:center}.portrait-mobile .left{order:0;margin-bottom:6px}.portrait-mobile #themeToggle{order:2;margin-top:8px;align-self:center}.portrait-mobile nav{order:1;margin-top:8px;display:grid;grid-template-columns:repeat(2,1fr);gap:10px;width:100%;max-width:460px;padding:0 8px;justify-items:stretch}.portrait-mobile nav a{width:100%;text-align:center}.portrait-mobile .tile-row{display:grid;grid-template-columns:1fr;gap:10px;padding:10px 0}.portrait-mobile .tile::after{content:"";display:block;height:var(--divider-height);background:var(--heading);margin-top:8px;border-radius:4px}}
+body.landscape-fixed header{position:fixed;left:0;right:0;top:0;z-index:600}
+body.landscape-mobile header{display:flex;align-items:center;justify-content:space-between}.landscape-mobile .left{flex:0 0 auto}.landscape-mobile nav{flex:1 1 auto;display:flex;justify-content:center;gap:10px;margin-left:8px;margin-right:8px}.landscape-mobile #themeToggle{order:3;margin-left:auto;flex:0 0 auto}
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.85);z-index:999;padding:16px}.modal.open{display:flex}
 .player{width:100%;max-width:980px;background:#000;border-radius:12px;overflow:hidden}
 .player iframe{width:100%;height:66vh;border:0}
 .controls{display:flex;gap:8px;padding:10px;background:var(--card);align-items:center;justify-content:center}
 .btn{background:var(--accent);color:#fff;border:0;padding:8px 12px;border-radius:10px;font-weight:800;cursor:pointer}
 .btn.alt{background:#eee;color:#111}.btn.yt{background:var(--accent2)}
 footer{padding:18px;text-align:center;color:var(--muted);font-size:13px}
-
-/* large screens tweaks */
-@media (min-width:1600px){
-  .tile-row{ gap:20px; padding:18px 0; border-bottom-width: 10px; }
-}
 </style>
 </head>
 <body data-theme="light">
@@ -144,21 +60,17 @@ footer{padding:18px;text-align:center;color:var(--muted);font-size:13px}
       <div style="font-size:12px;color:var(--muted)">Safe, Islamic videos for kids 4–11</div>
     </div>
   </div>
-
-  <nav aria-label="Sections" id="mainNav">
-    <a href="#" onclick="event.preventDefault(); show('Stories')">Stories</a>
-    <a href="#" onclick="event.preventDefault(); show('Nasheeds')">Nasheeds</a>
-    <a href="#" onclick="event.preventDefault(); show('Duas')">Duas</a>
-    <a href="#" onclick="event.preventDefault(); show('Cartoons')">Cartoons</a>
+  <nav id="mainNav">
+    <a href="#" onclick="show('Stories')">Stories</a>
+    <a href="#" onclick="show('Nasheeds')">Nasheeds</a>
+    <a href="#" onclick="show('Duas')">Duas</a>
+    <a href="#" onclick="show('Cartoons')">Cartoons</a>
   </nav>
-
-  <button id="themeToggle" aria-label="Toggle theme">🌙</button>
+  <button id="themeToggle">🌙</button>
 </header>
 
 <main id="mainContent">
-  <!-- kept visible under header: Welcome box -->
-  <section class="hero" id="heroBox"><h1>Welcome to IlmPlay</h1><p>Choose a section, pick a video and enjoy today — safe content for kids</p></section>
-
+  <section class="hero"><h1>Welcome to IlmPlay</h1><p>Choose a section, pick a video and enjoy today — safe content for kids</p></section>
   <section id="Stories" class="page active"><div class="sectionTitle">Stories</div><div class="tiles" id="t-Stories"></div></section>
   <section id="Nasheeds" class="page"><div class="sectionTitle">Nasheeds</div><div class="tiles" id="t-Nasheeds"></div></section>
   <section id="Duas" class="page"><div class="sectionTitle">Duas</div><div class="tiles" id="t-Duas"></div></section>
@@ -168,7 +80,7 @@ footer{padding:18px;text-align:center;color:var(--muted);font-size:13px}
 <footer>© IlmPlay — Safe Islamic Videos for Kids</footer>
 
 <div id="modal" class="modal" aria-hidden="true">
-  <div class="player" role="dialog" aria-label="Video player">
+  <div class="player">
     <iframe id="playerFrame" src="" allow="autoplay; fullscreen; picture-in-picture"></iframe>
     <div class="controls">
       <button class="btn" onclick="closePlayer()">Close</button>
@@ -178,335 +90,264 @@ footer{padding:18px;text-align:center;color:var(--muted);font-size:13px}
 </div>
 
 <script>
-/* -------------------------
-   Full original video lists
-   ------------------------- */
-const VIDEOS = {
-  Stories: ['7ygd_iChqZY','c2I-MdrBkUY','T8GrguVA1zM','F-ZgxRR4VZ4','dlA_UuwzL54','ROx9i2Sc52Y','CLuGMjcu_fI','U7af2isLy0E','PyWPFZlNa-E','vAA7OSWUFsA','yGrDEioXc-k','7pBK8vE6_g0','1qSy36w_Vck','QjNCj6oBDmk','7zUIsx342nE','9g4IrfSqG0c',"fzOBRSvmSC8", "l7s8R9ugb98", "o4tcfC9LArs", "_nKqgSky4Sg", "aZYiMp_vpgU", "VAmXKBSF6Zs", "SvcSVsgy09M", "Tyv8yvFYyGA", "7B7ZT3tPAq4", "oEBUuNXf2R8","d2D6WuKlymM","_RUNc_lZBVA", "I9pLrzaHpvY","Xh2M6lxu1BI","aZYiMp_vpgU","oPENjZ7D8pY"],
-  Nasheeds: ['JzzjOXQ-G8I','Mx9BjUJKE14','UE7h60tXD_g','7-dG0wjd8P8','FgbRWef_v4k','71hi9H6fZuc','ezi5zLBsaLU','o2W8_mvLuxU','VamZ-Jr8o5o','fiT-WWaH5bc','CuXHj1jQbvI','Nipm5KVLlFU','QLPvZ6LordQ','71hi9H6fZuc','5BRc_eGKNBA','jvoz273QkBk',"x5cw4EiYUWo", "HXyuweIbhpk", "pXna06Hv1GU", "oEJsflgauqQ", "BlSXxA1o1-Y", "QWvv0GZWY8A", "B7bjfyxTD-c", "KeYVelb22r0", "HiM3hGpCPTM","4DcolrBCErQ","iIxT0Zp8xaI","W7pNrDZghkg", "cUqcQ16pijk","U98HOEXZfks","Qz-hDyYxa4Q","Q_hyCryvyuk"],
-  Duas: ['UKmZLEEexiQ','UFp3YakLFuQ','R6hLVHbGSH8','PQmkaUlKzpk','KHNJ6LKmC0k','nK-XaF779Qg','mdGFkWDP6uc','I_rx06PSWrk','waBCUU-Tdho','WFhuHuC2LK8','sxm6EollTvk','zi5s5EfHkWo','60z20-hYQkI','RRa477FQfhs','WFhuHuC2LK8','OQFMU0Lp5p4',"UXYjxswqDxA", "aR7j9o1l3dY", "cBGEn_L_fxs", "i0g1cm2EVIw", "yFRMrWafbOw", "PQmkaUlKzpk", "KA63AoDlV4I", "xxE7So44oOk","u4IRxi4jyAs","2Mq2gvBV3RE","TjXhqrFrh-0","d55pHbj-QPA","_zZmKMac8wE","ZOtuJrwx9-o","y1TUN9ivr-Q","_2b73KAzx1c"],
-  Cartoons: ['AwW8s_r4g4w','RPL7HNerqZY','H86i72hNAUk','bpvNfqWTXhw','mQwgJ2-9lVI','1TJNdq0PtFk','Gc-HTK-cZ-4','3EaHOg7_WbU','DHVPFNWrLwE','0HVH-KWSC8c','ePMdS25VBto','NbIG26OvMRI','BUz9mexF83A','AQiX-HvjC5o','XBCQK9dTGRI','AnKFO_FRYFY', "vTvUjjimHEc", "_jwHjDl0mU0", "RkOz_Gg2nqw", "cDjvqur2IIE", "xPwmqbpipS4","9cQ-nEc2UeQ","lRSxlnBL8eY","neaZg92Dl2k","lZ40R_rxT6Y","gKXwvroOI88","0W_CC4_qZl0","uuSI4idbjOU","pvT6XdqLYWk","T3DuAFu2ZoY","YOOQ_hCiCjs","mvrtGfwY5LM"]
+const VIDEOS={
+  Stories:[
+    {type:'local',file:'Stories Section/story1.mp4',thumb:'Stories Section/story1.jpg'},
+    {type:'local',file:'Stories Section/story2.mp4',thumb:'Stories Section/story2.jpg'},
+    {type:'local',file:'Stories Section/story3.mp4',thumb:'Stories Section/story3.jpg'},
+    {type:'local',file:'Stories Section/story4.mp4',thumb:'Stories Section/story4.jpg'},
+    {type:'local',file:'Stories Section/story5.mp4',thumb:'Stories Section/story5.jpg'},
+    {type:'local',file:'Stories Section/story6.mp4',thumb:'Stories Section/story6.jpg'},
+
+    {type:'local',file:'Stories Section/story7.mp4',thumb:'Stories Section/story7.jpeg'},
+    {type:'local',file:'Stories Section/story8.mp4',thumb:'Stories Section/story8.jpeg'},
+    {type:'local',file:'Stories Section/story9.mp4',thumb:'Stories Section/story9.jpeg'},
+    {type:'local',file:'Stories Section/story10.mp4',thumb:'Stories Section/story10.jpeg'},
+    {type:'local',file:'Stories Section/story11.mp4',thumb:'Stories Section/story11.jpeg'},
+    {type:'local',file:'Stories Section/story12.mp4',thumb:'Stories Section/story12.jpeg'},
+
+
+    {type:'local',file:'Stories Section/story13.mp4',thumb:'Stories Section/story13.jpeg'},
+    {type:'local',file:'Stories Section/story14.mp4',thumb:'Stories Section/story14.jpeg'},
+    {type:'local',file:'Stories Section/story15.mp4',thumb:'Stories Section/story15.jpeg'},
+    {type:'local',file:'Stories Section/story16.mp4',thumb:'Stories Section/story16.jpeg'},
+    {type:'local',file:'Stories Section/story17.mp4',thumb:'Stories Section/story17.jpeg'},
+    {type:'local',file:'Stories Section/story18.mp4',thumb:'Stories Section/story18.jpeg'},
+
+
+    {type:'local',file:'Stories Section/story19.mp4',thumb:'Stories Section/story19.jpeg'},
+    {type:'local',file:'Stories Section/story20.mp4',thumb:'Stories Section/story20.jpeg'},
+    {type:'local',file:'Stories Section/story21.mp4',thumb:'Stories Section/story21.jpeg'},
+    {type:'local',file:'Stories Section/story22.mp4',thumb:'Stories Section/story22.jpeg'},
+    {type:'local',file:'Stories Section/story23.mp4',thumb:'Stories Section/story23.jpeg'},
+    {type:'local',file:'Stories Section/story24.mp4',thumb:'Stories Section/story24.jpeg'},
+
+
+    {type:'local',file:'Stories Section/story25.mp4',thumb:'Stories Section/story25.jpeg'},
+    {type:'local',file:'Stories Section/story26.mp4',thumb:'Stories Section/story26.jpeg'},
+    {type:'local',file:'Stories Section/story27.mp4',thumb:'Stories Section/story27.jpeg'},
+    {type:'local',file:'Stories Section/story28.mp4',thumb:'Stories Section/story28.jpeg'},
+    {type:'local',file:'Stories Section/story29.mp4',thumb:'Stories Section/story29.jpeg'},
+    {type:'local',file:'Stories Section/story30.mp4',thumb:'Stories Section/story30.jpeg'},
+
+    {type:'local',file:'Stories Section/story31.mp4',thumb:'Stories Section/story31.jpeg'},
+    {type:'local',file:'Stories Section/story32.mp4',thumb:'Stories Section/story32.jpeg'},
+  ],
+  Nasheeds:[     
+    
+    {type:'local',file:'Nasheeds Section/nasheed1.mp4',thumb:'Nasheeds Section/nasheed1.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed2.mp4',thumb:'Nasheeds Section/nasheed2.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed3.mp4',thumb:'Nasheeds Section/nasheed3.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed4.mp4',thumb:'Nasheeds Section/nasheed4.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed5.mp4',thumb:'Nasheeds Section/nasheed5.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed6.mp4',thumb:'Nasheeds Section/nasheed6.jpg'},
+
+    {type:'local',file:'Nasheeds Section/nasheed7.mp4',thumb:'Nasheeds Section/nasheed7.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed8.mp4',thumb:'Nasheeds Section/nasheed8.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed9.mp4',thumb:'Nasheeds Section/nasheed9.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed10.mp4',thumb:'Nasheeds Section/nasheed10.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed11.mp4',thumb:'Nasheeds Section/nasheed11.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed12.mp4',thumb:'Nasheeds Section/nasheed12.jpg'},
+
+    {type:'local',file:'Nasheeds Section/nasheed13.mp4',thumb:'Nasheeds Section/nasheed13.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed14.mp4',thumb:'Nasheeds Section/nasheed14.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed15.mp4',thumb:'Nasheeds Section/nasheed15.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed16.mp4',thumb:'Nasheeds Section/nasheed16.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed17.mp4',thumb:'Nasheeds Section/nasheed17.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed18.mp4',thumb:'Nasheeds Section/nasheed18.jpg'},
+
+    {type:'local',file:'Nasheeds Section/nasheed19.mp4',thumb:'Nasheeds Section/nasheed19.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed20.mp4',thumb:'Nasheeds Section/nasheed20.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed21.mp4',thumb:'Nasheeds Section/nasheed21.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed22.mp4',thumb:'Nasheeds Section/nasheed22.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed23.mp4',thumb:'Nasheeds Section/nasheed23.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed24.mp4',thumb:'Nasheeds Section/nasheed24.jpg'},
+
+    {type:'local',file:'Nasheeds Section/nasheed25.mp4',thumb:'Nasheeds Section/nasheed25.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed26.mp4',thumb:'Nasheeds Section/nasheed26.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed27.mp4',thumb:'Nasheeds Section/nasheed27.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed28.mp4',thumb:'Nasheeds Section/nasheed28.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed29.mp4',thumb:'Nasheeds Section/nasheed29.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed30.mp4',thumb:'Nasheeds Section/nasheed30.jpg'},
+
+    {type:'local',file:'Nasheeds Section/nasheed31.mp4',thumb:'Nasheeds Section/nasheed31.jpg'},
+    {type:'local',file:'Nasheeds Section/nasheed32.mp4',thumb:'Nasheeds Section/nasheed32.jpg'},
+],
+  Duas:[
+    {type:'local',file:'Duas Section/dua1.mp4',thumb:'Duas Section/dua1.jpg'},
+    {type:'local',file:'Duas Section/dua2.mp4',thumb:'Duas Section/dua2.jpg'},
+{type:'local',file:'Duas Section/dua3.mp4',thumb:'Duas Section/dua3.jpg'},
+{type:'local',file:'Duas Section/dua4.mp4',thumb:'Duas Section/dua4.jpg'},
+{type:'local',file:'Duas Section/dua5.mp4',thumb:'Duas Section/dua5.jpg'},
+{type:'local',file:'Duas Section/dua6.mp4',thumb:'Duas Section/dua6.jpg'},
+{type:'local',file:'Duas Section/dua7.mp4',thumb:'Duas Section/dua7.jpg'},
+
+{type:'local',file:'Duas Section/dua8.mp4',thumb:'Duas Section/dua8.jpg'},
+{type:'local',file:'Duas Section/dua9.mp4',thumb:'Duas Section/dua9.jpg'},
+{type:'local',file:'Duas Section/dua10.mp4',thumb:'Duas Section/dua10.jpg'},
+{type:'local',file:'Duas Section/dua11.mp4',thumb:'Duas Section/dua11.jpg'},
+{type:'local',file:'Duas Section/dua12.mp4',thumb:'Duas Section/dua12.jpg'},
+{type:'local',file:'Duas Section/dua13.mp4',thumb:'Duas Section/dua13.jpg'},
+
+{type:'local',file:'Duas Section/dua14.mp4',thumb:'Duas Section/dua14.jpg'},
+{type:'local',file:'Duas Section/dua15.mp4',thumb:'Duas Section/dua15.jpg'},
+{type:'local',file:'Duas Section/dua16.mp4',thumb:'Duas Section/dua16.jpg'},
+{type:'local',file:'Duas Section/dua17.mp4',thumb:'Duas Section/dua17.jpg'},
+{type:'local',file:'Duas Section/dua18.mp4',thumb:'Duas Section/dua18.jpg'},
+{type:'local',file:'Duas Section/dua19.mp4',thumb:'Duas Section/dua19.jpg'},
+
+{type:'local',file:'Duas Section/dua20.mp4',thumb:'Duas Section/dua20.jpg'},
+{type:'local',file:'Duas Section/dua21.mp4',thumb:'Duas Section/dua21.jpg'},
+{type:'local',file:'Duas Section/dua22.mp4',thumb:'Duas Section/dua22.jpg'},
+{type:'local',file:'Duas Section/dua23.mp4',thumb:'Duas Section/dua23.jpg'},
+{type:'local',file:'Duas Section/dua24.mp4',thumb:'Duas Section/dua24.jpg'},
+{type:'local',file:'Duas Section/dua25.mp4',thumb:'Duas Section/dua25.jpg'},
+
+{type:'local',file:'Duas Section/dua26.mp4',thumb:'Duas Section/dua26.jpg'},
+{type:'local',file:'Duas Section/dua27.mp4',thumb:'Duas Section/dua27.jpg'},
+{type:'local',file:'Duas Section/dua28.mp4',thumb:'Duas Section/dua28.jpg'},
+{type:'local',file:'Duas Section/dua29.mp4',thumb:'Duas Section/dua29.jpg'},
+{type:'local',file:'Duas Section/dua30.mp4',thumb:'Duas Section/dua30.jpg'},
+{type:'local',file:'Duas Section/dua31.mp4',thumb:'Duas Section/dua31.jpg'},
+
+{type:'local',file:'Duas Section/dua32.mp4',thumb:'Duas Section/dua32.jpg'},
+
+    ],
+  Cartoons:[
+    {type:'local',file:'Cartoons Section/cartoon1.mp4',thumb:'Cartoons Section/cartoon1.jpg'},
+{type:'local',file:'Cartoons Section/cartoon2.mp4',thumb:'Cartoons Section/cartoon2.jpg'},
+{type:'local',file:'Cartoons Section/cartoon3.mp4',thumb:'Cartoons Section/cartoon3.jpg'},
+{type:'local',file:'Cartoons Section/cartoon4.mp4',thumb:'Cartoons Section/cartoon4.jpg'},
+{type:'local',file:'Cartoons Section/cartoon5.mp4',thumb:'Cartoons Section/cartoon5.jpg'},
+{type:'local',file:'Cartoons Section/cartoon6.mp4',thumb:'Cartoons Section/cartoon6.jpg'},
+
+{type:'local',file:'Cartoons Section/cartoon7.mp4',thumb:'Cartoons Section/cartoon7.jpg'},
+{type:'local',file:'Cartoons Section/cartoon8.mp4',thumb:'Cartoons Section/cartoon8.jpg'},
+{type:'local',file:'Cartoons Section/cartoon9.mp4',thumb:'Cartoons Section/cartoon9.jpg'},
+{type:'local',file:'Cartoons Section/cartoon10.mp4',thumb:'Cartoons Section/cartoon10.jpg'},
+{type:'local',file:'Cartoons Section/cartoon11.mp4',thumb:'Cartoons Section/cartoon11.jpg'},
+{type:'local',file:'Cartoons Section/cartoon12.mp4',thumb:'Cartoons Section/cartoon12.jpg'},
+
+{type:'local',file:'Cartoons Section/cartoon13.mp4',thumb:'Cartoons Section/cartoon13.jpg'},
+{type:'local',file:'Cartoons Section/cartoon14.mp4',thumb:'Cartoons Section/cartoon14.jpg'},
+{type:'local',file:'Cartoons Section/cartoon15.mp4',thumb:'Cartoons Section/cartoon15.jpg'},
+{type:'local',file:'Cartoons Section/cartoon16.mp4',thumb:'Cartoons Section/cartoon16.jpg'},
+{type:'local',file:'Cartoons Section/cartoon17.mp4',thumb:'Cartoons Section/cartoon17.jpg'},
+{type:'local',file:'Cartoons Section/cartoon18.mp4',thumb:'Cartoons Section/cartoon18.jpg'},
+
+{type:'local',file:'Cartoons Section/cartoon19.mp4',thumb:'Cartoons Section/cartoon19.jpg'},
+{type:'local',file:'Cartoons Section/cartoon20.mp4',thumb:'Cartoons Section/cartoon20.jpg'},
+{type:'local',file:'Cartoons Section/cartoon21.mp4',thumb:'Cartoons Section/cartoon21.jpg'},
+{type:'local',file:'Cartoons Section/cartoon22.mp4',thumb:'Cartoons Section/cartoon22.jpg'},
+{type:'local',file:'Cartoons Section/cartoon23.mp4',thumb:'Cartoons Section/cartoon23.jpg'},
+{type:'local',file:'Cartoons Section/cartoon24.mp4',thumb:'Cartoons Section/cartoon24.jpg'},
+
+{type:'local',file:'Cartoons Section/cartoon25.mp4',thumb:'Cartoons Section/cartoon25.jpg'},
+{type:'local',file:'Cartoons Section/cartoon26.mp4',thumb:'Cartoons Section/cartoon26.jpg'},
+{type:'local',file:'Cartoons Section/cartoon27.mp4',thumb:'Cartoons Section/cartoon27.jpg'},
+{type:'local',file:'Cartoons Section/cartoon28.mp4',thumb:'Cartoons Section/cartoon28.jpg'},
+{type:'local',file:'Cartoons Section/cartoon29.mp4',thumb:'Cartoons Section/cartoon29.jpg'},
+{type:'local',file:'Cartoons Section/cartoon30.mp4',thumb:'Cartoons Section/cartoon30.jpg'},
+
+{type:'local',file:'Cartoons Section/cartoon31.mp4',thumb:'Cartoons Section/cartoon31.jpg'},
+{type:'local',file:'Cartoons Section/cartoon32.mp4',thumb:'Cartoons Section/cartoon32.jpg'},
+
+    ]
 };
 
-const PLACEHOLDER = 'data:image/svg+xml;base64,'+btoa(`<svg xmlns='http://www.w3.org/2000/svg' width='480' height='270'><rect width='100%' height='100%' fill='#f3f3f3'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='#999' font-size='18'>No image</text></svg>`);
+const PLACEHOLDER='data:image/svg+xml;base64,'+btoa(`<svg xmlns='http://www.w3.org/2000/svg' width='480' height='270'><rect width='100%' height='100%' fill='#f3f3f3'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='#999' font-size='18'>No image</text></svg>`);
 
-/* ---------- mode detection & header reveal settings ---------- */
-const MAX_MOBILE_WIDTH = 820;
-const REVEAL_THRESHOLD = 120; // only begin revealing header when within this px from top
-const bodyEl = document.body;
-const headerEl = document.getElementById('mainHeader');
-const mainContent = document.getElementById('mainContent');
+const bodyEl=document.body,headerEl=document.getElementById('mainHeader'),mainContent=document.getElementById('mainContent');
+let headerHeight=0,headerScrollAttached=false;
 
-let headerHeight = 0;
-let headerScrollAttached = false;
+function isLandscapeMobile(){return window.innerWidth>window.innerHeight && window.innerWidth<=820;}
+function isPortraitMobile(){return window.innerWidth<=820 && window.innerWidth<=window.innerHeight;}
 
-/* detect modes */
-function isLandscapeMobile(){ return window.innerWidth > window.innerHeight && window.innerWidth <= MAX_MOBILE_WIDTH; }
-function isPortraitMobile(){ return window.innerWidth <= MAX_MOBILE_WIDTH && window.innerWidth <= window.innerHeight; }
-
-/* Apply classes and header sizes/position */
 function updateModeClasses(){
-  const landscape = isLandscapeMobile();
-  const portrait = isPortraitMobile();
-
-  if(landscape){
-    bodyEl.classList.add('landscape-mobile','landscape-fixed');
-    bodyEl.classList.remove('portrait-mobile');
-
-    headerEl.style.position = 'fixed';
-    headerEl.style.left = '0';
-    headerEl.style.right = '0';
-    headerEl.style.top = '0';
-    headerEl.style.zIndex = '600';
-
-    // make header/logo/nav one-third smaller (200 -> 133)
-    const logo = document.getElementById('logoImg');
-    const brand = document.getElementById('brandText');
-    logo.style.height = '133px';
-    brand.style.fontSize = '23px';
-
-    // compute header height & pad main so hero remains visible
-    setTimeout(()=> {
-      headerHeight = Math.ceil(headerEl.getBoundingClientRect().height || 0);
-      mainContent.style.paddingTop = (headerHeight + 8) + 'px';
-      // set initial header transform based on current scroll
-      applyHeaderTransform(window.pageYOffset || document.documentElement.scrollTop || 0);
-    }, 40);
-
-    attachHeaderScroll();
-  } else {
-    // cleanup
-    bodyEl.classList.remove('landscape-mobile','landscape-fixed');
-    headerEl.style.transform = '';
-    headerEl.style.position = '';
-    headerEl.style.left = '';
-    headerEl.style.right = '';
-    headerEl.style.top = '';
-    headerEl.style.zIndex = '';
-    mainContent.style.paddingTop = '';
-    document.getElementById('logoImg').style.removeProperty('height');
-    document.getElementById('brandText').style.removeProperty('font-size');
-
-    detachHeaderScroll();
-  }
-
-  if(portrait){
-    bodyEl.classList.add('portrait-mobile');
-  } else {
-    bodyEl.classList.remove('portrait-mobile');
-  }
+  const landscape=isLandscapeMobile(),portrait=isPortraitMobile();
+  if(landscape){bodyEl.classList.add('landscape-mobile','landscape-fixed');bodyEl.classList.remove('portrait-mobile');
+    const logo=document.getElementById('logoImg'),brand=document.getElementById('brandText');logo.style.height='133px';brand.style.fontSize='23px';
+    headerEl.style.position='fixed';headerEl.style.left='0';headerEl.style.right='0';headerEl.style.top='0';headerEl.style.zIndex='600';
+    setTimeout(()=>{headerHeight=Math.ceil(headerEl.getBoundingClientRect().height);mainContent.style.paddingTop=(headerHeight+8)+'px';applyHeaderTransform(window.pageYOffset||0)},40);attachHeaderScroll();}
+  else{bodyEl.classList.remove('landscape-mobile','landscape-fixed');headerEl.style.transform='';headerEl.style.position='';headerEl.style.left='';headerEl.style.right='';headerEl.style.top='';headerEl.style.zIndex='';mainContent.style.paddingTop='';document.getElementById('logoImg').style.removeProperty('height');document.getElementById('brandText').style.removeProperty('font-size');detachHeaderScroll();}
+  if(portrait)bodyEl.classList.add('portrait-mobile');else bodyEl.classList.remove('portrait-mobile');
 }
 
-/* Apply transform based on absolute scroll position:
-   - clamp values so we never leave header permanently offscreen
-   - always reset transform when not in landscape-mobile
-*/
 function applyHeaderTransform(scrollY){
-  // recalc header height frequently (safer when fonts/images change or when orientation changes)
-  headerHeight = Math.ceil(headerEl.getBoundingClientRect().height || 0);
-
-  // if not in landscape-mobile mode, always ensure header visible
-  if (!bodyEl.classList.contains('landscape-mobile')) {
-    headerEl.style.transform = 'translateY(0)';
-    return;
-  }
-
-  // clamp between 0 and REVEAL_THRESHOLD
-  const clamped = Math.max(0, Math.min(scrollY, REVEAL_THRESHOLD));
-
-  // if at very top, show it
-  if (clamped <= 1) {
-    headerEl.style.transform = 'translateY(0)';
-    return;
-  }
-
-  // compute translate proportionally — when scroll >= REVEAL_THRESHOLD it's fully hidden
-  const t = Math.round(headerHeight * (clamped / Math.max(REVEAL_THRESHOLD, 1)));
-  headerEl.style.transform = `translateY(-${t}px)`;
+  headerHeight=Math.ceil(headerEl.getBoundingClientRect().height);
+  if(!bodyEl.classList.contains('landscape-mobile')){headerEl.style.transform='translateY(0)';return;}
+  const clamped=Math.max(0,Math.min(scrollY,120));
+  if(clamped<=1){headerEl.style.transform='translateY(0)';return;}
+  headerEl.style.transform=`translateY(-${Math.round(headerHeight*(clamped/120))}px)`;
 }
+function onScrollHandler(){if(bodyEl.classList.contains('landscape-mobile'))applyHeaderTransform(window.pageYOffset||0);}
+function attachHeaderScroll(){if(headerScrollAttached)return;window.addEventListener('scroll',onScrollHandler,{passive:true});headerScrollAttached=true;}
+function detachHeaderScroll(){if(!headerScrollAttached){headerEl.style.transform='translateY(0)';return;}window.removeEventListener('scroll',onScrollHandler);headerScrollAttached=false;headerEl.style.transform='translateY(0)';}
 
-/* scroll handler for landscape: calls applyHeaderTransform with absolute position */
-function onScrollHandler(){
-  // only active during landscape-mobile
-  if (!bodyEl.classList.contains('landscape-mobile')) return;
-  const cur = Math.max(0, window.pageYOffset || document.documentElement.scrollTop || 0);
-  applyHeaderTransform(cur);
-}
-
-function attachHeaderScroll(){
-  if (headerScrollAttached) return;
-  // set headerHeight now
-  headerHeight = Math.ceil(headerEl.getBoundingClientRect().height || 0);
-  window.addEventListener('scroll', onScrollHandler, {passive:true});
-  headerScrollAttached = true;
-}
-function detachHeaderScroll(){
-  if (!headerScrollAttached) {
-    // ensure header visible in case transform was left behind
-    headerEl.style.transform = 'translateY(0)';
-    return;
-  }
-  window.removeEventListener('scroll', onScrollHandler);
-  headerScrollAttached = false;
-  headerEl.style.transform = 'translateY(0)';
-}
-
-/* ---------- render tiles and scroll indicators ---------- */
-function clearChildren(el){ while(el.firstChild) el.removeChild(el.firstChild); }
+function clearChildren(el){while(el.firstChild)el.removeChild(el.firstChild)}
 
 function renderAll(){
   updateModeClasses();
-  const landscape = isLandscapeMobile();
-  const isDesktop = window.innerWidth > MAX_MOBILE_WIDTH;
-
+  const landscape=isLandscapeMobile(),isDesktop=window.innerWidth>820;
   Object.keys(VIDEOS).forEach(section=>{
-    const container = document.getElementById('t-'+section);
+    const container=document.getElementById('t-'+section);
     clearChildren(container);
-
-    const ids = VIDEOS[section] || [];
-
-    if (isDesktop) {
-      // Desktop: create 4 horizontal rows, 8 items per row (showing 4 at a time due to CSS)
-      const rowsWanted = 4; // keep same number of wrappers as before
-      const perRow = 8;
-      for (let r = 0; r < rowsWanted; r++){
-        const wrapper = document.createElement('div');
-        wrapper.className = 'tile-row-wrapper';
-
-        const row = document.createElement('div');
-        row.className = 'tile-row';
-
-        const startIndex = r * perRow;
-        for (let k = startIndex; k < startIndex + perRow; k++){
-          const tile = document.createElement('div');
-          tile.className = 'tile';
-
-          const id = ids[k];
-          if (id){
-            tile.innerHTML = `<img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="thumb">`;
-            tile.addEventListener('click', (function(videoId){
-              return function(){ openPlayer(videoId); };
-            })(id));
-            const img = tile.querySelector('img');
-            img.onerror = ()=> img.src = PLACEHOLDER;
-          } else {
-            tile.innerHTML = `<img src="${PLACEHOLDER}" alt="No video">`;
-            tile.style.opacity = '0.65';
-          }
-
-          row.appendChild(tile);
+    const ids=VIDEOS[section]||[];
+    const step=isDesktop?8:(landscape?8:4);
+    for(let i=0;i<ids.length;i+=step){
+      const wrapper=document.createElement('div');wrapper.className='tile-row-wrapper';
+      const row=document.createElement('div');row.className='tile-row';if(!isDesktop && landscape)row.classList.add('scrollable');
+      for(let j=i;j<i+step&&j<ids.length;j++){
+        const tile=document.createElement('div');tile.className='tile';
+        if(typeof ids[j]==='string'){ 
+            tile.innerHTML=`<img src="https://i.ytimg.com/vi/${ids[j]}/hqdefault.jpg" alt="thumb">`;
+            tile.onclick=(()=>openPlayer(ids[j]));
+        } else if(ids[j].type==='local'){
+            tile.innerHTML=`<img src="${ids[j].thumb}" alt="thumb">`;
+            tile.onclick=(()=>openPlayer(ids[j]));
         }
-
-        wrapper.appendChild(row);
-
-        // Add scroll indicators for desktop rows that scroll by one "page" (visible 4 tiles)
-        const indicator = document.createElement('div');
-        indicator.className = 'scroll-indicator';
-        const leftBtn = document.createElement('button'); leftBtn.type='button'; leftBtn.innerHTML='&#8249;';
-        const rightBtn = document.createElement('button'); rightBtn.type='button'; rightBtn.innerHTML='&#8250;';
-        leftBtn.addEventListener('click', ()=> row.scrollBy({left: -Math.round(row.clientWidth), behavior:'smooth'}));
-        rightBtn.addEventListener('click', ()=> row.scrollBy({left: Math.round(row.clientWidth), behavior:'smooth'}));
-        indicator.appendChild(leftBtn); indicator.appendChild(rightBtn);
+        tile.querySelector('img').onerror=e=>e.target.src=PLACEHOLDER;
+        row.appendChild(tile);
+      }
+      wrapper.appendChild(row);
+      if(isDesktop||row.classList.contains('scrollable')){
+        const indicator=document.createElement('div');indicator.className='scroll-indicator';
+        ['<','>'].forEach((s,k)=>{
+          const b=document.createElement('button');b.innerHTML=s==='<'?'&#8249;':'&#8250;';
+          b.addEventListener('click',()=>row.scrollBy({left:(k?1:-1)*(isDesktop?row.clientWidth:row.clientWidth/2),behavior:'smooth'}));
+          indicator.appendChild(b);
+        });
         wrapper.appendChild(indicator);
-
-        // Enable/disable indicators based on scroll position
-        const updateBtns = ()=> {
-          // small timeout to allow layout to settle in some browsers
-          setTimeout(()=> {
-            const atLeft = row.scrollLeft <= 2;
-            const atRight = Math.ceil(row.scrollLeft + row.clientWidth) >= row.scrollWidth - 2;
-            leftBtn.disabled = atLeft;
-            rightBtn.disabled = atRight;
-          }, 20);
-        };
-        row.addEventListener('scroll', updateBtns, {passive:true});
-        setTimeout(updateBtns, 60);
-
-        container.appendChild(wrapper);
+        const updateBtns=()=>{setTimeout(()=>{const atLeft=row.scrollLeft<=2,atRight=Math.ceil(row.scrollLeft+row.clientWidth)>=row.scrollWidth-2;indicator.querySelectorAll('button')[0].disabled=atLeft;indicator.querySelectorAll('button')[1].disabled=atRight},20)};
+        row.addEventListener('scroll',updateBtns,{passive:true});setTimeout(updateBtns,60);
       }
-    } else {
-      // Mobile / tablet behavior:
-      // - portrait: group into rows of 4
-      // - landscape-mobile: group into rows of 8 and make each row scrollable with 2 visible at once
-      const step = landscape ? 8 : 4;
-      for (let i=0;i<ids.length;i+=step){
-        const wrapper = document.createElement('div');
-        wrapper.className = 'tile-row-wrapper';
-
-        const row = document.createElement('div');
-        row.className = 'tile-row';
-        if (landscape) row.classList.add('scrollable');
-
-        for (let j=i;j<i+step && j<ids.length;j++){
-          const id = ids[j];
-          const tile = document.createElement('div');
-          tile.className = 'tile';
-          tile.innerHTML = `<img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="thumb">`;
-          tile.onclick = ()=> openPlayer(id);
-          const img = tile.querySelector('img');
-          img.onerror = ()=> img.src = PLACEHOLDER;
-          row.appendChild(tile);
-        }
-
-        wrapper.appendChild(row);
-
-        if (landscape){
-          const indicator = document.createElement('div');
-          indicator.className = 'scroll-indicator';
-          const leftBtn = document.createElement('button'); leftBtn.type='button'; leftBtn.innerHTML='&#8249;';
-          const rightBtn = document.createElement('button'); rightBtn.type='button'; rightBtn.innerHTML='&#8250;';
-          // scroll by half the row width to move ~2 tiles (since 2 visible)
-          leftBtn.addEventListener('click', ()=> row.scrollBy({left: -Math.round(row.clientWidth/2), behavior:'smooth'}));
-          rightBtn.addEventListener('click', ()=> row.scrollBy({left: Math.round(row.clientWidth/2), behavior:'smooth'}));
-          indicator.appendChild(leftBtn); indicator.appendChild(rightBtn);
-          wrapper.appendChild(indicator);
-
-          const updateBtns = ()=> {
-            setTimeout(()=> {
-              const atLeft = row.scrollLeft <= 2;
-              const atRight = Math.ceil(row.scrollLeft + row.clientWidth) >= row.scrollWidth - 2;
-              leftBtn.disabled = atLeft;
-              rightBtn.disabled = atRight;
-            }, 20);
-          };
-          row.addEventListener('scroll', updateBtns, {passive:true});
-          setTimeout(updateBtns, 60);
-        }
-
-        container.appendChild(wrapper);
-      }
+      container.appendChild(wrapper);
     }
   });
-
-  // ensure header transform correct at render time (in case user is already scrolled)
-  applyHeaderTransform(window.pageYOffset || document.documentElement.scrollTop || 0);
+  applyHeaderTransform(window.pageYOffset||0);
 }
 
-/* ---------- player modal ---------- */
-const modal = document.getElementById('modal');
-const playerFrame = document.getElementById('playerFrame');
-const reportBtn = document.getElementById('reportBtn');
-
+const modal=document.getElementById('modal'),playerFrame=document.getElementById('playerFrame'),reportBtn=document.getElementById('reportBtn');
 function openPlayer(id){
-  playerFrame.src = `https://www.youtube.com/embed/${id}?rel=0&playsinline=1&autoplay=1`;
-  reportBtn.onclick = ()=> location.href = `mailto:parents@safaplay.example?subject=${encodeURIComponent('Report video')}&body=${encodeURIComponent('Video ID: '+id)}`;
-  modal.classList.add('open'); modal.setAttribute('aria-hidden','false');
+  if(typeof id==='string'){
+    playerFrame.src=`https://www.youtube.com/embed/${id}?rel=0&playsinline=1&autoplay=1`;
+  } else if(id.type==='local'){
+    playerFrame.src=id.file;
+  }
+  reportBtn.onclick=()=>location.href=`mailto:parents@safaplay.example?subject=${encodeURIComponent('Report video')}&body=${encodeURIComponent('Video ID:'+ (id.type==='local'?id.file:id))}`;
+  modal.classList.add('open');modal.setAttribute('aria-hidden','false')
 }
-function closePlayer(){ modal.classList.remove('open'); playerFrame.src=''; modal.setAttribute('aria-hidden','true'); }
-modal.addEventListener('click', e => { if(e.target === modal) closePlayer(); });
+function closePlayer(){modal.classList.remove('open');playerFrame.src='';modal.setAttribute('aria-hidden','true')}
+modal.addEventListener('click',e=>{if(e.target===modal)closePlayer()})
+function show(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));const el=document.getElementById(id);if(!el)return;el.classList.add('active');setTimeout(()=>window.scrollTo({top:0,behavior:'smooth'}),30);history.replaceState(null,'','#'+id)}
 
-/* ---------- sections & theme toggle ---------- */
-function show(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  const el = document.getElementById(id);
-  if(!el) return;
-  el.classList.add('active');
-  setTimeout(()=> window.scrollTo({top:0,behavior:'smooth'}), 30);
-  history.replaceState(null,'','#'+id);
-}
+const themeToggleBtn=document.getElementById('themeToggle');
+function updateThemeToggleIcon(){const current=document.documentElement.getAttribute('data-theme')||document.body.getAttribute('data-theme')||'light';themeToggleBtn.textContent=current==='dark'?'☀️':'🌙';themeToggleBtn.setAttribute('aria-label',current==='dark'?'Switch to light theme':'Switch to dark theme')}
+themeToggleBtn.addEventListener('click',()=>{const html=document.documentElement,current=html.getAttribute('data-theme')||document.body.getAttribute('data-theme')||'light',next=current==='dark'?'light':'dark';html.setAttribute('data-theme',next);localStorage.setItem('safaplay_theme',next);updateThemeToggleIcon()})
 
-/* ---- theme toggle icon handling (keeps previous change) ---- */
-const themeToggleBtn = document.getElementById('themeToggle');
-
-function updateThemeToggleIcon(){
-  const html = document.documentElement;
-  const bodyTheme = document.body.getAttribute('data-theme');
-  const htmlTheme = html.getAttribute('data-theme');
-  const current = htmlTheme || bodyTheme || 'light';
-  // show sun when dark mode active, moon when light mode active
-  themeToggleBtn.textContent = current === 'dark' ? '☀️' : '🌙';
-  themeToggleBtn.setAttribute('aria-label', current === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
-}
-
-themeToggleBtn.addEventListener('click', ()=>{
-  const html = document.documentElement;
-  const current = html.getAttribute('data-theme') || document.body.getAttribute('data-theme') || 'light';
-  const next = current === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', next);
-  localStorage.setItem('safaplay_theme', next);
-  updateThemeToggleIcon();
-});
-
-/* ---------- init & listeners ---------- */
-function init(){
-  const saved = localStorage.getItem('safaplay_theme');
-  if(saved) document.documentElement.setAttribute('data-theme', saved);
-
-  renderAll();
-
-  // ensure the theme toggle icon matches the active theme on load
-  updateThemeToggleIcon();
-
-  // debounce resize/orientation changes
-  let rt = null;
-  window.addEventListener('resize', ()=> { clearTimeout(rt); rt = setTimeout(()=> renderAll(), 120); });
-  window.addEventListener('orientationchange', ()=> { setTimeout(()=> renderAll(), 160); });
-
-  // also ensure mode classes update on scroll end (small safeguard)
-  let st = null;
-  window.addEventListener('scroll', ()=> { clearTimeout(st); st = setTimeout(()=> applyHeaderTransform(window.pageYOffset || document.documentElement.scrollTop || 0), 50); }, {passive:true});
-}
-window.addEventListener('load', init);
+function init(){const saved=localStorage.getItem('safaplay_theme');if(saved)document.documentElement.setAttribute('data-theme',saved);renderAll();updateThemeToggleIcon();let rt=null;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>renderAll(),120)});window.addEventListener('orientationchange',()=>setTimeout(()=>renderAll(),160));let st=null;window.addEventListener('scroll',()=>{clearTimeout(st);st=setTimeout(()=>applyHeaderTransform(window.pageYOffset||0),50)},{passive:true})}
+window.addEventListener('load',init);
 </script>
+
 </body>
 </html>
