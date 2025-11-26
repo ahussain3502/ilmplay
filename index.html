@@ -31,18 +31,34 @@
 body{font-family:"Baloo 2","Roboto",cursive;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 
 /* Header */
-header{display:flex;align-items:center;justify-content:space-between;padding:22px 36px;background:var(--card);box-shadow:0 8px 24px rgba(0,0,0,.08);gap:12px;position:relative;z-index:50}
-.left{display:flex;align-items:center;gap:18px}.logo img{height:220px;transition:.25s}.brand{font-weight:900;font-size:56px;color:var(--accent)}
+header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:22px 36px;
+  background:var(--card);
+  box-shadow:0 8px 24px rgba(0,0,0,.08);
+  gap:12px;
+  position:relative;
+  z-index:50;
+  width:100%;
+}
+.left{display:flex;align-items:center;gap:18px}
+.logo img{height:220px;transition:.25s}
+.brand{font-weight:900;font-size:56px;color:var(--accent)}
 .nav{display:flex;gap:10px;align-items:center;flex-wrap:nowrap}
 .nav a{background:var(--orange);color:#fff;padding:10px 18px;border-radius:12px;font-weight:800;text-decoration:none;min-width:110px;text-align:center;cursor:pointer;box-shadow:0 6px 14px rgba(0,0,0,.06)}
 #themeToggle{background:var(--accent2);color:#fff;border:0;padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:900;font-size:16px;box-shadow:0 6px 14px rgba(0,0,0,.06)}
 
 /* Hero */
 .hero{margin:16px auto;padding:16px 20px;border-radius:14px;max-width:1100px;text-align:center;background:var(--card);box-shadow:0 6px 18px rgba(0,0,0,.06)}
-.hero h1{font-size:28px;color:var(--accent);font-weight:900}.hero p{color:var(--muted);font-size:14px}
+.hero h1{font-size:28px;color:var(--accent);font-weight:900}
+.hero p{color:var(--muted);font-size:14px}
 
 /* Layout */
-main{padding:8px 14px;max-width:1280px;margin:0 auto}.page{display:none}.page.active{display:block}
+main{padding:8px 14px;max-width:1280px;margin:0 auto}
+.page{display:none}
+.page.active{display:block}
 .sectionTitle{background:var(--orange);color:#fff;padding:8px 12px;border-radius:10px;font-weight:800;display:inline-block;margin-bottom:6px}
 
 /* Row wrapper */
@@ -76,31 +92,27 @@ main{padding:8px 14px;max-width:1280px;margin:0 auto}.page{display:none}.page.ac
 
 /* Mobile Vertical Mode */
 @media(max-width:480px){
-  header{flex-direction:column;align-items:center;gap:12px}
+  header{flex-direction:column;align-items:center;gap:12px;width:100%}
   .left{flex-direction:column;align-items:center}
-  .logo img{height:250px} /* slightly larger logo */
-  .brand{font-size:44px}  /* slightly larger title */
+  .logo img{height:250px}
+  .brand{font-size:44px}
   .nav {
-  display: grid;
-  grid-template-columns: repeat(2, max-content); /* columns fit buttons exactly */
-  gap: 8px;                                      /* horizontal spacing between buttons */
-  justify-content: center;                        /* center the grid inside nav */
-  width: 100%;
-  padding: 0 12px;
-}
-
-  .nav a{font-size:15px;padding:11px 20px} /* slightly larger buttons */
-  #themeToggle{order:1;grid-column:1/-1;justify-self:center;font-size:15px;padding:11px 20px}
-
-  .hero{
-    margin-top:12px;       /* slightly less vertical gap below header */
-    max-width:92%;         /* NEW: make hero slightly less wide */
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    gap: 8px;
+    justify-content: center;
+    width: 100%;
+    padding: 0 12px;
   }
-
+  .nav a{font-size:15px;padding:11px 20px}
+  #themeToggle{order:1;grid-column:1/-1;justify-self:center;font-size:15px;padding:11px 20px}
+  .hero{
+    margin-top:12px;
+    max-width:92%;
+  }
   .row{flex-direction:column;gap:12px;overflow-x:unset;border-bottom:4px solid var(--orange)}
   .tile{flex:1 0 100%}
   .rowWrapper{margin-bottom:14px}
-
   .modal-info{
     position:relative;
     flex-direction:column;
@@ -114,7 +126,6 @@ main{padding:8px 14px;max-width:1280px;margin:0 auto}.page{display:none}.page.ac
     overscroll-behavior: none;
     touch-action: pan-y;
   }
-
   .modal-info::-webkit-scrollbar{width:6px}
   .modal-info::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:999px}
   .modal-info > div{padding-right:6px;display:flex;flex-direction:column;gap:4px}
@@ -125,35 +136,348 @@ main{padding:8px 14px;max-width:1280px;margin:0 auto}.page{display:none}.page.ac
 
 /* Mobile Landscape Mode */
 @media(max-width:820px) and (min-width:481px){
-  body{overflow-x:hidden}
+  body{overflow-x:hidden; margin:0; padding:0}
+  
   header {
     position: relative;
     top: auto;
-    left: auto;
-    right: auto;
-    z-index: 600;
+    left: 0;
+    right: 0;
+    width: 100vw; /* full width */
     background: var(--card);
+    padding: 16px 12px; /* reduced padding to prevent cutoff */
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    z-index: 600;
   }
   .left{flex:0 0 auto;gap:12px;align-items:center}
-  .logo img{height:190px} /* slightly larger logo */
-  .brand{font-size:26px}  /* slightly larger title */
-  .nav{display:flex;flex:1 1 auto;justify-content:center;gap:8px;margin-left:4px;margin-right:4px}
-  .nav a{flex:0 0 auto;padding:8px 12px;font-size:14px;min-width:88px} /* slightly larger buttons */
+  .logo img{height:190px}
+  .brand{font-size:26px}
+  .nav {
+    display:flex;
+    flex:1 1 auto;
+    justify-content:flex-end;
+    gap:8px;
+    margin:0;
+    padding:0;
+  }
+  .nav a{flex:0 0 auto;padding:8px 12px;font-size:14px;min-width:88px}
   #themeToggle{order:3;margin-left:auto;flex:0 0 auto;padding:8px 12px;font-size:14px}
   .hero {
-    margin-top:10px; /* slightly reduced spacing */
-    max-width:94%;   /* NEW: slightly less horizontal width */
+    margin-top:10px;
+    max-width:100vw;
+    padding:0 12px;
   }
   main{padding-top:0;max-width:100vw;margin:0}
   .row{gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;flex-wrap:nowrap;padding-left:12px;padding-right:12px}
   .tile{flex:0 0 calc((100% - 24px)/2.2);scroll-snap-align:start;min-width:0}
 }
+header {
+  position: relative; /* ensures absolute children are positioned relative to header */
+}
+
+/* Common support box styling */
+.support-hero {
+  border-radius: 12px;
+  background: #e3edf6; /* darker than header */
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  text-align: center;
+  cursor: pointer;
+  transition: transform .15s;
+}
+.support-hero:hover { transform: scale(1.02); }
+
+/* Desktop & mobile landscape */
+.support-hero-desktop { display: none; }
+/* Desktop & Mobile Landscape Support Box */
+@media(min-width: 821px), (max-width: 820px) and (min-width: 481px) {
+  .support-hero-desktop { 
+    display: block;
+    position: absolute;
+    top: 21px;
+    right: 7px;
+
+    width: 180px;          /* smaller horizontally */
+    padding: 6px 8px;      /* reduced left/right padding ONLY */
+    
+    background: var(--card); 
+    border: none;          /* NO OUTLINE */
+    border-radius: 12px;
+
+    text-align: center;
+    cursor: pointer;
+    box-shadow: none;
+    transition: transform .15s;
+  }
+
+  .support-hero-desktop:hover { 
+    transform: scale(1.02);
+  }
+
+  .support-hero-desktop h2 {
+    font-size: 19px;
+    font-weight: 950;
+    color: rgba(0,0,0,0.9);
+    margin-bottom: 2px;     /* tight spacing */
+    line-height: 1.1;
+  }
+
+  .support-hero-desktop p {
+    font-size: 14px;
+    color: rgba(0,0,0,0.55);
+    margin: 0;              /* tighter vertically */
+    line-height: 1.1;
+  }
+
+  .support-hero-mobile { display: none; }
+}
+/* Mobile Vertical Support Box – Smaller Version */
+@media(max-width:480px) {
+  .support-hero-mobile {
+    display: block;
+    position: static;
+
+    width: 55%;           /* tighter horizontally */
+    max-width: 260px;     /* smaller max width */
+    margin: 10px auto;    /* slightly smaller vertical spacing */
+    padding: 6px 10px;    /* reduce vertical and horizontal padding */
+    background: var(--card); /* same as hero box */
+    border-radius: 12px;      /* slightly smaller radius */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05); /* slightly lighter shadow */
+    text-align: center;
+    font-family: "Roboto","Baloo 2",sans-serif;
+  }
+
+  /* Title: smaller */
+  .support-hero-mobile h2 {
+    font-size: 22px;               /* smaller than hero h1 */
+    font-weight: 900;
+    color: var(--accent) !important;  /* same as hero title, works in dark mode */
+    margin-bottom: 3px;
+    line-height: 1.2;
+  }
+
+  /* Subtitle: smaller */
+  .support-hero-mobile p {
+    font-size: 12px;               /* smaller subtitle */
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  /* Finger emoji: slightly smaller than before but still prominent */
+  .support-hero-mobile .big-pointer {
+    font-size: 2.5em;
+    display: inline-block;
+    vertical-align: middle;
+    transform: translateY(-1px);
+  }
+}
+
+/* Dark mode overrides */
+[data-theme="dark"] .support-hero-mobile h2 {
+  color: var(--accent) !important;
+}
+
+[data-theme="dark"] .support-hero-mobile p {
+  color: var(--muted);
+}
+
+
+[data-theme="dark"] .support-hero-mobile h2,
+[data-theme="dark"] .support-hero-mobile p {
+  color: var(--text);
+}
+
+/* Dark mode (matches Welcome To IlmPlay behaviour) */
+[data-theme="dark"] .support-hero-mobile {
+  background: var(--card); /* hero also uses var(--card) in dark mode */
+  box-shadow: 0 6px 18px rgba(255,255,255,0.06);
+}
+
+[data-theme="dark"] .support-hero-mobile h2,
+[data-theme="dark"] .support-hero-mobile p {
+  color: var(--text);
+}
+
+/* Dark mode overrides */
+[data-theme=dark] .support-hero-desktop h2,
+[data-theme=dark] .support-hero-desktop p {
+  color: var(--text);
+}
+
+/* Default mobile emoji */
+.big-pointer {
+  font-size: 1em;
+}
+
+/* Larger emoji for landscape + desktop */
+@media(min-width: 821px), (max-width: 820px) and (min-width: 481px) {
+  .big-pointer {
+    font-size: 1.9em;
+    display: inline-block;
+    vertical-align: middle;
+    transform: translateY(-1px);
+  }
+}
+/* Mobile vertical: Make Welcome subtitle match Support Us subtitle */
+/* Mobile vertical dark mode */
+@media(max-width:480px) {
+  [data-theme="dark"] .hero p {
+    color: #ffffff !important;               /* white in dark mode */
+    font-family: "Roboto","Baloo 2",sans-serif !important;
+    font-weight: 400 !important;             /* match Support Us subtitle weight */
+    font-size: 12px !important;              /* match mobile vertical size */
+    line-height: 1.3 !important;             /* same line height as Support Us subtitle */
+    margin: 0 !important;                    /* spacing */
+  }
+}
+          /* match spacing */
+  
+
+/* Donation modal overlay */
+.donation-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s;
+  z-index: 1000;
+}
+
+/* Show modal */
+.donation-modal.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Donation box */
+.donation-box {
+  background: var(--card);
+  color: var(--text);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  width: 90%;
+  max-width: 380px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  font-family: "Roboto","Baloo 2",sans-serif;
+}
+
+/* Donation title */
+.donation-box h2 {
+  font-size: 22px;
+  font-weight: 900;
+  margin-bottom: 8px;
+  color: var(--accent);
+}
+
+/* Donation subtitle */
+.donation-box p {
+  font-size: 14px;
+  margin-bottom: 20px;
+  color: var(--muted);
+}
+
+/* Donation options buttons */
+.donation-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.donation-options button {
+  flex: 1 1 40%;
+  padding: 12px 0;
+  font-weight: 700;
+  font-size: 16px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  background: var(--orange);
+  color: #fff;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.donation-options button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+}
+
+/* Cancel button */
+.close-donation {
+  background: var(--accent2);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.close-donation:hover {
+  transform: scale(1.05);
+}
+
+/* Default state */
+#donationModal .donation-box {
+  border: 6px solid transparent;
+  border-radius: 20px;
+  transition: border-color 0.25s ease;
+}
+
+/* When modal opens */
+#donationModal.open .donation-box {
+  border-color: #2a9d8f; /* Light mode color */
+}
+
+/* Dark mode override */
+body[data-theme="dark"] #donationModal.open .donation-box {
+  border-color: #ffd93d; /* Dark mode color */
+}
+
+/* Mobile vertical: unify hero and support subtitles for light and dark mode */
+@media(max-width:480px) {
+  /* Force same font and size for all subtitles */
+  .hero p,
+  .support-hero-mobile p {
+    font-family: "Roboto", "Baloo 2", sans-serif !important; /* same font */
+    font-size: 12px !important;      /* same as dark mode */
+    line-height: 1.3 !important;     /* same as dark mode */
+    font-weight: 400 !important;     /* same weight */
+    margin: 0 !important;            /* remove any extra spacing */
+    color: var(--muted) !important;  /* keep light/dark text color correct */
+  }
+
+  /* If you want the pointer emoji spacing consistent too */
+  .support-hero-mobile .big-pointer {
+    font-size: 2.5em;
+    vertical-align: middle;
+    transform: translateY(-1px);
+  }
+}
+
 </style>
 </head>
 <body data-theme="light">
 
 <header>
-  <div class="left"><div class="logo"><img src="Untitled design(5).png" alt="IlmPlay logo"></div><div class="brand">IlmPlay</div></div>
+  <div class="left">
+    <div class="logo"><img src="Untitled design(5).png" alt="IlmPlay logo"></div>
+    <div class="brand">IlmPlay</div>
+  </div>
+
   <nav class="nav">
     <a data-section="Stories">Stories</a>
     <a data-section="Nasheeds">Nasheeds</a>
@@ -161,9 +485,118 @@ main{padding:8px 14px;max-width:1280px;margin:0 auto}.page{display:none}.page.ac
     <a data-section="Cartoons">Cartoons</a>
     <button id="themeToggle">🌙</button>
   </nav>
+
+<!-- Desktop & landscape only -->
+<div class="support-hero support-hero-desktop" id="supportBoxDesktop">
+  <h2>Support Us ❤️</h2>
+  <p>Press Here <span class="big-pointer">👆</span> To Donate</p>
+</div>
+
 </header>
 
-<div class="hero"><h1>Welcome To IlmPlay</h1><p>Choose a section and watch safe Islamic videos — designed for kids</p></div>
+<div class="hero">
+  <h1>Welcome To IlmPlay</h1>
+  <p>Choose a section and watch safe Islamic videos — designed for kids</p>
+</div>
+
+<!-- Mobile vertical only -->
+<div class="support-hero support-hero-mobile" id="supportBox">
+  <h2>❤️ Support Us</h2>
+  <p>Press Here <span class="big-pointer">👆</span> To Donate</p>
+</div>
+<!-- Donation Modal (updated with custom input) -->
+<div id="donationModal" class="donation-modal" aria-hidden="true">
+  <div class="donation-box">
+    <h2>Support Us ❤️</h2>
+    <p>Choose a donation amount:</p>
+    <div class="donation-options">
+      <button data-amount="1">£1</button>
+      <button data-amount="5">£5</button>
+      <button data-amount="10">£10</button>
+      <button data-amount="custom">Custom</button>
+    </div>
+    
+   
+  <button class="close-donation" style="margin-top:10px;">Cancel</button>
+  </div>
+</div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+  const donationModal = document.getElementById('donationModal');
+  const supportBoxes = [document.getElementById('supportBox'), document.getElementById('supportBoxDesktop')];
+  const closeDonation = donationModal.querySelector('.close-donation');
+  const donationButtons = donationModal.querySelectorAll('.donation-options button');
+  const customInput = document.getElementById('customAmountInput');
+  const donateBtn = document.getElementById('donateBtn');
+
+  let selectedAmount = null;
+
+  // Open modal when any support box is clicked
+  supportBoxes.forEach(box => {
+    if(box) box.addEventListener('click', () => donationModal.classList.add('open'));
+  });
+
+  // Close modal
+  closeDonation.addEventListener('click', () => {
+    donationModal.classList.remove('open');
+    customInput.style.display = 'none';
+    customInput.value = '';
+    selectedAmount = null;
+  });
+
+  // Donation option buttons
+  donationButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const amt = btn.getAttribute('data-amount');
+      if(amt === 'custom'){
+        customInput.style.display = 'block';
+        customInput.focus();
+        selectedAmount = null;
+      } else {
+        customInput.style.display = 'none';
+        customInput.value = '';
+        selectedAmount = parseFloat(amt);
+      }
+    });
+  });
+
+  // Stripe Checkout
+  const stripe = Stripe('YOUR_STRIPE_PUBLISHABLE_KEY'); // replace with your Stripe publishable key
+
+  donateBtn.addEventListener('click', async () => {
+    let amount = selectedAmount;
+
+    if(customInput.style.display === 'block'){
+      const val = parseFloat(customInput.value);
+      if(isNaN(val) || val <= 0){
+        alert('Please enter a valid donation amount.');
+        return;
+      }
+      amount = val;
+    }
+
+    if(!amount) return alert('Please select a donation amount.');
+
+    try {
+      // Call your server to create a Checkout Session
+      const res = await fetch('/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: amount * 100 }) // Stripe expects amount in pence/cents
+      });
+      const session = await res.json();
+
+      // Redirect to Stripe Checkout
+      const result = await stripe.redirectToCheckout({ sessionId: session.id });
+      if(result.error) alert(result.error.message);
+    } catch(err){
+      console.error(err);
+      alert('Failed to process donation. Please try again.');
+    }
+  });
+</script>
+
 
 <main>
   <section id="Stories" class="page active"><div class="sectionTitle">Stories</div><div id="rows-Stories"></div></section>
@@ -185,43 +618,44 @@ main{padding:8px 14px;max-width:1280px;margin:0 auto}.page{display:none}.page.ac
   </div>
 </div>
 
-<div class="footer">© IlmPlay — Safe Islamic Videos for Kids</div>
+
+<div class="footer">© IlmPlay — Safe Islamic Videos for Kids</div> 
 
 <script>
 const BASE='https://pub-34add490d32a4fbc9886affb7dc6b47d.r2.dev';
 const PLACEHOLDER='data:image/svg+xml;base64,'+btoa("<svg xmlns='http://www.w3.org/2000/svg' width='640' height='360'><rect width='100%' height='100%' fill='#f3f3f3'/><text x='50%' y='50%' text-anchor='middle' fill='#999' font-size='18'>No image</text></svg>");
-const STORIES = [{ file: `${BASE}/ilmplay_videos/story1.mp4`,  thumb: `${BASE}/ilmplay_videospic/story1.jpg`,  title: "People of the Cave - Surah Kahf Story | Islamic Stories | Stories from the Quran | Islamic Cartoon", desc: "The story of the young believers who sought refuge in a cave and were miraculously protected by Allah for many years, teaching faith, patience, and trust in Allah." },
-  { file: `${BASE}/ilmplay_videos/story2.mp4`,  thumb: `${BASE}/ilmplay_videospic/story2.jpg`,  title: "The Story of Prophet Yunus (as) With Zaky - Muslim Cartoon", desc: "Prophet Yunus (AS) learns repentance after being swallowed by a great fish — a gentle lesson in saying sorry, turning to Allah, and trusting His plan." },
-    { file: `${BASE}/ilmplay_videos/ilmplay_videos_ilmplay_videos_story3.mp4`, thumb: `${BASE}/ilmplay_videospic/story3.jpg`, title: "The Story of Prophet Adam (as) with Zaky - The First Man | HD", desc: "The creation and early life of Prophet Adam (AS), teaching obedience, the meaning of repentance, and how Allah guides those who turn to Him." },
-  { file: `${BASE}/ilmplay_videos/ilmplay_videos_ilmplay_videos_story4.mp4`, thumb: `${BASE}/ilmplay_videospic/story4.jpg`, title: "The Story of Prophet Ibrahim (as) FULL MOVIE", desc: "The remarkable life of Prophet Ibrahim (AS): his trials, sacrifices, and steadfast belief that teach us devotion and trust in Allah." },
-  { file: `${BASE}/ilmplay_videos/ilmplay_videos_ilmplay_videos_story5.mp4`, thumb: `${BASE}/ilmplay_videospic/story5.jpg`, title: "Prophet Stories MUSA / MOSES (AS) Part 1 | Islamic Cartoon | Quran Stories | Islamic Videos - Ep 15", desc: "The early story of Prophet Musa (AS) — his brave upbringing and how Allah used him to free his people and teach justice and faith." },
-  { file: `${BASE}/ilmplay_videos/ilmplay_videos_ilmplay_videos_story6.mp4`, thumb: `${BASE}/ilmplay_videospic/story6.jpg`, title: "The Story of Prophet Nuh (Noah) with Zaky | HD", desc: "Prophet Nuh (AS) warns his people and builds the ark as commanded by Allah — a moving tale of patience, obedience, and hope." },
-  { file: `${BASE}/ilmplay_videos/ilmplay_videos_ilmplay_videos_story7.mp4`, thumb: `${BASE}/ilmplay_videospic/story7.jpeg`, title: "The People of the Garden | Islamic Stories | Stories from the Quran | Islamic Cartoon", desc: "A story about the blessings of a garden and the lesson of gratitude to Allah." },
+const STORIES = [{ file: `${BASE}/ilmplay_videos/story1_safari.mp4`,  thumb: `${BASE}/ilmplay_videospic/story1a.webp`,  title: "People of the Cave - Surah Kahf Story | Islamic Stories | Stories from the Quran | Islamic Cartoon", desc: "The story of the young believers who sought refuge in a cave and were miraculously protected by Allah for many years, teaching faith, patience, and trust in Allah." },
+  { file: `${BASE}/story2_safari.mp4`,  thumb: `${BASE}/ilmplay_videospic/story2.jpg`,  title: "The Story of Prophet Yunus (as) With Zaky - Muslim Cartoon", desc: "Prophet Yunus (AS) learns repentance after being swallowed by a great fish — a gentle lesson in saying sorry, turning to Allah, and trusting His plan." },
+    { file: `${BASE}/ilmplay_videos/story3_safari.mp4`, thumb: `${BASE}/ilmplay_videospic/story3.webp`, title: "The Story of Prophet Adam (as) with Zaky - The First Man | HD", desc: "The creation and early life of Prophet Adam (AS), teaching obedience, the meaning of repentance, and how Allah guides those who turn to Him." },
+  { file: `${BASE}/ilmplay_videos/story4_safari.mp4`, thumb: `${BASE}/ilmplay_videospic/story4.jpg`, title: "The Story of Prophet Ibrahim (as) FULL MOVIE", desc: "The remarkable life of Prophet Ibrahim (AS): his trials, sacrifices, and steadfast belief that teach us devotion and trust in Allah." },
+  { file: `${BASE}/ilmplay_videos/story5_safari.mp4`, thumb: `${BASE}/ilmplay_videospic/story5.jpg`, title: "Prophet Stories MUSA / MOSES (AS) Part 1 | Islamic Cartoon | Quran Stories | Islamic Videos - Ep 15", desc: "The early story of Prophet Musa (AS) — his brave upbringing and how Allah used him to free his people and teach justice and faith." },
+  { file: `${BASE}/ilmplay_videos/story6_safari_fast.mp4`, thumb: `${BASE}/ilmplay_videospic/story6.jpg`, title: "The Story of Prophet Nuh (Noah) with Zaky | HD", desc: "Prophet Nuh (AS) warns his people and builds the ark as commanded by Allah — a moving tale of patience, obedience, and hope." },
+  { file: `${BASE}/ilmplay_videos/story7_safari_fast.mp4`, thumb: `${BASE}/ilmplay_videospic/story7.jpeg`, title: "The People of the Garden | Islamic Stories | Stories from the Quran | Islamic Cartoon", desc: "A story about the blessings of a garden and the lesson of gratitude to Allah." },
   { file: `${BASE}/newstory2.mp4`, thumb: `${BASE}/ilmplay_videospic/newstory2.webp`, title: "The Luckiest Man or Not? The Story of Qaroon | Islamic stories for Kids", desc: "The story of Qaroon shows how arrogance and greed can lead to downfall, teaching the value of humility and gratefulness." },
-  { file: `${BASE}/ilmplay_videos/ilmplay_videos_ilmplay_videos_story9.mp4`, thumb: `${BASE}/ilmplay_videospic/story9.jpeg`, title: "Prophet Yusuf AS Story - Stories of the Prophets for Kids in English - Part 1", desc: "The story of Prophet Yusuf (AS), showing patience through hardship, the power of forgiveness, and faith in Allah's plan." },
-  { file: `${BASE}/ilmplay_videos/story10.mp4`, thumb: `${BASE}/ilmplay_videospic/story10.jpeg`, title: "The Story Of Prophet Yusuf (A.S) | English Islam Stories For Kids", desc: "The life of Prophet Yusuf (AS) teaches patience, forgiveness, and trusting Allah through hardships." },
-  { file: `${BASE}/ilmplay_videos/story11.mp4`, thumb: `${BASE}/ilmplay_videospic/story11.jpeg`, title: "Prophet Stories DANIEL (AS) | Islamic Cartoon | Quran Stories | Islamic Children Kids Videos - Ep 26", desc: "The story of Prophet Daniel (AS), showing steadfast faith and trust in Allah during trials." },
+  { file: `${BASE}/ilmplay_videos/story9_safari_fast.mp4`, thumb: `${BASE}/ilmplay_videospic/story9.jpeg`, title: "Prophet Yusuf AS Story - Stories of the Prophets for Kids in English - Part 1", desc: "The story of Prophet Yusuf (AS), showing patience through hardship, the power of forgiveness, and faith in Allah's plan." },
+  { file: `${BASE}/ilmplay_videos/story10_safari_fast.mp4`, thumb: `${BASE}/ilmplay_videospic/story10.jpeg`, title: "The Story Of Prophet Yusuf (A.S) | English Islam Stories For Kids", desc: "The life of Prophet Yusuf (AS) teaches patience, forgiveness, and trusting Allah through hardships." },
+  { file: `${BASE}/ilmplay_videos/story11_safari.mp4`, thumb: `${BASE}/ilmplay_videospic/story11.jpeg`, title: "Prophet Stories DANIEL (AS) | Islamic Cartoon | Quran Stories | Islamic Children Kids Videos - Ep 26", desc: "The story of Prophet Daniel (AS), showing steadfast faith and trust in Allah during trials." },
   { file: `${BASE}/newstory5.mp4`, thumb: `${BASE}/ilmplay_videospic/newstory5.webp`, title: "Prophet Stories In English | Prophet Shammil (AS) Story | Samuel (AS) | Stories Of The Prophets", desc: "The story of Prophet Shammil (AS) (Samuel) teaching courage, leadership, and reliance on Allah." },
-  { file: `${BASE}/ilmplay_videos/ilmplay_videos_ilmplay_videos_story13.mp4`, thumb: `${BASE}/ilmplay_videospic/story13.jpeg`, title: "The Story Of Prophet Nuh (A.S) | English Islam Stories For Kids", desc: "Prophet Nuh (AS) calls his people to faith and builds the ark, teaching obedience and perseverance." },
+  { file: `${BASE}/ilmplay_videos/story13_safari.mp4`, thumb: `${BASE}/ilmplay_videospic/story13.jpeg`, title: "The Story Of Prophet Nuh (A.S) | English Islam Stories For Kids", desc: "Prophet Nuh (AS) calls his people to faith and builds the ark, teaching obedience and perseverance." },
   { file: `${BASE}/newstory1.mp4`, thumb: `${BASE}/ilmplay_videospic/newstory1.webp`, title: "Prophet Stories In English | Prophet Uzair (AS) Story | Stories Of The Prophets | Quran Stories", desc: "Prophet Uzair (AS) story teaching reflection, guidance, and reliance on Allah." },
   { file: `${BASE}/newstory3.mp4`, thumb: `${BASE}/ilmplay_videospic/newstory3.webp`, title: "The Giant VS Small Boy", desc: "A story teaching courage and wisdom, showing that strength is not everything." },
-  { file: `${BASE}/ilmplay_videos/ilmplay_videos_ilmplay_videos_story16(1).mp4`, thumb: `${BASE}/ilmplay_videospic/story16.jpeg`, title: "Prophet Stories DAWUD / DAVID (AS) | Iqra Cartoon | Quran Stories | Islamic Kids Videos - Ep 19", desc: "Prophet Dawud (AS) shows justice, devotion, and reliance on Allah through his leadership and worship." },
-  { file: `${BASE}/story17.mp4`, thumb: `${BASE}/ilmplay_videospic/story17.jpeg`, title: "Prophet Stories Adam (AS) | Islamic Cartoon | Quran Stories | Prophet story - Ep 01", desc: "The life of Prophet Adam (AS) explained for kids — how he was created, taught by Allah, and the importance of saying sorry and doing good." },
-  { file: `${BASE}/ilmplay_videos/story18.mp4`, thumb: `${BASE}/ilmplay_videospic/story18.jpeg`, title: "Prophet Stories ISA / JESUS (AS) | Islamic Cartoon | Quran Stories | Islamic Children Videos - Ep 31", desc: "The story of Prophet Isa (AS) and his kind miracles, teaching compassion, patience, and trust in Allah's wisdom." },
-  { file: `${BASE}/ilmplay_videos/story19.mp4`, thumb: `${BASE}/ilmplay_videospic/story19.jpeg`, title: "Prophet Stories HUD (AS) | Islamic Cartoon | Quran Stories | Islamic Children Kids Videos - Ep 04", desc: "Prophet Hud (AS) called his people to do what is right — a story about honesty, following Allah, and learning from our mistakes." },
+  { file: `${BASE}/ilmplay_videos/story16_safari.mp4`, thumb: `${BASE}/ilmplay_videospic/story16.webp`, title: "Prophet Stories DAWUD / DAVID (AS) | Iqra Cartoon | Quran Stories | Islamic Kids Videos - Ep 19", desc: "Prophet Dawud (AS) shows justice, devotion, and reliance on Allah through his leadership and worship." },
+  { file: `${BASE}/story17_safari.mp4`, thumb: `${BASE}/ilmplay_videospic/story17.jpeg`, title: "Prophet Stories Adam (AS) | Islamic Cartoon | Quran Stories | Prophet story - Ep 01", desc: "The life of Prophet Adam (AS) explained for kids — how he was created, taught by Allah, and the importance of saying sorry and doing good." },
+  { file: `${BASE}/story18_safari.mp4`, thumb: `${BASE}/ilmplay_videospic/story18.jpeg`, title: "Prophet Stories ISA / JESUS (AS) | Islamic Cartoon | Quran Stories | Islamic Children Videos - Ep 31", desc: "The story of Prophet Isa (AS) and his kind miracles, teaching compassion, patience, and trust in Allah's wisdom." },
+  { file: `${BASE}/ilmplay_videos/story19_safari.mp4`, thumb: `${BASE}/ilmplay_videospic/story19.jpeg`, title: "Prophet Stories HUD (AS) | Islamic Cartoon | Quran Stories | Islamic Children Kids Videos - Ep 04", desc: "Prophet Hud (AS) called his people to do what is right — a story about honesty, following Allah, and learning from our mistakes." },
   { file: `${BASE}/ilmplay_videos/story20.mp4`, thumb: `${BASE}/ilmplay_videospic/story20.jpeg`, title: "Prophet Stories ISMAIL (AS) | Islamic Cartoon | Quran Stories | Islamic Children Kids Videos - Ep 08", desc: "The story of Prophet Ismail (AS) teaches obedience and trust in Allah through family devotion and brave choices." },
-  { file: `${BASE}/ilmplay_videos/story21.mp4`, thumb: `${BASE}/ilmplay_videospic/story21.jpeg`, title: "The Boy and the Evil King | Islamic Stories | Stories from the Quran: Surah Buruj | Islamic Cartoon", desc: "A brave boy stands up to a cruel king — a tale of courage, faith, and holding to what is right even when it's hard." },
-  { file: `${BASE}/ilmplay_videos/story22.mp4`, thumb: `${BASE}/ilmplay_videospic/story22.jpeg`, title: "The Story of the Fisherman by ZAKY - ISLAMIC KIDS CARTOONS", desc: "A fisherman learns important lessons about honesty, patience, and trusting Allah when things seem difficult." },
-  { file: `${BASE}/ilmplay_videos/story23.mp4`, thumb: `${BASE}/ilmplay_videospic/story23.jpeg`, title: "Prophet Stories In English | Story of Prophet Ayub (AS) | Stories Of The Prophets | Quran Stories", desc: "Prophet Ayub (AS) teaches patience and faith during hardship, showing how trust in Allah brings hope and healing." },
-  { file: `${BASE}/ilmplay_videos/story24.mp4`, thumb: `${BASE}/ilmplay_videospic/story24.jpeg`, title: "Prophet Stories In English | Prophet Yusuf (AS) & The King's Dream | Part3 | Stories Of The Prophets", desc: "Prophet Yusuf (AS) interprets the king's dream — a story of wisdom, forgiveness, and believing in Allah's plan." },
-  { file: `${BASE}/ilmplay_videos/story25.mp4`, thumb: `${BASE}/ilmplay_videospic/story25.jpeg`, title: "Prophet Stories In English | Prophet Ibrahim (AS) Part 1 | Stories Of The Prophets", desc: "The early life of Prophet Ibrahim (AS): his search for truth, devotion to Allah, and brave faith that changed hearts." },
-  { file: `${BASE}/ilmplay_videos/story26.mp4`, thumb: `${BASE}/ilmplay_videospic/story26.jpeg`, title: "The Third Brother | Hadith Story", desc: "A short Hadith story teaching kindness, honesty, and how small good actions make us better people every day." },
-  { file: `${BASE}/ilmplay_videos/story27.mp4`, thumb: `${BASE}/ilmplay_videospic/story27.jpeg`, title: "Prophet Stories In English | Prophet Nuh (AS) | Stories Of The Prophets | Quran Stories", desc: "Prophet Nuh (AS) shows perseverance while calling his people to Allah — a story about faith, patience, and doing what's right." },
-  { file: `${BASE}/ilmplay_videos/ilmplay_videos_ilmplay_videos_story28.mp4`, thumb: `${BASE}/ilmplay_videospic/story28.jpeg`, title: "Prophet Stories SALIH (AS) | Islamic Cartoon | Quran Stories | Islamic Children Kids Videos - Ep 05", desc: "Prophet Salih (AS) calls his people to be fair and worship Allah — a lesson in listening to wise guidance and choosing kindness." },
-  { file: `${BASE}/ilmplay_videos/ilmplay_videos_ilmplay_videos_story29.mp4`, thumb: `${BASE}/ilmplay_videospic/story29.jpeg`, title: "Prophet Stories ELYAS / ELIJAH (AS) | Islamic Cartoon | Quran Stories | Islamic Kids Videos - Ep 21", desc: "Prophet Elyas (AS) reminds his people to keep faith and seek Allah's mercy — a tale about courage and returning to the right path." },
-  { file: `${BASE}/ilmplay_videos/ilmplay_videos_ilmplay_videos_story30.mp4`, thumb: `${BASE}/ilmplay_videospic/story30.jpeg`, title: "Mus'ab ibn Umair (ra) - 1st Muslim Ambassador | Chained by Mom | Sahaba Stories | Islamic Cartoon", desc: "The inspiring life of Mus'ab ibn Umair (RA) — a story of bravery, learning, and how one person can help spread goodness." },
+  { file: `${BASE}/ilmplay_videos/story21_safari.mp4`, thumb: `${BASE}/ilmplay_videospic/story21.jpeg`, title: "The Boy and the Evil King | Islamic Stories | Stories from the Quran: Surah Buruj | Islamic Cartoon", desc: "A brave boy stands up to a cruel king — a tale of courage, faith, and holding to what is right even when it's hard." },
+  { file: `${BASE}/story22_safari.mp4`, thumb: `${BASE}/ilmplay_videospic/story22.jpeg`, title: "The Story of the Fisherman by ZAKY - ISLAMIC KIDS CARTOONS", desc: "A fisherman learns important lessons about honesty, patience, and trusting Allah when things seem difficult." },
+  { file: `${BASE}/story23_safari_fast.mp4`, thumb: `${BASE}/ilmplay_videospic/story23.jpeg`, title: "Prophet Stories In English | Story of Prophet Ayub (AS) | Stories Of The Prophets | Quran Stories", desc: "Prophet Ayub (AS) teaches patience and faith during hardship, showing how trust in Allah brings hope and healing." },
+  { file: `${BASE}/story24_safari_fast.mp4`, thumb: `${BASE}/ilmplay_videospic/story24.jpeg`, title: "Prophet Stories In English | Prophet Yusuf (AS) & The King's Dream | Part3 | Stories Of The Prophets", desc: "Prophet Yusuf (AS) interprets the king's dream — a story of wisdom, forgiveness, and believing in Allah's plan." },
+  { file: `${BASE}/story25_safari.mp4`, thumb: `${BASE}/ilmplay_videospic/story25.jpeg`, title: "Prophet Stories In English | Prophet Ibrahim (AS) Part 1 | Stories Of The Prophets", desc: "The early life of Prophet Ibrahim (AS): his search for truth, devotion to Allah, and brave faith that changed hearts." },
+  { file: `${BASE}/ilmplay_videos/story26_safari.mp4`, thumb: `${BASE}/ilmplay_videospic/story26.jpeg`, title: "The Third Brother | Hadith Story", desc: "A short Hadith story teaching kindness, honesty, and how small good actions make us better people every day." },
+  { file: `${BASE}/story27_safari.mp4`, thumb: `${BASE}/ilmplay_videospic/story27.jpeg`, title: "Prophet Stories In English | Prophet Nuh (AS) | Stories Of The Prophets | Quran Stories", desc: "Prophet Nuh (AS) shows perseverance while calling his people to Allah — a story about faith, patience, and doing what's right." },
+  { file: `${BASE}/story28_safari.mp4`, thumb: `${BASE}/ilmplay_videospic/story28.jpeg`, title: "Prophet Stories SALIH (AS) | Islamic Cartoon | Quran Stories | Islamic Children Kids Videos - Ep 05", desc: "Prophet Salih (AS) calls his people to be fair and worship Allah — a lesson in listening to wise guidance and choosing kindness." },
+  { file: `${BASE}/ilmplay_videos/story29_safari.mp4`, thumb: `${BASE}/ilmplay_videospic/story29.jpeg`, title: "Prophet Stories ELYAS / ELIJAH (AS) | Islamic Cartoon | Quran Stories | Islamic Kids Videos - Ep 21", desc: "Prophet Elyas (AS) reminds his people to keep faith and seek Allah's mercy — a tale about courage and returning to the right path." },
+  { file: `${BASE}/ilmplay_videos/story30_safari.mp4`, thumb: `${BASE}/ilmplay_videospic/story30.jpeg`, title: "Mus'ab ibn Umair (ra) - 1st Muslim Ambassador | Chained by Mom | Sahaba Stories | Islamic Cartoon", desc: "The inspiring life of Mus'ab ibn Umair (RA) — a story of bravery, learning, and how one person can help spread goodness." },
   { file: `${BASE}/newstory4.mp4`, thumb: `${BASE}/ilmplay_videospic/newstory4.webp`, title: "Prophet Shoaib VS the Greedy Town", desc: "Prophet Shoaib teaches fairness and honesty to his people — a story about standing for justice and caring for others." },
-  { file: `${BASE}/ilmplay_videos/ilmplay_videos_ilmplay_videos_story32.mp4`, thumb: `${BASE}/ilmplay_videospic/story32.jpeg`, title: "Surah Al-Balad #90 - The City | Kids Quran Tafsir for Children | Quran For Kids", desc: "A kid-friendly explanation of Surah Al-Balad that teaches kindness, helping others, and being mindful of what we do." },
+  { file: `${BASE}/ilmplay_videos/story32_safari.mp4`, thumb: `${BASE}/ilmplay_videospic/story32.jpeg`, title: "Surah Al-Balad #90 - The City | Kids Quran Tafsir for Children | Quran For Kids", desc: "A kid-friendly explanation of Surah Al-Balad that teaches kindness, helping others, and being mindful of what we do." },
   { file: `${BASE}/ilmplay_videos/story33.mp4`, thumb: `${BASE}/ilmplay_videospic/story33.webp`, title: "Bashir's Lies & Allah's Justice | Time of Muhammad ﷺ | Islamic Stories | Islamic Cartoon for Muslims", desc: "A powerful story showing how lies can lead to downfall and how Allah’s justice always prevails. Kids learn honesty and truth through this lesson from the Prophet’s time." },
   { file: `${BASE}/ilmplay_videos/story34.mp4`, thumb: `${BASE}/ilmplay_videospic/story34.webp`, title: "Surah Al-Mutaffifin #83 - The Dishonest | Kids Quran Tafsir for Children | Quran For Kids | Islamic Story", desc: "An engaging explanation of Surah Al-Mutaffifin that teaches the dangers of cheating and dishonesty in trade and daily life." },
   { file: `${BASE}/ilmplay_videos/story35.mp4`, thumb: `${BASE}/ilmplay_videospic/story35.webp`, title: "Surah Al-Lail #92 - The Night | Kids Quran Tafsir for Children | Quran For Kids", desc: "Beautifully animated story helping children understand Surah Al-Lail and how good deeds bring light to one’s life while greed leads to darkness." },
@@ -232,14 +666,14 @@ const STORIES = [{ file: `${BASE}/ilmplay_videos/story1.mp4`,  thumb: `${BASE}/i
   { file: `${BASE}/ilmplay_videos/story40.mp4`, thumb: `${BASE}/ilmplay_videospic/story40.webp`, title: "Muslims' First Battles Against Persians: Rise of Islam Ep 6 | Islamic Cartoon History | IQRA Cartoon", desc: "Step into Islamic history and witness the early Muslim victories against the Persian Empire. A thrilling yet educational story showing faith, unity, and divine help in battle." }
   ];
  
-const NASHEEDS = [ { file: `${BASE}/ilmplay_nasheeds/nasheed1.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed1.webp`, title: "Rahman Ya Rahman – Mishary Rashid Al Afasy", desc: "A soulful Arabic nasheed praising Allah’s mercy and greatness, performed by Mishary Rashid Al Afasy with serene vocals and meaning." },
-  { file: `${BASE}/ilmplay_nasheeds/nasheed2.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed2.jpg`, title: "Omar Esa - Believe Nasheed | 3D Islamic Animation", desc: "A heartfelt nasheed repeating the beautiful declaration of faith, inspiring remembrance and reflection on the oneness of Allah." },
+const NASHEEDS = [ { file: `${BASE}/ilmplay_nasheeds/nasheed1_safari.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed1.webp`, title: "Rahman Ya Rahman – Mishary Rashid Al Afasy", desc: "A soulful Arabic nasheed praising Allah’s mercy and greatness, performed by Mishary Rashid Al Afasy with serene vocals and meaning." },
+  { file: `${BASE}/ilmplay_nasheeds/nasheed2_safari.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed2.jpg`, title: "Omar Esa - Believe Nasheed | 3D Islamic Animation", desc: "A heartfelt nasheed repeating the beautiful declaration of faith, inspiring remembrance and reflection on the oneness of Allah." },
 { file: `${BASE}/ilmplay_nasheeds/nasheed3.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed3.jpg`, title: "Mishari Alafasy - La Ilah Ela Allah", desc: "A gentle, vocals-only nasheed that emphasizes the oneness of Allah, perfect for quiet reflection." },
   { file: `${BASE}/ilmplay_nasheeds/nasheed4.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed4.webp`, title: "Mustafa Mustafa - Mishary bin Rashid Alafasy (with lyrics & translation)", desc: "Vocals-only, inspiring nasheed with English translation, helping listeners connect deeply with their faith and the meaning behind the words." },
-  { file: `${BASE}/ilmplay_nasheeds/nasheed5.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed5.jpg`, title: "Ya Ummi | Nasheed By Ahmed Bukhatir", desc: "A touching vocals-only tribute to mothers, expressing love, gratitude, and respect through heartfelt lyrics." },
-  { file: `${BASE}/ilmplay_nasheeds/nasheed6.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed6.jpg`, title: "Ya Adheeman Nasheed - Ahmed Bukhatir", desc: "Devotional vocals-only nasheed praising the greatness of Allah, simple yet deeply moving." },
+  { file: `${BASE}/ilmplay_nasheeds/nasheed5_safari.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed5.jpg`, title: "Ya Ummi | Nasheed By Ahmed Bukhatir", desc: "A touching vocals-only tribute to mothers, expressing love, gratitude, and respect through heartfelt lyrics." },
+  { file: `${BASE}/ilmplay_nasheeds/nasheed6_safari.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed6.jpg`, title: "Ya Adheeman Nasheed - Ahmed Bukhatir", desc: "Devotional vocals-only nasheed praising the greatness of Allah, simple yet deeply moving." },
   { file: `${BASE}/ilmplay_nasheeds/nasheed7.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed7.webp`, title: "Maher Zain - Habibi Yaa Muhammad (Vocals Only, Lyrics + English Translation)", desc: "Soulful vocals-only nasheed dedicated to the Prophet ﷺ, combining touching lyrics with English translation for wider understanding." },
-  { file: `${BASE}/ilmplay_nasheeds/nasheed8.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed8.jpg`, title: "Ahmed Bukhatir - Taweel Al Shawq (Lyrics + English Translation)", desc: "Vocals-only reflection on longing and devotion, beautifully capturing the emotion of spiritual love." },
+  { file: `${BASE}/ilmplay_nasheeds/nasheed8_safari.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed8.jpg`, title: "Ahmed Bukhatir - Taweel Al Shawq (Lyrics + English Translation)", desc: "Vocals-only reflection on longing and devotion, beautifully capturing the emotion of spiritual love." },
   { file: `${BASE}/ilmplay_nasheeds/nasheed9.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed9.webp`, title: "The Wheels On The Bus - Kids Song (Nasheed) - Vocals Only - Muslim Version", desc: "Fun, interactive vocals-only song teaching children Islamic manners and values through a playful, familiar melody." },
   { file: `${BASE}/ilmplay_nasheeds/nasheed10.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed10.webp`, title: "Little Muslim Spider - Kids song (Nasheed) - Vocals Only - Muslim Version", desc: "Catchy vocals-only kids’ song about a clever Muslim spider, encouraging problem-solving and perseverance." },
   { file: `${BASE}/ilmplay_nasheeds/nasheed11.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed11.webp`, title: "Omar Esa - One Family (One Ummah) Nasheed | 3D Islamic Animation", desc: "Uplifting vocals-only nasheed celebrating the unity of the Muslim Ummah, paired with bright 3D visuals to engage young viewers." },
@@ -248,16 +682,16 @@ const NASHEEDS = [ { file: `${BASE}/ilmplay_nasheeds/nasheed1.mp4`, thumb: `${BA
   { file: `${BASE}/ilmplay_nasheeds/nasheed14.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed14.webp`, title: "Sahaba Zindabad | New Nasheed | Hafiz Abu Bakar Official", desc: "Celebratory vocals-only nasheed praising the lives and contributions of the Sahaba, inspiring listeners of all ages." },
   { file: `${BASE}/ilmplay_nasheeds/nasheed15.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed15.webp`, title: "Maher Zain - Ummati (Lyrics) | Vocals Only - Slow & Reverb - English Translation | Arabic Nasheed", desc: "Slow, reflective vocals-only nasheed conveying love for the Ummah, beautifully layered with subtle reverb for emotional depth." },
   { file: `${BASE}/ilmplay_nasheeds/nasheed16.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed16.jpg`, title: "Ahmed Bukhatir - Ya Adheeman (Lyrics) - With English Subtitles", desc: "Vocals-only nasheed glorifying Allah, enriched with English subtitles to enhance understanding and devotion." },
-  { file: `${BASE}/ilmplay_nasheeds/nasheed17.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed17.jpg`, title: "Kaabe Ki Ronak Hafiz Abu Bakar Naat | Hafiz Abu Bakar Official", desc: "Spiritual vocals-only Naat celebrating the sacred Kaaba and the blessings of visiting the holy site." },
+  { file: `${BASE}/ilmplay_nasheeds/nasheed17_safari.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed17.jpg`, title: "Kaabe Ki Ronak Hafiz Abu Bakar Naat | Hafiz Abu Bakar Official", desc: "Spiritual vocals-only Naat celebrating the sacred Kaaba and the blessings of visiting the holy site." },
   { file: `${BASE}/ilmplay_nasheeds/nasheed18.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed18.jpg`, title: "Kun Anta | Vocals Only - Without Music | Slow & Reverb - English Lyrics + Translation | Hamood", desc: "Inspirational vocals-only track encouraging self-acceptance and faith in Allah, slowed for reflection and meditation." },
-  { file: `${BASE}/ilmplay_nasheeds/nasheed19.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed19.jpg`, title: "Omar Esa - Jummah Mubarak Nasheed | 3D Islamic Cartoon", desc: "Cheerful, vocals-only nasheed reminding believers of Friday blessings, paired with colorful 3D animation for kids." },
+  { file: `${BASE}/ilmplay_nasheeds/nasheed19_safari.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed19.jpg`, title: "Omar Esa - Jummah Mubarak Nasheed | 3D Islamic Cartoon", desc: "Cheerful, vocals-only nasheed reminding believers of Friday blessings, paired with colorful 3D animation for kids." },
   { file: `${BASE}/ilmplay_nasheeds/nasheed20.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed20.webp`, title: "Osman Al Safi - Tabalagh Bil Qaleel (Lyrics) | English Translation - Vocals Only | Arabic Nasheed", desc: "Vocals-only nasheed inspiring listeners to spread Islam through small, meaningful acts, with English translation included." },
-  { file: `${BASE}/ilmplay_nasheeds/nasheed21.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed21.jpg`, title: "Surah Mulk - Calming Recitation", desc: "Serene recitation of Surah Al-Mulk, perfect for quiet reflection or memorization before sleep." },
+  { file: `${BASE}/ilmplay_nasheeds/nasheed21_safari.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed21.jpg`, title: "Surah Mulk - Calming Recitation", desc: "Serene recitation of Surah Al-Mulk, perfect for quiet reflection or memorization before sleep." },
   { file: `${BASE}/ilmplay_nasheeds/nasheed22.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed22.webp`, title: "Omar Esa - Spiderman Nasheed | 3D Islamic Animation", desc: "Fun and energetic vocals-only children’s nasheed teaching Islamic values through a superhero theme." },
-  { file: `${BASE}/ilmplay_nasheeds/nasheed23.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed23.jpg`, title: "O Allah - Haris J (Vocals Only) | Lyrics - Without Music - Acapella Version | English Nasheed", desc: "Heartfelt acapella vocals-only track seeking Allah’s guidance, mercy, and protection." },
-  { file: `${BASE}/ilmplay_nasheeds/nasheed24.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed24.jpg`, title: "Abdullah Alsinani - Ya Quluban (Lyrics) | English Translation - Vocals Only | Arabic Nasheed", desc: "Soothing vocals-only track promoting spiritual reflection and mindfulness, with translation for clarity." },
+  { file: `${BASE}/ilmplay_nasheeds/nasheed23_safari.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed23.jpg`, title: "O Allah - Haris J (Vocals Only) | Lyrics - Without Music - Acapella Version | English Nasheed", desc: "Heartfelt acapella vocals-only track seeking Allah’s guidance, mercy, and protection." },
+  { file: `${BASE}/ilmplay_nasheeds/nasheed24_safari.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed24.jpg`, title: "Abdullah Alsinani - Ya Quluban (Lyrics) | English Translation - Vocals Only | Arabic Nasheed", desc: "Soothing vocals-only track promoting spiritual reflection and mindfulness, with translation for clarity." },
   { file: `${BASE}/ilmplay_nasheeds/nasheed25.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed25.webp`, title: "World's Most Beautiful Recitation of Surah Ar-Rahman", desc: "A mesmerizing recitation emphasizing Allah’s blessings, perfect for spiritual calm and inner peace." },
-  { file: `${BASE}/ilmplay_nasheeds/nasheed26.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed26.webp`, title: "Liyakun Yawmuka Slowed Reverb | Lyrics | Vocals only", desc: "Slow, reflective vocals-only track with reverb, encouraging contemplation and personal connection with Allah." },
+  { file: `${BASE}/ilmplay_nasheeds/nasheed26_safari.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed26.webp`, title: "Liyakun Yawmuka Slowed Reverb | Lyrics | Vocals only", desc: "Slow, reflective vocals-only track with reverb, encouraging contemplation and personal connection with Allah." },
   { file: `${BASE}/ilmplay_nasheeds/nasheed27.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed27.webp`, title: "'Where You Are' Vocals Only [Slowed + Reverb] (Nasheed Background)", desc: "Gentle, vocals-only nasheed providing comfort and reassurance through soft, emotional delivery." },
   { file: `${BASE}/ilmplay_nasheeds/nasheed28.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed28.webp`, title: "Siedd - Allah Humma (Slowed + Reverb) | Vocals Only Nasheed", desc: "Vocals-only, meditative track invoking Allah’s mercy with slow, atmospheric reverb." },
   { file: `${BASE}/ilmplay_nasheeds/nasheed29.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed29.webp`, title: "Paradise (Slowed +Reverb) By Maher Zain Vocals Only", desc: "Soft, reflective vocals-only track imagining the beauty and serenity of Paradise." },
@@ -265,47 +699,47 @@ const NASHEEDS = [ { file: `${BASE}/ilmplay_nasheeds/nasheed1.mp4`, thumb: `${BA
   { file: `${BASE}/ilmplay_nasheeds/nasheed31.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed31.webp`, title: "In My Dreams | Amin Davis feat. Ilyas Mao x Faisal Salah | (Official Nasheed Video) - Vocals Only", desc: "Uplifting vocals-only track about faith, dreams, and hope in Allah’s guidance." },
   { file: `${BASE}/ilmplay_nasheeds/nasheed32.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed32.webp`, title: "Muslim Belal - Traveller", desc: "Energetic vocals-only nasheed celebrating perseverance, adventure, and dedication to faith." },
   { file: `${BASE}/ilmplay_nasheeds/nasheed33.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed33.webp`, title: "Siedd - My Beloved (PBUH) | Vocals Only Nasheed", desc: "Touching vocals-only nasheed expressing deep love and devotion to the Prophet ﷺ." },
-  { file: `${BASE}/ilmplay_nasheeds/nasheed34.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed34.webp`, title: "Omar Esa - Dawah Ft. Muslim Belal (Official Nasheed Video) | Vocals Only", desc: "Motivational vocals-only track emphasizing dawah and spreading Islamic teachings." },
+  { file: `${BASE}/ilmplay_nasheeds/nasheed34_safari.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed34.webp`, title: "Omar Esa - Dawah Ft. Muslim Belal (Official Nasheed Video) | Vocals Only", desc: "Motivational vocals-only track emphasizing dawah and spreading Islamic teachings." },
   { file: `${BASE}/ilmplay_nasheeds/nasheed35.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed35.webp`, title: "Omar Esa - Rabb (Official Nasheed Video) | Vocals Only", desc: "Heartfelt vocals-only nasheed expressing devotion, love, and praise for Allah." },
   { file: `${BASE}/ilmplay_nasheeds/nasheed36.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed36.webp`, title: "FORGIVE ME - Heart Touching Nasheed (Vocals Only)", desc: "Vocals-only track reflecting on repentance, seeking Allah’s forgiveness, and inner purification." },
   { file: `${BASE}/ilmplay_nasheeds/nasheed37.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed37.webp`, title: "You Are Not Alone - Heart Touching Nasheed (Official Video)", desc: "Vocals-only nasheed offering comfort and reassurance that Allah is always near, even in hardship." },
   { file: `${BASE}/ilmplay_nasheeds/nasheed38.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed38.webp`, title: "THIS DUNYA FADES - Heart Touching Nasheed (Vocals Only)", desc: "Soulful vocals-only reminder of life’s fleeting nature and the importance of prioritizing faith." },
-  { file: `${BASE}/ilmplay_nasheeds/nasheed39.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed39.webp`, title: "YOUR MERCY - Heart Touching Nasheed (Vocals Only)", desc: "Gentle vocals-only reflection on Allah’s infinite mercy, compassion, and care for His creation." },
+  { file: `${BASE}/ilmplay_nasheeds/nasheed39_safari.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed39.webp`, title: "YOUR MERCY - Heart Touching Nasheed (Vocals Only)", desc: "Gentle vocals-only reflection on Allah’s infinite mercy, compassion, and care for His creation." },
   { file: `${BASE}/ilmplay_nasheeds/nasheed40.mp4`, thumb: `${BASE}/ilmplay_nasheedspic/nasheed40.webp`, title: "I Found Islam (La ilaha illallah) – Heart Touching English Nasheed", desc: "Uplifting vocals-only English track celebrating the beauty of embracing Islam and discovering faith." }
 ];
 
-const DUAS = [ { file: `${BASE}/ilmplay_duas/dua1.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua1.jpg`, title: "Omar & Hana | Dua Before Sleeping | Islamic Songs for Kids", desc: "A fun nasheed by Omar & Hana teaching children the dua before sleeping, reminding kids to end their day with gratitude." },
-  { file: `${BASE}/ilmplay_duas/dua2.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua2.jpg`, title: "Morning Adhkar Dua - Kids/Children’s Version", desc: "A bright and cheerful recitation of the morning adhkar for children — easy to follow and memorize daily." },
-  { file: `${BASE}/ilmplay_duas/dua3.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua3.jpg`, title: "Compilation Of Dua For Kids & Parents | Omar & Hana", desc: "A collection of beautiful daily duas for children and parents, featuring fun animations and reminders from Omar & Hana." },
-  { file: `${BASE}/ilmplay_duas/dua4.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua4.jpg`, title: "Islamic Dua Before Going To Sleep: Kids Series", desc: "A simple, catchy dua video that helps kids learn the Islamic prayer before going to sleep." },
-  { file: `${BASE}/ilmplay_duas/dua5.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua5.jpg`, title: "Learn Dua Before Sleeping | Dua For Sleep | Dua For Kids", desc: "An educational and musical video teaching the dua before sleep through easy-to-remember rhymes for children." },
-  { file: `${BASE}/ilmplay_duas/dua6.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua6.jpg`, title: "Sleeping Dua Song + More Islamic Songs for Kids | Nasheed", desc: "A nasheed compilation teaching bedtime duas and Islamic songs to help children develop good nightly habits." },
+const DUAS = [ { file: `${BASE}/ilmplay_duas/dua1_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua1.webp`, title: "Simple Morning and Evening Protection recited by Mufti Menk", desc: "A simple and soothing collection of morning and evening protection adhkar, beautifully recited by Mufti Menk, perfect for daily listening, spiritual grounding, and strengthening your connection with Allah, let these powerful duas bring peace, clarity, and protection to your day and night." },
+  { file: `${BASE}/ilmplay_duas/dua2_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua2.jpg`, title: "Morning Adhkar Dua - Kids/Children’s Version", desc: "A bright and cheerful recitation of the morning adhkar for children — easy to follow and memorize daily." },
+  { file: `${BASE}/ilmplay_duas/dua3_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua3.jpg`, title: "Compilation Of Dua For Kids & Parents | Omar & Hana", desc: "A collection of beautiful daily duas for children and parents, featuring fun animations and reminders from Omar & Hana." },
+  { file: `${BASE}/ilmplay_duas/dua4_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua4.jpg`, title: "Islamic Dua Before Going To Sleep: Kids Series", desc: "A simple, catchy dua video that helps kids learn the Islamic prayer before going to sleep." },
+  { file: `${BASE}/ilmplay_duas/dua5_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua5.webp`, title: "Powerful Dua for Success — Ask Allah for Barakah & Guidance", desc: "A heartfelt supplication seeking Allah’s help, blessings, and victory in your life. Recite with sincerity and trust in His plan." },
+  { file: `${BASE}/ilmplay_duas/dua6_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua6.webp`, title: "Surah Ar-Rahman — Recited Like You’ve Never Heard Before", desc: "A beautiful and powerful recitation that softens the heart and fills it with tranquility. Immerse yourself in the most soothing reminder of Allah’s endless blessings." },
   { file: `${BASE}/ilmplay_duas/dua7.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua7.jpg`, title: "Morning Dua ᴴᴰ | Islam for Kids", desc: "An uplifting dua video to start the morning with remembrance of Allah, perfect for daily routine." },
   { file: `${BASE}/ilmplay_duas/dua8.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua8.jpg`, title: "Dua Before Sleeping | Omar & Hana Maker | Little Ammar - Durioo+", desc: "Join Omar, Hana, and Little Ammar as they recite the dua before sleeping with colorful animations and joyful nasheed." },
-  { file: `${BASE}/ilmplay_duas/dua9.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua9.jpg`, title: "Omar & Hana | Dua Before Sleeping | Colour of Voices", desc: "A beautiful vocal-only version of the Dua Before Sleeping by Omar & Hana, performed by Colour of Voices." },
-  { file: `${BASE}/ilmplay_duas/dua10.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua10.jpg`, title: "Dua Before Sleeping, Surah Al-Fatihah & The Four Quls | Omar & Hana", desc: "A powerful combination of bedtime duas and short surahs, ideal for kids to listen and memorize before sleeping." },
-  { file: `${BASE}/ilmplay_duas/dua11.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua11.jpg`, title: "[NO INSTRUMENTS] Omar & Hana | Dua Before Sleeping | Colour of Voices| Nasheed for Kids", desc: "A gentle vocal-only nasheed by Colour of Voices, teaching kids the Dua Before Sleeping in a calm and easy-to-follow way. Perfect for bedtime routines and peaceful nightly remembrance." },
-  { file: `${BASE}/ilmplay_duas/dua12.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua12.jpg`, title: "Omar & Hana | Dua For Safe Travel | Islamic Cartoon for Kids", desc: "A cheerful animation teaching kids the dua for safe travel — perfect before family trips!" },
-  { file: `${BASE}/ilmplay_duas/dua13.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua13.jpg`, title: "Surah Al-Fatihah and The Four Quls | Islamic Series & Songs For Kids | Omar & Hana English", desc: "A calming recitation video helping kids learn Surah Al-Fatihah and the four Quls through clear, child-friendly repetition.." },
-  { file: `${BASE}/ilmplay_duas/dua14.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua14.jpg`, title: "Evening Adhkar Dua – Listen Daily – Kids/Children’s Version", desc: "A gentle evening dua session designed to help children end their day with remembrance and protection." },
-  { file: `${BASE}/ilmplay_duas/dua15.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua15.webp`, title: "Dua & Dhikr Compilation | Islamic Series & Songs For Kids | Omar & Hana English", desc: "A rich collection of duas and dhikr for kids. Packed with easy-to-learn supplications, soothing reminders, and joyful moments of worship. Ideal for daily practice at home or school." },
-  { file: `${BASE}/ilmplay_duas/dua16.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua16.jpg`, title: "Omar & Hana | Dua For Safe Travel| Islamic Cartoon for Kids | Nasheed", desc: "An animated lesson that helps children memorize Ayatul Kursi with Laith and Layla’s fun learning journey." },
-  { file: `${BASE}/ilmplay_duas/dua17.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua17.jpg`, title: "Learn DUA with ZAKY! - When We Leave Our House", desc: "Simple daily dua to say when leaving home, making it fun and easy for kids." },
+  { file: `${BASE}/ilmplay_duas/dua9_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua9.webp`, title: "Dua Before Sleeping ", desc: "A beautiful vocal-only version of the Dua Before Sleeping." },
+  { file: `${BASE}/ilmplay_duas/dua10_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua10.jpg`, title: "Dua Before Sleeping, Surah Al-Fatihah & The Four Quls | Omar & Hana", desc: "A powerful combination of bedtime duas and short surahs, ideal for kids to listen and memorize before sleeping." },
+  { file: `${BASE}/ilmplay_duas/dua11_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua11.jpg`, title: "[NO INSTRUMENTS] Omar & Hana | Dua Before Sleeping | Colour of Voices| Nasheed for Kids", desc: "A gentle vocal-only nasheed by Colour of Voices, teaching kids the Dua Before Sleeping in a calm and easy-to-follow way. Perfect for bedtime routines and peaceful nightly remembrance." },
+  { file: `${BASE}/ilmplay_duas/dua12_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua12.jpg`, title: "Omar & Hana | Dua For Safe Travel | Islamic Cartoon for Kids", desc: "A cheerful animation teaching kids the dua for safe travel — perfect before family trips!" },
+  { file: `${BASE}/ilmplay_duas/dua13_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua13.jpg`, title: "Surah Al-Fatihah and The Four Quls | Islamic Series & Songs For Kids | Omar & Hana English", desc: "A calming recitation video helping kids learn Surah Al-Fatihah and the four Quls through clear, child-friendly repetition.." },
+  { file: `${BASE}/ilmplay_duas/dua14_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua14.jpg`, title: "Evening Adhkar Dua – Listen Daily – Kids/Children’s Version", desc: "A gentle evening dua session designed to help children end their day with remembrance and protection." },
+  { file: `${BASE}/dua15_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua15.webp`, title: "Dua & Dhikr Compilation | Islamic Series & Songs For Kids | Omar & Hana English", desc: "A rich collection of duas and dhikr for kids. Packed with easy-to-learn supplications, soothing reminders, and joyful moments of worship. Ideal for daily practice at home or school." },
+  { file: `${BASE}/ilmplay_duas/dua16_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua16.jpg`, title: "Omar & Hana | Dua For Safe Travel| Islamic Cartoon for Kids | Nasheed", desc: "An animated lesson that helps children memorize Ayatul Kursi with Laith and Layla’s fun learning journey." },
+  { file: `${BASE}/ilmplay_duas/dua17_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua17.jpg`, title: "Learn DUA with ZAKY! - When We Leave Our House", desc: "Simple daily dua to say when leaving home, making it fun and easy for kids." },
   { file: `${BASE}/ilmplay_duas/dua18.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua18.jpg`, title: "Maryam & Musa | Our Daily Duas | Islamic Cartoons | English", desc: "Follow Maryam & Musa as they teach daily duas in English with colorful animation." },
-  { file: `${BASE}/ilmplay_duas/dua19.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua19.jpg`, title: "Repeat Quran For Kids | The 3 Quls ☀️ Al-Ikhlas | Al-Falaq | An-Naas", desc: "Short, easy-to-repeat recitation of the 3 Quls to help kids memorize and understand." },
+  { file: `${BASE}/ilmplay_duas/dua19_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua19.jpg`, title: "Repeat Quran For Kids | The 3 Quls ☀️ Al-Ikhlas | Al-Falaq | An-Naas", desc: "Short, easy-to-repeat recitation of the 3 Quls to help kids memorize and understand." },
   { file: `${BASE}/ilmplay_duas/dua20.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua20.jpg`, title: "Let's Learn Ayatul Kursi with Laith & Layla! | Islamic Cartoons For Kids", desc: "Engaging cartoon teaching Ayatul Kursi, helping kids learn this powerful verse with ease." },
-  { file: `${BASE}/ilmplay_duas/dua21.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua21.jpg`, title: "Short Surah for Kids | Surat Quraysh - Surat Al-Masad | Omar & Hana English", desc: "Clear English recitation of short surahs for children, ideal for memorization." },
-  { file: `${BASE}/ilmplay_duas/dua22.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua22.jpg`, title: "Islamic Dua Before Going To Sleep: Kids Series", desc: "Gentle bedtime duas to help kids sleep with calm and remember Allah before sleeping." },
-  { file: `${BASE}/ilmplay_duas/dua23.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua23.jpg`, title: "Ar-Rahman – The Most Merciful | 99 Names of Allah for Kids | Learn with Musa", desc: "Fun and educational series introducing the 99 names of Allah, making learning easy and memorable." },
-  { file: `${BASE}/ilmplay_duas/dua24.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua24.jpg`, title: "Arabic Alphabet - Children's Nasheed Song (No Music) Vocal Only", desc: "Vocal-only nasheed guiding children through the Arabic alphabet with clear pronunciation." },
+  { file: `${BASE}/ilmplay_duas/dua21_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua21.jpg`, title: "Short Surah for Kids | Surat Quraysh - Surat Al-Masad | Omar & Hana English", desc: "Clear English recitation of short surahs for children, ideal for memorization." },
+  { file: `${BASE}/ilmplay_duas/dua22_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua22.webp`, title: "Siedd - After the Call | (Dua of Intercession) Vocals Only", desc: "A soothing nasheed by Siedd reflecting on hope, forgiveness, and turning back to Allah. Vocals-only, peaceful, and uplifting — ideal for quiet reflection and spiritual moments." },
+  { file: `${BASE}/ilmplay_duas/dua23_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua23.jpg`, title: "Ar-Rahman – The Most Merciful | 99 Names of Allah for Kids | Learn with Musa", desc: "Fun and educational series introducing the 99 names of Allah, making learning easy and memorable." },
+  { file: `${BASE}/ilmplay_duas/dua24_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua24.jpg`, title: "Arabic Alphabet - Children's Nasheed Song (No Music) Vocal Only", desc: "Vocal-only nasheed guiding children through the Arabic alphabet with clear pronunciation." },
   { file: `${BASE}/ilmplay_duas/dua25.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua25.jpg`, title: "SOLVE ANY PROBLEM ᴴᴰ ♥ - Best Darood Sharif ♥ - Durood e Ibrahim", desc: "Heartwarming recitation of Durood e Ibrahim to bring blessings and solve problems, perfect for kids and adults." },
   { file: `${BASE}/ilmplay_duas/dua26.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua26.jpg`, title: "Evening Adhkar and Dua - Omar Hisham", desc: "Complete evening adhkar and duas to help children end their day with remembrance of Allah." },
-  { file: `${BASE}/ilmplay_duas/dua27.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua27.jpg`, title: "Sheikh Idris Abkar Dua TRANSLATION Arabic Subtitles", desc: "Meaningful duas with Arabic subtitles and translation, making it easy to follow along." },
-  { file: `${BASE}/ilmplay_duas/dua28.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua28.jpg`, title: "Heart Trembling Dua - Idriss Abkar", desc: "Emotional and touching dua that inspires reflection and devotion in young hearts and adults alike." },
+  { file: `${BASE}/ilmplay_duas/dua27_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua27.jpg`, title: "Sheikh Idris Abkar Dua Translation Arabic Subtitles", desc: "Meaningful duas with Arabic subtitles and translation, making it easy to follow along." },
+  { file: `${BASE}/ilmplay_duas/dua28_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua28.jpg`, title: "Heart Trembling Dua - Idriss Abkar", desc: "Emotional and touching dua that inspires reflection and devotion in young hearts and adults alike." },
   { file: `${BASE}/ilmplay_duas/dua29.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua29.jpg`, title: "Morning Dua in Full أذكار الصباح كاملة بدقة عالية بصوت عمر هشام العربي (adhkar) Omar Hisham", desc: "Full morning adhkar with precise recitation by Omar Hisham, helping kids start the day blessed." },
-  { file: `${BASE}/ilmplay_duas/dua30.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua30.jpg`, title: "💤 Muslim Lullabies - La ilaha illa Allah for 1 Hour | Bedtime Dhikr For Kids", desc: "One-hour soothing dhikr and lullabies to calm children, combining devotion and relaxation." },
-  { file: `${BASE}/ilmplay_duas/dua31.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua31.jpg`, title: "Quran for Kids-Al Fatihah 30' Repetition", desc: "Clear, repetitive recitation of Surah Al-Fatihah for easy memorization and learning." },
-  { file: `${BASE}/ilmplay_duas/dua32.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua32.jpg`, title: "Soul Touching Quran Recitation - The Pen (Al Qalam)", desc: "Beautiful, emotional recitation of Al-Qalam that captures the heart and soul of the listener." } 
+  { file: `${BASE}/ilmplay_duas/dua30_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua30.jpg`, title: "💤 Muslim Lullabies - La ilaha illa Allah for 1 Hour | Bedtime Dhikr For Kids", desc: "One-hour soothing dhikr and lullabies to calm children, combining devotion and relaxation." },
+  { file: `${BASE}/ilmplay_duas/dua31_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua31.webp`, title: "Ayat Al-Kursi | آيَةَ الْكُرْسِيِّ | Raad Mohammad al Kurdi ", desc: "A beautiful and powerful recitation of Ayat Al-Kursi by Raad Mohammad al Kurdi, a verse of protection, tranquility, and remembrance of Allah’s supreme authority, perfect for daily listening and spiritual comfort." },
+  { file: `${BASE}/ilmplay_duas/dua32_safari.mp4`, thumb: `${BASE}/ilmplay_duaspic/dua32.jpg`, title: "Soul Touching Quran Recitation - The Pen (Al Qalam)", desc: "Beautiful, emotional recitation of Al-Qalam that captures the heart and soul of the listener." } 
 ];
 
 const CARTOONS = [
@@ -316,13 +750,13 @@ const CARTOONS = [
     desc: "A cheerful episode teaching kids everyday Islamic phrases through fun songs and gentle storytelling."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon2.mp4`,
+    file: `${BASE}/ilmplay_cartoons/cartoon2_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon2.jpg`,
     title: "Courage Episode 1 | The MiniMuslims Islamic Cartoon Series for Kids",
     desc: "A heartwarming lesson about bravery as a young Muslim learns to overcome fears with faith and kindness."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon3.mp4`,
+    file: `${BASE}/cartoon3_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon3.jpg`,
     title: "Ghulam Rasool Cartoon | Baqra Eid Special Compilation | Kids Land",
     desc: "A festive Eid-ul-Adha special showing kids the meaning of sacrifice and gratitude through engaging stories."
@@ -334,73 +768,73 @@ const CARTOONS = [
     desc: "A touching reminder of the honor and love due to mothers, taught through gentle visuals and nasheed."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon5.mp4`,
+    file: `${BASE}/ilmplay_cartoons/cartoon5_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon5.jpg`,
     title: "Omar & Hana | Compilation of Series | Islamic Cartoons",
     desc: "A fun mix of Omar & Hana stories teaching manners, kindness, and Islamic values for kids."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon6.mp4`,
+    file: `${BASE}/cartoon6_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon6.jpg`,
     title: "Kazwa & Bilal | 8 Episodes | Featuring Zaky",
     desc: "Adventures with Kazwa, Bilal, and Zaky teaching kindness, manners, and teamwork."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon7.mp4`,
+    file: `${BASE}/cartoon7_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon7.jpg`,
     title: "Zaky & Friends Cartoons Compilation | 10 Episodes | 55 Minutes",
     desc: "A fun 55-minute mix of Zaky & Friends episodes filled with gentle Islamic lessons."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon8.mp4`,
+    file: `${BASE}/cartoon8_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon8.jpg`,
     title: "Zaky & Friends 75 Minutes Compilation | 10 Zaky Cartoon Episodes",
     desc: "A longer Zaky compilation with uplifting episodes teaching faith and good manners."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon9.mp4`,
+    file: `${BASE}/cartoon9_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon9.jpg`,
     title: "Omar & Hana | Series Compilation | 90 Mins | Omar & Hana English",
     desc: "A 90-minute bundle of Omar & Hana’s best Islamic songs and stories."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon10.mp4`,
+    file: `${BASE}/cartoon10_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon10.jpg`,
     title: "Zaky & Friends 40 Minute Compilation | Islamic Cartoons For Kids",
     desc: "A short 40-minute collection full of Islamic reminders and friendly stories."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon11.mp4`,
+    file: `${BASE}/cartoon11_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon11.jpg`,
     title: "Omar & Hana English 58 Minutes Compilation",
     desc: "A nearly hour-long compilation teaching du’as, manners, and Islamic values."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon12.mp4`,
+    file: `${BASE}/cartoon12_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon12.jpg`,
     title: "Zaky & Friends Compilation | Islamic Kids Cartoons | 70 Minutes",
     desc: "Seventy minutes of Zaky & Friends adventures teaching morals and kindness."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon13.mp4`,
+    file: `${BASE}/cartoon13_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon13.jpg`,
     title: "80 Minutes Compilation Islamic Songs | Omar & Hana English",
     desc: "An 80-minute playlist of Omar & Hana songs helping children learn Islamic basics."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon14.mp4`,
+    file: `${BASE}/cartoon14_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon14.jpg`,
     title: "Compilation Season 1–5 | Omar & Hana English",
     desc: "A multi-season collection featuring Omar & Hana’s most-loved lessons and songs."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon15.mp4`,
+    file: `${BASE}/cartoon15_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon15.jpg`,
     title: "Omar & Hana 60 Minute Compilation | Islamic Series & Songs For Kids",
     desc: "A 60-minute mix of stories and songs introducing kids to Islamic values."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon16.mp4`,
+    file: `${BASE}/ilmplay_cartoons/cartoon16_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon16.jpg`,
     title: "Omar & Hana | I Want To Be | Islamic Cartoons for Kids",
     desc: "A playful episode exploring dreams and careers while highlighting good intentions."
@@ -412,13 +846,13 @@ const CARTOONS = [
     desc: "A special mix featuring Mufti Menk’s uplifting messages with Omar & Hana lessons."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon18.mp4`,
+    file: `${BASE}/cartoon18_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon18.jpg`,
     title: "The Last Cake & Ramadan Compilation | Omar & Hana English",
     desc: "A Ramadan-themed compilation teaching patience, sharing, and blessings."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon19.mp4`,
+    file: `${BASE}/cartoon19_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon19.jpg`,
     title: "Omar & Hana on Summer Holiday | Islamic Songs For Kids",
     desc: "A cheerful summer adventure full of songs and Islamic reminders."
@@ -430,130 +864,266 @@ const CARTOONS = [
     desc: "Ali and Fatima learn the beauty of patience while caring for their garden."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon21.mp4`,
+    file: `${BASE}/cartoon21_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon21.jpg`,
     title: "Finding the Qiblah | Islamic Cartoon | Omar & Hana English",
     desc: "Omar & Hana discover how to find the Qiblah and why it matters."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon22.mp4`,
+    file: `${BASE}/cartoon22_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon22.jpg`,
     title: "The Good Muslim | All 8 Episodes",
     desc: "Eight inspiring episodes teaching kindness, manners, and good character."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon23.mp4`,
+    file: `${BASE}/ilmplay_cartoons/cartoon23_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon23.jpg`,
     title: "The Three Men | Hadith Story for Kids",
     desc: "A beautifully animated hadith story about sincerity and trust in Allah."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon24.mp4`,
+    file: `${BASE}/ilmplay_cartoons/cartoon24_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon24.jpg`,
     title: "The Treasure That Traveled By Sea",
     desc: "An Islamic story teaching honesty, trust, and the blessing of truthfulness."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon25.mp4`,
+    file: `${BASE}/cartoon25_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon25.jpg`,
     title: "Laith & Layla | All 4 Episodes",
     desc: "Four short episodes teaching salah, manners, and good habits."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon26.mp4`,
+    file: `${BASE}/cartoon26_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon26.jpg`,
     title: "Mina Mila | Compilation | From The Makers of Omar & Hana",
     desc: "A fun compilation where Mina Mila learns faith, kindness, and life lessons."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon27.mp4`,
+    file: `${BASE}/ilmplay_cartoons/cartoon27_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon27.jpg`,
     title: "Celebrating Our First Eid",
     desc: "A joyful Islamic story introducing kids to the meaning and traditions of Eid."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon28.mp4`,
+    file: `${BASE}/ilmplay_cartoons/cartoon28_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon28.jpg`,
     title: "How Kids Defeated Shaytan During Ramadan",
     desc: "A Ramadan lesson about resisting Shaytan through patience and good deeds."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon29.mp4`,
+    file: `${BASE}/ilmplay_cartoons/cartoon29_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon29.jpg`,
     title: "Why You Should Never Delay to Pray | Lesson for Muslim Kids",
     desc: "A clear and relatable lesson about praying on time and loving the salah."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon30.mp4`,
+    file: `${BASE}/ilmplay_cartoons/cartoon30_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon30.jpg`,
     title: "Muslim Shark | The Pillars of Islam | Vocals Only",
     desc: "A catchy kids song teaching the five pillars of Islam without instruments."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon31.mp4`,
+    file: `${BASE}/ilmplay_cartoons/cartoon31_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon31.jpg`,
     title: "Little Ammar | Time for School Compilation",
     desc: "Little Ammar learns routines and manners as he gets ready for school."
   },
   {
-    file: `${BASE}/ilmplay_cartoons/cartoon32.mp4`,
+    file: `${BASE}/cartoon32_safari.mp4`,
     thumb: `${BASE}/ilmplay_cartoonspic/cartoon32.jpg`,
     title: "Little Ammar | Summer Holiday Compilation",
     desc: "A summer-filled compilation teaching Islamic values through fun and adventure."
   }
 ];
 
+document.addEventListener("DOMContentLoaded", () => {
 
-function buildRow(section,videos){
-  const wrapper=document.createElement("div");wrapper.className="rowWrapper";
-  const row=document.createElement("div");row.className="row";
-  videos.forEach((v)=>{
-    const tile=document.createElement("div");tile.className="tile";
-    const img=document.createElement("img");img.src=v.thumb||PLACEHOLDER;img.alt=v.title;
-    const title=document.createElement("div");title.className="tile-title";title.textContent=v.title;
-    tile.appendChild(img);tile.appendChild(title);
-    tile.addEventListener("click",()=>openModal(v));
-    row.appendChild(tile);
+  /* -----------------------------
+      DONATION MODAL
+  ----------------------------- */
+
+
+  const closeDonation = donationModal.querySelector(".close-donation");
+  const donationButtons = donationModal.querySelectorAll(".donation-options button");
+
+  function openDonationModal() {
+    donationModal.classList.add("open");
+    donationModal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeDonationModal() {
+    donationModal.classList.remove("open");
+    donationModal.setAttribute("aria-hidden", "true");
+  }
+
+  // Support Us boxes
+  const boxMobile = document.getElementById("supportBox");
+  const boxDesktop = document.getElementById("supportBoxDesktop");
+
+  if (boxMobile) boxMobile.addEventListener("click", openDonationModal);
+  if (boxDesktop) boxDesktop.addEventListener("click", openDonationModal);
+
+  // Close modal
+  closeDonation.addEventListener("click", closeDonationModal);
+  donationModal.addEventListener("click", (e) => {
+    if (e.target === donationModal) closeDonationModal();
   });
-  wrapper.appendChild(row);
-  document.getElementById("rows-"+section).appendChild(wrapper);
-}
-for(let i=0;i<STORIES.length;i+=8)buildRow("Stories",STORIES.slice(i,i+8));
-for(let i=0;i<NASHEEDS.length;i+=8)buildRow("Nasheeds", NASHEEDS.slice(i, i+8));
-for(let i=0;i<DUAS.length;i+=8)buildRow("Duas", DUAS.slice(i, i+8));
-for(let i=0;i<CARTOONS.length;i+=8)buildRow("Cartoons", CARTOONS.slice(i, i+8));
 
 
-const modal=document.getElementById("modal"),player=document.getElementById("player"),
-modalTitle=document.getElementById("modalTitle"),modalDesc=document.getElementById("modalDesc"),
-closeBtn=document.getElementById("closeBtn");
+  /* -----------------------------
+      VIDEO GRID BUILDER
+  ----------------------------- */
 
-function openModal(v){
-  player.src=v.file;
-  modalTitle.textContent=v.title;
-  modalDesc.textContent=v.desc;
-  modal.classList.add("open");
-  modal.setAttribute('aria-hidden','false');
-  const playPromise=player.play();
-  if(playPromise && playPromise.catch) playPromise.catch(()=>{});
-}
-closeBtn.addEventListener("click",()=>{
-  modal.classList.remove("open");
-  modal.setAttribute('aria-hidden','true');
-  try{player.pause();player.currentTime=0;}catch(e){}
-  player.removeAttribute('src');player.load();
+  function buildRow(section, videos) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "rowWrapper";
+
+    const row = document.createElement("div");
+    row.className = "row";
+
+    videos.forEach((v) => {
+      const tile = document.createElement("div");
+      tile.className = "tile";
+
+      const img = document.createElement("img");
+      img.src = v.thumb || PLACEHOLDER;
+      img.alt = v.title;
+
+      const title = document.createElement("div");
+      title.className = "tile-title";
+      title.textContent = v.title;
+
+      tile.appendChild(img);
+      tile.appendChild(title);
+      tile.addEventListener("click", () => openModal(v));
+
+      row.appendChild(tile);
+    });
+
+    wrapper.appendChild(row);
+    document.getElementById("rows-" + section).appendChild(wrapper);
+  }
+
+  for (let i = 0; i < STORIES.length; i += 8)
+    buildRow("Stories", STORIES.slice(i, i + 8));
+
+  for (let i = 0; i < NASHEEDS.length; i += 8)
+    buildRow("Nasheeds", NASHEEDS.slice(i, i + 8));
+
+  for (let i = 0; i < DUAS.length; i += 8)
+    buildRow("Duas", DUAS.slice(i, i + 8));
+
+  for (let i = 0; i < CARTOONS.length; i += 8)
+    buildRow("Cartoons", CARTOONS.slice(i, i + 8));
+
+
+  /* -----------------------------
+      VIDEO MODAL
+  ----------------------------- */
+
+  const modal = document.getElementById("modal"),
+    player = document.getElementById("player"),
+    modalTitle = document.getElementById("modalTitle"),
+    modalDesc = document.getElementById("modalDesc"),
+    closeBtn = document.getElementById("closeBtn");
+
+  function openModal(v) {
+    player.src = v.file;
+    modalTitle.textContent = v.title;
+    modalDesc.textContent = v.desc;
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+
+    const playPromise = player.play();
+    if (playPromise && playPromise.catch) playPromise.catch(() => {});
+  }
+
+  closeBtn.addEventListener("click", () => {
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+
+    try {
+      player.pause();
+      player.currentTime = 0;
+    } catch (e) {}
+
+    player.removeAttribute("src");
+    player.load();
+  });
+
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeBtn.click();
+  });
+
+
+  /* -----------------------------
+      NAVIGATION
+  ----------------------------- */
+
+  document.querySelectorAll(".nav a").forEach((a) =>
+    a.addEventListener("click", () => {
+      document.querySelectorAll(".page").forEach((p) =>
+        p.classList.remove("active")
+      );
+      document.getElementById(a.dataset.section).classList.add("active");
+    })
+  );
+
+
+  /* -----------------------------
+      THEME TOGGLE
+  ----------------------------- */
+
+  const themeToggle = document.getElementById("themeToggle");
+
+  themeToggle.addEventListener("click", () => {
+    if (document.body.dataset.theme === "light") {
+      document.body.dataset.theme = "dark";
+      themeToggle.textContent = "☀️";
+    } else {
+      document.body.dataset.theme = "light";
+      themeToggle.textContent = "🌙";
+    }
+  });
+
 });
-modal.addEventListener('click',e=>{if(e.target===modal)closeBtn.click();});
 
-document.querySelectorAll(".nav a").forEach(a=>a.addEventListener("click",()=>{
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  document.getElementById(a.dataset.section).classList.add("active");
-}));
-const themeToggle=document.getElementById("themeToggle");
-themeToggle.addEventListener("click",()=>{
-  if(document.body.dataset.theme==="light"){document.body.dataset.theme="dark";themeToggle.textContent="☀️";}
-  else{document.body.dataset.theme="light";themeToggle.textContent="🌙";}
+
+/* -----------------------------
+    STRIPE LINKS
+----------------------------- */
+
+const STRIPE_LINKS = {
+  "1": "https://buy.stripe.com/test_28E8wI4P2c5zcBj3cGfbq00",
+  "5": "https://buy.stripe.com/test_4gMdR2gxKc5z30J14yfbq01",
+  "10": "https://buy.stripe.com/test_bJe00c3KY0mR7gZ7sWfbq02",
+
+  // Custom: Stripe page where user enters their own amount
+  "custom": "https://buy.stripe.com/test_bJefZa6Xac5zatbbJcfbq03"
+};
+
+/* -----------------------------
+    HANDLE DONATION BUTTONS
+----------------------------- */
+
+donationButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const amount = btn.dataset.amount;
+
+    // If custom → go straight to Stripe (no prompt on your site)
+    if (amount === "custom") {
+      window.open(STRIPE_LINKS["custom"], "_blank");
+      return;
+    }
+
+    // Fixed amounts → open their Stripe link
+    window.open(STRIPE_LINKS[amount], "_blank");
+  });
 });
+
+
+
 </script>
 </body>
 </html>
