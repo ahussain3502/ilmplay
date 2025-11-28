@@ -561,40 +561,7 @@ body[data-theme="dark"] #donationModal.open .donation-box {
     });
   });
 
-  // Stripe Checkout
-  const stripe = Stripe('YOUR_STRIPE_PUBLISHABLE_KEY'); // replace with your Stripe publishable key
-
-  donateBtn.addEventListener('click', async () => {
-    let amount = selectedAmount;
-
-    if(customInput.style.display === 'block'){
-      const val = parseFloat(customInput.value);
-      if(isNaN(val) || val <= 0){
-        alert('Please enter a valid donation amount.');
-        return;
-      }
-      amount = val;
-    }
-
-    if(!amount) return alert('Please select a donation amount.');
-
-    try {
-      // Call your server to create a Checkout Session
-      const res = await fetch('/create-checkout-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: amount * 100 }) // Stripe expects amount in pence/cents
-      });
-      const session = await res.json();
-
-      // Redirect to Stripe Checkout
-      const result = await stripe.redirectToCheckout({ sessionId: session.id });
-      if(result.error) alert(result.error.message);
-    } catch(err){
-      console.error(err);
-      alert('Failed to process donation. Please try again.');
-    }
-  });
+ 
 </script>
 
 
@@ -1095,12 +1062,12 @@ document.addEventListener("DOMContentLoaded", () => {
 ----------------------------- */
 
 const STRIPE_LINKS = {
-  "1": "https://buy.stripe.com/test_28E8wI4P2c5zcBj3cGfbq00",
-  "5": "https://buy.stripe.com/test_4gMdR2gxKc5z30J14yfbq01",
-  "10": "https://buy.stripe.com/test_bJe00c3KY0mR7gZ7sWfbq02",
+  "1": "https://buy.stripe.com/aFacMYc4ud8UarY8ydeEo03",
+  "5": "https://buy.stripe.com/6oU9AMb0q4Co2ZweWBeEo02",
+  "10": "https://buy.stripe.com/7sY7sE1pQ1qc7fM01HeEo01",
 
   // Custom: Stripe page where user enters their own amount
-  "custom": "https://buy.stripe.com/test_bJefZa6Xac5zatbbJcfbq03"
+  "custom": "https://buy.stripe.com/dRmcMY2tUd8U1Vs4hXeEo00"
 };
 
 /* -----------------------------
