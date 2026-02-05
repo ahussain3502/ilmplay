@@ -469,6 +469,9 @@ body[data-theme="dark"] #donationModal.open .donation-box {
 }
 
 </style>
+
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#000000">
 </head>
 <body data-theme="light">
 
@@ -911,6 +914,10 @@ document.addEventListener("DOMContentLoaded", () => {
   ----------------------------- */
 
 
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js");
+}
+
   const closeDonation = donationModal.querySelector(".close-donation");
   const donationButtons = donationModal.querySelectorAll(".donation-options button");
 
@@ -1094,4 +1101,5 @@ donationButtons.forEach((btn) => {
 </script>
 </body>
 </html>
+
 
