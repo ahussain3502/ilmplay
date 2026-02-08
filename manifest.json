@@ -1,6 +1,6 @@
 {
-  "name": "ilmplay",
-  "short_name": "ilmplay",
+  "name": "Ilmplay",
+  "short_name": "Ilmplay",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
