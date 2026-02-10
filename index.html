@@ -916,15 +916,11 @@ document.addEventListener("DOMContentLoaded", () => {
   ----------------------------- */
 
 if ("serviceWorker" in navigator) {
-
   window.addEventListener("load", () => {
-
-    navigator.serviceWorker.register("/sw.js", { scope: "/" })
-
-      .then(reg => console.log("SW registered", reg))
-      .catch(err => console.error("SW failed", err));
+    navigator.serviceWorker.register("/sw.js")
+      .then(reg => console.log("SW registered:", reg))
+      .catch(err => console.error("SW failed:", err));
   });
-}
 
   const closeDonation = donationModal.querySelector(".close-donation");
   const donationButtons = donationModal.querySelectorAll(".donation-options button");
