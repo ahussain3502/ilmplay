@@ -470,6 +470,16 @@ body[data-theme="dark"] #donationModal.open .donation-box {
 
 </style>
 
+<!-- iOS support -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="/icon-192.png">
+
+<!-- Optional: splash screen -->
+<link rel="apple-touch-startup-image" href="/icon-512.png">  
+
+<button id="installBtn" style="display:none;">Install App</button>
+  
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#000000">
@@ -949,7 +959,25 @@ if ("serviceWorker" in navigator) {
   donationModal.addEventListener("click", (e) => {
     if (e.target === donationModal) closeDonationModal();
   });
+let deferredPrompt;
 
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault(); // Prevent auto-prompt
+  deferredPrompt = e;
+
+  const installBtn = document.getElementById('installBtn');
+  if (installBtn) installBtn.style.display = 'block'; // show a button
+});
+
+document.getElementById('installBtn')?.addEventListener('click', async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const choiceResult = await deferredPrompt.userChoice;
+    console.log('User choice:', choiceResult.outcome);
+    deferredPrompt = null;
+    document.getElementById('installBtn').style.display = 'none';
+  }
+});
 
   /* -----------------------------
       VIDEO GRID BUILDER
