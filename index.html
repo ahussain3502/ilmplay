@@ -1027,40 +1027,6 @@ if ("serviceWorker" in navigator) {
   donationModal.addEventListener("click", (e) => {
     if (e.target === donationModal) closeDonationModal();
   });
-let deferredPrompt = null;
-
-const modal = document.getElementById("installModal");
-const installConfirm = document.getElementById("installConfirm");
-const installCancel = document.getElementById("installCancel");
-
-window.addEventListener("beforeinstallprompt", (e) => {
-  // Stop Chrome from showing its own mini banner
-  e.preventDefault();
-
-  // Save the event for later
-  deferredPrompt = e;
-
-  // Show our custom modal
-  modal.classList.remove("hidden");
-});
-
-installConfirm.addEventListener("click", async () => {
-  if (!deferredPrompt) return;
-
-  // Show the real browser install prompt
-  deferredPrompt.prompt();
-
-  const { outcome } = await deferredPrompt.userChoice;
-  console.log("User choice:", outcome);
-
-  // Clear and hide modal
-  deferredPrompt = null;
-  modal.classList.add("hidden");
-});
-
-installCancel.addEventListener("click", () => {
-  modal.classList.add("hidden");
-});
   /* -----------------------------
       VIDEO GRID BUILDER
   ----------------------------- */
