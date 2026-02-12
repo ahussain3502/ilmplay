@@ -555,7 +555,9 @@ body[data-theme="dark"] #donationModal.open .donation-box {
   // Close modal
   closeDonation.addEventListener('click', () => {
     donationModal.classList.remove('open');
-    customInput.style.display = 'none';
+    const customInput = document.getElementById("customInput");
+    if (!customInput) return;
+    customInput.style.display = "none";
     customInput.value = '';
     selectedAmount = null;
   });
