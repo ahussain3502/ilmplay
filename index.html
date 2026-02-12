@@ -479,7 +479,13 @@ body[data-theme="dark"] #donationModal.open .donation-box {
 <link rel="apple-touch-startup-image" href="/icon-512.png">  
 
 <button id="installBtn" style="display:none;">Install App</button>
-  
+
+<div id="installBanner" style="display:none; position:fixed; top:0; left:0; right:0; background:#111; color:#fff; padding:12px; z-index:9999;">
+  <span>Install IlmPlay for a better experience</span>
+  <button id="installBtn">Install</button>
+  <button id="dismissBtn">Not now</button>
+</div>
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#000000">
@@ -1132,7 +1138,33 @@ donationButtons.forEach((btn) => {
   });
 });
 
+let deferredPrompt = null;
 
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault(); // stop browser mini-infobar
+  deferredPrompt = e;
+
+  const banner = document.getElementById('installBanner');
+  if (banner) banner.style.display = 'block'; // show your custom UI
+});
+
+document.getElementById('installBtn')?.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+
+  deferredPrompt.prompt();
+  const choiceResult = await deferredPrompt.userChoice;
+  console.log('User choice:', choiceResult.outcome);
+
+  deferredPrompt = null;
+
+  const banner = document.getElementById('installBanner');
+  if (banner) banner.style.display = 'none';
+});
+
+document.getElementById('dismissBtn')?.addEventListener('click', () => {
+  const banner = document.getElementById('installBanner');
+  if (banner) banner.style.display = 'none';
+});
 
 </script>
 </body>
