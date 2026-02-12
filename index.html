@@ -541,6 +541,15 @@ body[data-theme="dark"] #donationModal.open .donation-box {
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#000000">
 
+<link rel="icon" href="/icon-192.png">
+
+
+
+
+
+
+  
+  
 </head>
 <body data-theme="light">
 
@@ -610,7 +619,7 @@ body[data-theme="dark"] #donationModal.open .donation-box {
   const closeDonation = donationModal.querySelector('.close-donation');
   const customInput = document.getElementById('customAmountInput');
   const donateBtn = document.getElementById('donateBtn');
-
+  const donationButtons = document.querySelectorAll(".donation-button");
   let selectedAmount = null;
 
   // Open modal when any support box is clicked
@@ -1157,7 +1166,7 @@ const STRIPE_LINKS = {
 /* -----------------------------
     HANDLE DONATION BUTTONS
 ----------------------------- */
-const donationButtons = document.querySelectorAll(".donation-button");
+
 donationButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     const amount = btn.dataset.amount;
