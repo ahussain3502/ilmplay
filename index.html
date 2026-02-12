@@ -933,7 +933,12 @@ document.addEventListener("DOMContentLoaded", () => {
       DONATION MODAL
   ----------------------------- */
 
+console.log("Main JS loaded");
 
+window.addEventListener('beforeinstallprompt', (e) => {
+  console.log("beforeinstallprompt fired!");
+});
+  
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("/sw.js", { scope: "/" })
