@@ -592,7 +592,17 @@ body[data-theme="dark"] #donationModal.open .donation-box {
   <button class="close-donation" style="margin-top:10px;">Cancel</button>
   </div>
 </div>
-
+ <!-- Install Modal -->
+<div id="installModal" class="install-modal hidden">
+  <div class="install-box">
+    <h2>Install IlmPlay</h2>
+    <p>Get the app for faster access and a better experience.</p>
+    <div class="install-actions">
+      <button id="installConfirm">Install</button>
+      <button id="installCancel">Not now</button>
+    </div>
+  </div>
+</div> 
 <script src="https://js.stripe.com/v3/"></script>
 <script>
   const donationModal = document.getElementById('donationModal');
@@ -633,20 +643,7 @@ body[data-theme="dark"] #donationModal.open .donation-box {
     });
   });
 
- <!-- Install Modal -->
-<div id="installModal" class="install-modal hidden">
-  <div class="install-box">
-    <h2>Install IlmPlay</h2>
-    <p>Get the app for faster access and a better experience.</p>
-    <div class="install-actions">
-      <button id="installConfirm">Install</button>
-      <button id="installCancel">Not now</button>
-    </div>
-  </div>
-</div> 
- 
 </script>
-
 
 <main>
   <section id="Stories" class="page active"><div class="sectionTitle">Stories</div><div id="rows-Stories"></div></section>
@@ -1162,7 +1159,7 @@ const STRIPE_LINKS = {
 /* -----------------------------
     HANDLE DONATION BUTTONS
 ----------------------------- */
-
+const donationButtons = document.querySelectorAll(".donation-button");
 donationButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     const amount = btn.dataset.amount;
