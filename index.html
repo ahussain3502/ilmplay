@@ -470,26 +470,8 @@ body[data-theme="dark"] #donationModal.open .donation-box {
 
 </style>
 
-<!-- iOS support -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="/icon-192.png">
-
-<!-- Optional: splash screen -->
-<link rel="apple-touch-startup-image" href="/icon-512.png">  
-
-<button id="installBtn" style="display:none;">Install App</button>
-
-<div id="installBanner" style="display:none; position:fixed; top:0; left:0; right:0; background:#111; color:#fff; padding:12px; z-index:9999;">
-  <span>Install IlmPlay for a better experience</span>
-  <button id="installBtn">Install</button>
-  <button id="dismissBtn">Not now</button>
-</div>
-
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#000000">
-
 </head>
 <body data-theme="light">
 
@@ -561,9 +543,7 @@ body[data-theme="dark"] #donationModal.open .donation-box {
   // Close modal
   closeDonation.addEventListener('click', () => {
     donationModal.classList.remove('open');
-    const customInput = document.getElementById("customInput");
-    if (!customInput) return;
-    customInput.style.display = "none";
+    customInput.style.display = 'none';
     customInput.value = '';
     selectedAmount = null;
   });
@@ -933,18 +913,9 @@ document.addEventListener("DOMContentLoaded", () => {
       DONATION MODAL
   ----------------------------- */
 
-console.log("Main JS loaded");
 
-window.addEventListener('beforeinstallprompt', (e) => {
-  console.log("beforeinstallprompt fired!");
-});
-  
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js", { scope: "/" })
-      .then(reg => console.log("SW registered", reg))
-      .catch(err => console.error("SW failed", err));
-  });
+  navigator.serviceWorker.register("/sw.js");
 }
 
   const closeDonation = donationModal.querySelector(".close-donation");
@@ -972,25 +943,7 @@ if ("serviceWorker" in navigator) {
   donationModal.addEventListener("click", (e) => {
     if (e.target === donationModal) closeDonationModal();
   });
-let deferredPrompt;
 
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault(); // Prevent auto-prompt
-  deferredPrompt = e;
-
-  const installBtn = document.getElementById('installBtn');
-  if (installBtn) installBtn.style.display = 'block'; // show a button
-});
-
-document.getElementById('installBtn')?.addEventListener('click', async () => {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    const choiceResult = await deferredPrompt.userChoice;
-    console.log('User choice:', choiceResult.outcome);
-    deferredPrompt = null;
-    document.getElementById('installBtn').style.display = 'none';
-  }
-});
 
   /* -----------------------------
       VIDEO GRID BUILDER
@@ -1143,33 +1096,7 @@ donationButtons.forEach((btn) => {
   });
 });
 
-let deferredPrompt = null;
 
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault(); // stop browser mini-infobar
-  deferredPrompt = e;
-
-  const banner = document.getElementById('installBanner');
-  if (banner) banner.style.display = 'block'; // show your custom UI
-});
-
-document.getElementById('installBtn')?.addEventListener('click', async () => {
-  if (!deferredPrompt) return;
-
-  deferredPrompt.prompt();
-  const choiceResult = await deferredPrompt.userChoice;
-  console.log('User choice:', choiceResult.outcome);
-
-  deferredPrompt = null;
-
-  const banner = document.getElementById('installBanner');
-  if (banner) banner.style.display = 'none';
-});
-
-document.getElementById('dismissBtn')?.addEventListener('click', () => {
-  const banner = document.getElementById('installBanner');
-  if (banner) banner.style.display = 'none';
-});
 
 </script>
 </body>
