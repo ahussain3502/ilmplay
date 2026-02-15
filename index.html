@@ -467,7 +467,19 @@ body[data-theme="dark"] #donationModal.open .donation-box {
     transform: translateY(-1px);
   }
 }
+ #splash {
+  position: fixed;
+  inset: 0;
+  background: #6b4ba3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+ }
 
+ #splash img {
+  width: 150px;
+ }
 </style>
 
 <link rel="manifest" href="/manifest.json">
@@ -476,6 +488,9 @@ body[data-theme="dark"] #donationModal.open .donation-box {
 <body data-theme="light">
 
 <header>
+  <div id="splash">
+  <img src="/icon-512.png" alt="IlmPlay Logo" />
+  </div>
   <div class="left">
     <div class="logo"><img src="Untitled design(5).png" alt="IlmPlay logo"></div>
     <div class="brand">IlmPlay</div>
@@ -1096,7 +1111,11 @@ donationButtons.forEach((btn) => {
   });
 });
 
-
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    document.getElementById("splash").style.display = "none";
+  }, 1500);
+});
 
 </script>
 </body>
