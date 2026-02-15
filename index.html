@@ -467,19 +467,6 @@ body[data-theme="dark"] #donationModal.open .donation-box {
     transform: translateY(-1px);
   }
 }
- #app-splash {
-  position: fixed;
-  inset: 0;
-  background: #6b4ba3;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-#app-splash img {
-  width: 160px;
-}
 </style>
 
 <link rel="manifest" href="/manifest.json">
@@ -509,10 +496,6 @@ body[data-theme="dark"] #donationModal.open .donation-box {
 </div>
 
 </header>
-
-  <div id="splash">
-  <img src="/icon-512.png" alt="IlmPlay Logo" />
-  </div>
   
 <div class="hero">
   <h1>Welcome To IlmPlay</h1>
@@ -1111,29 +1094,6 @@ donationButtons.forEach((btn) => {
     // Fixed amounts → open their Stripe link
     window.open(STRIPE_LINKS[amount], "_blank");
   });
-});
-
-window.addEventListener("load", () => {
-
-  const isStandalone =
-    window.matchMedia('(display-mode: standalone)').matches ||
-    window.navigator.standalone === true;
-
-  const isFirstLoad = !sessionStorage.getItem("pwaOpened");
-
-  if (isStandalone && isFirstLoad) {
-
-    const splash = document.getElementById("app-splash");
-    splash.style.display = "flex";
-
-    sessionStorage.setItem("pwaOpened", "true");
-
-    setTimeout(() => {
-      splash.style.display = "none";
-    }, 2000);
-
-  }
-
 });
 
 </script>
