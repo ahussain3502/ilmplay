@@ -467,7 +467,25 @@ body[data-theme="dark"] #donationModal.open .donation-box {
     transform: translateY(-1px);
   }
 }
+#ios-install-banner {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  display: none;
+  justify-content: center;
+  z-index: 9999;
+}
 
+.ios-box {
+  background: #6b4ba3;
+  color: white;
+  padding: 16px;
+  border-radius: 14px;
+  font-size: 14px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
 </style>
 
 <link rel="manifest" href="/manifest.json">
@@ -591,6 +609,20 @@ body[data-theme="dark"] #donationModal.open .donation-box {
 
 <div class="footer">© IlmPlay — Safe Islamic Videos for Kids</div> 
 
+<div id="ios-install-banner">
+  <div class="ios-box">
+    Install IlmPlay:
+    <br><br>
+    1. Tap the Share button ⬆️<br>
+    2. Tap "Add to Home Screen"<br>
+    3. Tap "Add"
+    <br><br>
+    <button onclick="this.parentElement.parentElement.style.display='none'">
+      Close
+    </button>
+  </div>
+</div>
+  
 <script>
 const BASE='https://pub-34add490d32a4fbc9886affb7dc6b47d.r2.dev';
 const PLACEHOLDER='data:image/svg+xml;base64,'+btoa("<svg xmlns='http://www.w3.org/2000/svg' width='640' height='360'><rect width='100%' height='100%' fill='#f3f3f3'/><text x='50%' y='50%' text-anchor='middle' fill='#999' font-size='18'>No image</text></svg>");
@@ -912,7 +944,17 @@ document.addEventListener("DOMContentLoaded", () => {
   /* -----------------------------
       DONATION MODAL
   ----------------------------- */
+function isIos() {
+  return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+}
 
+function isInStandaloneMode() {
+  return window.navigator.standalone === true;
+}
+
+if (isIos() && !isInStandaloneMode()) {
+  document.getElementById("ios-install-banner").style.display = "flex";
+}
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js");
