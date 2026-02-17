@@ -470,80 +470,21 @@ body[data-theme="dark"] #donationModal.open .donation-box {
 #ios-install-banner {
   position: fixed;
   bottom: 20px;
-  left: 15px;
-  right: 15px;
+  left: 20px;
+  right: 20px;
   display: none;
   justify-content: center;
   z-index: 9999;
-  animation: slideUp 0.4s ease;
 }
 
-@keyframes slideUp {
-  from { transform: translateY(40px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-.ios-install-card {
-  width: 100%;
-  max-width: 420px;
-  background: linear-gradient(135deg, #6b4ba3, #8a6fd1);
+.ios-box {
+  background: #6b4ba3;
   color: white;
-  padding: 20px;
-  border-radius: 20px;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.25);
-  backdrop-filter: blur(10px);
-}
-
-.ios-title {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 14px;
-  text-align: center;
-}
-
-.ios-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  padding: 16px;
+  border-radius: 14px;
   font-size: 14px;
-}
-
-.step {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  line-height: 1.4;
-}
-
-.number {
-  background: white;
-  color: #6b4ba3;
-  width: 22px;
-  height: 22px;
-  font-size: 12px;
-  font-weight: bold;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-#close-ios-banner {
-  margin-top: 16px;
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 12px;
-  background: white;
-  color: #6b4ba3;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-#close-ios-banner:hover {
-  background: #f2f2f2;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 </style>
 
@@ -669,37 +610,16 @@ body[data-theme="dark"] #donationModal.open .donation-box {
 <div class="footer">© IlmPlay — Safe Islamic Videos for Kids</div> 
 
 <div id="ios-install-banner">
-  <div class="ios-install-card">
-    <div class="ios-title">Install IlmPlay</div>
-
-    <div class="ios-steps">
-      <div class="step">
-        <span class="number">1</span>
-        Press the <b>3 dots</b> in the bottom right
-      </div>
-
-      <div class="step">
-        <span class="number">2</span>
-        Tap the <b>Share</b> button ⬆︎
-      </div>
-
-      <div class="step">
-        <span class="number">3</span>
-        Scroll down
-      </div>
-
-      <div class="step">
-        <span class="number">4</span>
-        Tap <b>"Add to Home Screen"</b>
-      </div>
-
-      <div class="step">
-        <span class="number">5</span>
-        Tap <b>"Add"</b>
-      </div>
-    </div>
-
-    <button id="close-ios-banner">Got it</button>
+  <div class="ios-box">
+    Install IlmPlay:
+    <br><br>
+    1. Tap the Share button ⬆️<br>
+    2. Tap "Add to Home Screen"<br>
+    3. Tap "Add"
+    <br><br>
+    <button onclick="this.parentElement.parentElement.style.display='none'">
+      Close
+    </button>
   </div>
 </div>
   
@@ -1024,6 +944,17 @@ document.addEventListener("DOMContentLoaded", () => {
   /* -----------------------------
       DONATION MODAL
   ----------------------------- */
+function isIos() {
+  return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+}
+
+function isInStandaloneMode() {
+  return window.navigator.standalone === true;
+}
+
+if (isIos() && !isInStandaloneMode()) {
+  document.getElementById("ios-install-banner").style.display = "flex";
+}
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js");
@@ -1207,29 +1138,6 @@ donationButtons.forEach((btn) => {
   });
 });
 
-function isIos() {
-  return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
-}
-
-function isInStandaloneMode() {
-  return window.navigator.standalone === true;
-}
-
-window.addEventListener("load", function () {
-  if (isIos() && !isInStandaloneMode() && !localStorage.getItem("iosInstallClosed")) {
-    setTimeout(() => {
-      document.getElementById("ios-install-banner").style.display = "flex";
-    }, 1500);
-  }
-
-  const closeBtn = document.getElementById("close-ios-banner");
-  if (closeBtn) {
-    closeBtn.addEventListener("click", function () {
-      document.getElementById("ios-install-banner").style.display = "none";
-      localStorage.setItem("iosInstallClosed", "true");
-    });
-  }
-});
 
 
 </script>
