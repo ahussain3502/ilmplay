@@ -1035,59 +1035,50 @@ const CARTOONS = [
 document.addEventListener("DOMContentLoaded", () => {
 
   /* -----------------------------
-      SERVICE WORKER
+      DONATION MODAL
   ----------------------------- */
-  if ("serviceWorker" in navigator) {
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
     navigator.serviceWorker.register("/sw.js")
       .then(reg => console.log("SW registered:", reg.scope))
       .catch(err => console.log("SW failed:", err));
+  });
+}
+
+
+  const closeDonation = donationModal.querySelector(".close-donation");
+  const donationButtons = donationModal.querySelectorAll(".donation-options button");
+
+  function openDonationModal() {
+    donationModal.classList.add("open");
+    donationModal.setAttribute("aria-hidden", "false");
   }
 
-  /* -----------------------------
-      DONATION MODAL
-  ----------------------------- */
-  const donationModal = document.getElementById("donationModal");
-  if (donationModal) {
-    const closeDonation = donationModal.querySelector(".close-donation");
-    const donationButtons = donationModal.querySelectorAll(".donation-options button");
-
-    function openDonationModal() {
-      donationModal.classList.add("open");
-      donationModal.setAttribute("aria-hidden", "false");
-    }
-
-    function closeDonationModal() {
-      donationModal.classList.remove("open");
-      donationModal.setAttribute("aria-hidden", "true");
-    }
-
-    const boxMobile = document.getElementById("supportBox");
-    const boxDesktop = document.getElementById("supportBoxDesktop");
-    if (boxMobile) boxMobile.addEventListener("click", openDonationModal);
-    if (boxDesktop) boxDesktop.addEventListener("click", openDonationModal);
-
-    if (closeDonation) closeDonation.addEventListener("click", closeDonationModal);
-    donationModal.addEventListener("click", (e) => {
-      if (e.target === donationModal) closeDonationModal();
-    });
-
-    // Donation button clicks
-    donationButtons.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const amount = btn.dataset.amount;
-        if (amount === "custom") window.open(STRIPE_LINKS["custom"], "_blank");
-        else if (STRIPE_LINKS[amount]) window.open(STRIPE_LINKS[amount], "_blank");
-      });
-    });
+  function closeDonationModal() {
+    donationModal.classList.remove("open");
+    donationModal.setAttribute("aria-hidden", "true");
   }
+
+  // Support Us boxes
+  const boxMobile = document.getElementById("supportBox");
+  const boxDesktop = document.getElementById("supportBoxDesktop");
+
+  if (boxMobile) boxMobile.addEventListener("click", openDonationModal);
+  if (boxDesktop) boxDesktop.addEventListener("click", openDonationModal);
+
+  // Close modal
+  closeDonation.addEventListener("click", closeDonationModal);
+  donationModal.addEventListener("click", (e) => {
+    if (e.target === donationModal) closeDonationModal();
+  });
+
 
   /* -----------------------------
       VIDEO GRID BUILDER
   ----------------------------- */
-  function buildRow(section, videos) {
-    const parent = document.getElementById("rows-" + section);
-    if (!parent) return;
 
+  function buildRow(section, videos) {
     const wrapper = document.createElement("div");
     wrapper.className = "rowWrapper";
 
@@ -1108,48 +1099,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
       tile.appendChild(img);
       tile.appendChild(title);
-
       tile.addEventListener("click", () => openModal(v));
 
       row.appendChild(tile);
     });
 
     wrapper.appendChild(row);
-    parent.appendChild(wrapper);
+    document.getElementById("rows-" + section).appendChild(wrapper);
   }
 
-  if (Array.isArray(STORIES)) {
-    for (let i = 0; i < STORIES.length; i += 8)
-      buildRow("Stories", STORIES.slice(i, i + 8));
-  }
-  if (Array.isArray(NASHEEDS)) {
-    for (let i = 0; i < NASHEEDS.length; i += 8)
-      buildRow("Nasheeds", NASHEEDS.slice(i, i + 8));
-  }
-  if (Array.isArray(DUAS)) {
-    for (let i = 0; i < DUAS.length; i += 8)
-      buildRow("Duas", DUAS.slice(i, i + 8));
-  }
-  if (Array.isArray(CARTOONS)) {
-    for (let i = 0; i < CARTOONS.length; i += 8)
-      buildRow("Cartoons", CARTOONS.slice(i, i + 8));
-  }
+  for (let i = 0; i < STORIES.length; i += 8)
+    buildRow("Stories", STORIES.slice(i, i + 8));
+
+  for (let i = 0; i < NASHEEDS.length; i += 8)
+    buildRow("Nasheeds", NASHEEDS.slice(i, i + 8));
+
+  for (let i = 0; i < DUAS.length; i += 8)
+    buildRow("Duas", DUAS.slice(i, i + 8));
+
+  for (let i = 0; i < CARTOONS.length; i += 8)
+    buildRow("Cartoons", CARTOONS.slice(i, i + 8));
+
 
   /* -----------------------------
       VIDEO MODAL
   ----------------------------- */
-  const modal = document.getElementById("modal");
-  const player = document.getElementById("player");
-  const modalTitle = document.getElementById("modalTitle");
-  const modalDesc = document.getElementById("modalDesc");
-  const closeBtn = document.getElementById("closeBtn");
+
+  const modal = document.getElementById("modal"),
+    player = document.getElementById("player"),
+    modalTitle = document.getElementById("modalTitle"),
+    modalDesc = document.getElementById("modalDesc"),
+    closeBtn = document.getElementById("closeBtn");
 
   function openModal(v) {
-    if (!modal || !player) return;
     player.src = v.file;
-    if (modalTitle) modalTitle.textContent = v.title;
-    if (modalDesc) modalDesc.textContent = v.desc;
-
+    modalTitle.textContent = v.title;
+    modalDesc.textContent = v.desc;
     modal.classList.add("open");
     modal.setAttribute("aria-hidden", "false");
 
@@ -1157,87 +1142,121 @@ document.addEventListener("DOMContentLoaded", () => {
     if (playPromise && playPromise.catch) playPromise.catch(() => {});
   }
 
-  if (closeBtn) {
-    closeBtn.addEventListener("click", () => {
-      if (!modal || !player) return;
+  closeBtn.addEventListener("click", () => {
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
 
-      modal.classList.remove("open");
-      modal.setAttribute("aria-hidden", "true");
+    try {
+      player.pause();
+      player.currentTime = 0;
+    } catch (e) {}
 
-      try {
-        player.pause();
-        player.currentTime = 0;
-      } catch (e) {}
+    player.removeAttribute("src");
+    player.load();
+  });
 
-      player.removeAttribute("src");
-      player.load();
-    });
-  }
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeBtn.click();
+  });
 
-  if (modal) {
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal && closeBtn) closeBtn.click();
-    });
-  }
 
   /* -----------------------------
       NAVIGATION
   ----------------------------- */
-  document.querySelectorAll(".nav a").forEach((a) => {
+
+  document.querySelectorAll(".nav a").forEach((a) =>
     a.addEventListener("click", () => {
-      document.querySelectorAll(".page").forEach((p) => p.classList.remove("active"));
-      const target = document.getElementById(a.dataset.section);
-      if (target) target.classList.add("active");
-    });
-  });
+      document.querySelectorAll(".page").forEach((p) =>
+        p.classList.remove("active")
+      );
+      document.getElementById(a.dataset.section).classList.add("active");
+    })
+  );
+
 
   /* -----------------------------
       THEME TOGGLE
   ----------------------------- */
+
   const themeToggle = document.getElementById("themeToggle");
-  if (themeToggle) {
-    themeToggle.addEventListener("click", () => {
-      if (document.body.dataset.theme === "light") {
-        document.body.dataset.theme = "dark";
-        themeToggle.textContent = "☀️";
-      } else {
-        document.body.dataset.theme = "light";
-        themeToggle.textContent = "🌙";
-      }
-    });
-  }
 
-  /* -----------------------------
-      IOS INSTALL BANNER
-  ----------------------------- */
-  const iosBanner = document.getElementById("ios-install-banner");
-  const iosClose = document.getElementById("close-ios-banner");
+  themeToggle.addEventListener("click", () => {
+    if (document.body.dataset.theme === "light") {
+      document.body.dataset.theme = "dark";
+      themeToggle.textContent = "☀️";
+    } else {
+      document.body.dataset.theme = "light";
+      themeToggle.textContent = "🌙";
+    }
+  });
 
-  function isIos() {
-    return /iphone|ipad|ipod/i.test(navigator.userAgent)
-      || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  }
+});
 
-  function isInStandaloneMode() {
-    return window.matchMedia("(display-mode: standalone)").matches
-           || window.navigator.standalone === true;
-  }
+
+/* -----------------------------
+    STRIPE LINKS
+----------------------------- */
+
+const STRIPE_LINKS = {
+  "1": "https://buy.stripe.com/aFacMYc4ud8UarY8ydeEo03",
+  "5": "https://buy.stripe.com/6oU9AMb0q4Co2ZweWBeEo02",
+  "10": "https://buy.stripe.com/7sY7sE1pQ1qc7fM01HeEo01",
+
+  // Custom: Stripe page where user enters their own amount
+  "custom": "https://buy.stripe.com/dRmcMY2tUd8U1Vs4hXeEo00"
+};
+
+/* -----------------------------
+    HANDLE DONATION BUTTONS
+----------------------------- */
+
+donationButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const amount = btn.dataset.amount;
+
+    // If custom → go straight to Stripe (no prompt on your site)
+    if (amount === "custom") {
+      window.open(STRIPE_LINKS["custom"], "_blank");
+      return;
+    }
+
+    // Fixed amounts → open their Stripe link
+    window.open(STRIPE_LINKS[amount], "_blank");
+  });
+});
+
+function isIos() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+function isInStandaloneMode() {
+  return window.matchMedia('(display-mode: standalone)').matches
+         || window.navigator.standalone === true;
+}
+
+window.addEventListener("load", function () {
 
   console.log("iOS:", isIos());
   console.log("Standalone:", isInStandaloneMode());
   console.log("Closed:", localStorage.getItem("iosInstallClosed"));
 
-  if (iosBanner && isIos() && !isInStandaloneMode() && !localStorage.getItem("iosInstallClosed")) {
-    setTimeout(() => iosBanner.style.display = "flex", 1500);
+  if (isIos() && !isInStandaloneMode() && !localStorage.getItem("iosInstallClosed")) {
+    setTimeout(() => {
+      const banner = document.getElementById("ios-install-banner");
+      if (banner) banner.style.display = "flex";
+    }, 1500);
   }
 
-  if (iosClose && iosBanner) {
-    iosClose.addEventListener("click", () => {
-      iosBanner.style.display = "none";
+  const closeBtn = document.getElementById("close-ios-banner");
+  if (closeBtn) {
+    closeBtn.addEventListener("click", function () {
+      document.getElementById("ios-install-banner").style.display = "none";
       localStorage.setItem("iosInstallClosed", "true");
     });
   }
 });
+  
   
 </script>
 </body>
