@@ -1225,17 +1225,25 @@ donationButtons.forEach((btn) => {
 });
 
 function isIos() {
-  return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+  return /iphone|ipad|ipod/i.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 }
+
 function isInStandaloneMode() {
-  return window.matchMedia('(display-mode: standalone)').matches 
+  return window.matchMedia('(display-mode: standalone)').matches
          || window.navigator.standalone === true;
 }
 
 window.addEventListener("load", function () {
+
+  console.log("iOS:", isIos());
+  console.log("Standalone:", isInStandaloneMode());
+  console.log("Closed:", localStorage.getItem("iosInstallClosed"));
+
   if (isIos() && !isInStandaloneMode() && !localStorage.getItem("iosInstallClosed")) {
     setTimeout(() => {
-      document.getElementById("ios-install-banner").style.display = "flex";
+      const banner = document.getElementById("ios-install-banner");
+      if (banner) banner.style.display = "flex";
     }, 1500);
   }
 
@@ -1247,8 +1255,6 @@ window.addEventListener("load", function () {
     });
   }
 });
-
-
 </script>
 </body>
 </html>
