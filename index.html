@@ -1224,14 +1224,12 @@ donationButtons.forEach((btn) => {
   });
 });
 
-console.log("isIos:", isIos());
-
 function isIos() {
   return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
 }
-
 function isInStandaloneMode() {
-  return window.navigator.standalone === true;
+  return window.matchMedia('(display-mode: standalone)').matches 
+         || window.navigator.standalone === true;
 }
 
 window.addEventListener("load", function () {
