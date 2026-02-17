@@ -467,84 +467,7 @@ body[data-theme="dark"] #donationModal.open .donation-box {
     transform: translateY(-1px);
   }
 }
-#ios-install-banner {
-  position: fixed;
-  bottom: 20px;
-  left: 15px;
-  right: 15px;
-  display: none;
-  justify-content: center;
-  z-index: 9999;
-  animation: slideUp 0.4s ease;
-}
 
-@keyframes slideUp {
-  from { transform: translateY(40px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-.ios-install-card {
-  width: 100%;
-  max-width: 420px;
-  background: linear-gradient(135deg, #6b4ba3, #8a6fd1);
-  color: white;
-  padding: 20px;
-  border-radius: 20px;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.25);
-  backdrop-filter: blur(10px);
-}
-
-.ios-title {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 14px;
-  text-align: center;
-}
-
-.ios-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  font-size: 14px;
-}
-
-.step {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  line-height: 1.4;
-}
-
-.number {
-  background: white;
-  color: #6b4ba3;
-  width: 22px;
-  height: 22px;
-  font-size: 12px;
-  font-weight: bold;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-#close-ios-banner {
-  margin-top: 16px;
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 12px;
-  background: white;
-  color: #6b4ba3;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-#close-ios-banner:hover {
-  background: #f2f2f2;
-}
 </style>
 
 <link rel="manifest" href="/manifest.json">
@@ -668,41 +591,6 @@ body[data-theme="dark"] #donationModal.open .donation-box {
 
 <div class="footer">© IlmPlay — Safe Islamic Videos for Kids</div> 
 
-<div id="ios-install-banner">
-  <div class="ios-install-card">
-    <div class="ios-title">Install IlmPlay</div>
-
-    <div class="ios-steps">
-      <div class="step">
-        <span class="number">1</span>
-        Press the <b>3 dots</b> in the bottom right
-      </div>
-
-      <div class="step">
-        <span class="number">2</span>
-        Tap the <b>Share</b> button ⬆︎
-      </div>
-
-      <div class="step">
-        <span class="number">3</span>
-        Scroll down
-      </div>
-
-      <div class="step">
-        <span class="number">4</span>
-        Tap <b>"Add to Home Screen"</b>
-      </div>
-
-      <div class="step">
-        <span class="number">5</span>
-        Tap <b>"Add"</b>
-      </div>
-    </div>
-
-    <button id="close-ios-banner">Got it</button>
-  </div>
-</div>
-  
 <script>
 const BASE='https://pub-34add490d32a4fbc9886affb7dc6b47d.r2.dev';
 const PLACEHOLDER='data:image/svg+xml;base64,'+btoa("<svg xmlns='http://www.w3.org/2000/svg' width='640' height='360'><rect width='100%' height='100%' fill='#f3f3f3'/><text x='50%' y='50%' text-anchor='middle' fill='#999' font-size='18'>No image</text></svg>");
@@ -1025,6 +913,7 @@ document.addEventListener("DOMContentLoaded", () => {
       DONATION MODAL
   ----------------------------- */
 
+
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js");
 }
@@ -1207,29 +1096,6 @@ donationButtons.forEach((btn) => {
   });
 });
 
-function isIos() {
-  return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
-}
-
-function isInStandaloneMode() {
-  return window.navigator.standalone === true;
-}
-
-window.addEventListener("load", function () {
-  if (isIos() && !isInStandaloneMode() && !localStorage.getItem("iosInstallClosed")) {
-    setTimeout(() => {
-      document.getElementById("ios-install-banner").style.display = "flex";
-    }, 1500);
-  }
-
-  const closeBtn = document.getElementById("close-ios-banner");
-  if (closeBtn) {
-    closeBtn.addEventListener("click", function () {
-      document.getElementById("ios-install-banner").style.display = "none";
-      localStorage.setItem("iosInstallClosed", "true");
-    });
-  }
-});
 
 
 </script>
