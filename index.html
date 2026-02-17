@@ -1224,6 +1224,8 @@ donationButtons.forEach((btn) => {
   });
 });
 
+console.log("isIos:", isIos());
+
 function isIos() {
   return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
 }
