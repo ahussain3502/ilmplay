@@ -1046,7 +1046,38 @@ if ("serviceWorker" in navigator) {
   });
 }
 
+function isIos() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
 
+function isInStandaloneMode() {
+  return window.matchMedia('(display-mode: standalone)').matches
+         || window.navigator.standalone === true;
+}
+
+window.addEventListener("load", function () {
+
+  console.log("iOS:", isIos());
+  console.log("Standalone:", isInStandaloneMode());
+  console.log("Closed:", localStorage.getItem("iosInstallClosed"));
+
+  if (isIos() && !isInStandaloneMode() && !localStorage.getItem("iosInstallClosed")) {
+    setTimeout(() => {
+      const banner = document.getElementById("ios-install-banner");
+      if (banner) banner.style.display = "flex";
+    }, 1500);
+  }
+
+  const closeBtn = document.getElementById("close-ios-banner");
+  if (closeBtn) {
+    closeBtn.addEventListener("click", function () {
+      document.getElementById("ios-install-banner").style.display = "none";
+      localStorage.setItem("iosInstallClosed", "true");
+    });
+  }
+});
+  
   const closeDonation = donationModal.querySelector(".close-donation");
   const donationButtons = donationModal.querySelectorAll(".donation-options button");
 
@@ -1225,39 +1256,6 @@ donationButtons.forEach((btn) => {
   });
 });
 
-function isIos() {
-  return /iphone|ipad|ipod/i.test(navigator.userAgent)
-    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-}
-
-function isInStandaloneMode() {
-  return window.matchMedia('(display-mode: standalone)').matches
-         || window.navigator.standalone === true;
-}
-
-window.addEventListener("load", function () {
-
-  console.log("iOS:", isIos());
-  console.log("Standalone:", isInStandaloneMode());
-  console.log("Closed:", localStorage.getItem("iosInstallClosed"));
-
-  if (isIos() && !isInStandaloneMode() && !localStorage.getItem("iosInstallClosed")) {
-    setTimeout(() => {
-      const banner = document.getElementById("ios-install-banner");
-      if (banner) banner.style.display = "flex";
-    }, 1500);
-  }
-
-  const closeBtn = document.getElementById("close-ios-banner");
-  if (closeBtn) {
-    closeBtn.addEventListener("click", function () {
-      document.getElementById("ios-install-banner").style.display = "none";
-      localStorage.setItem("iosInstallClosed", "true");
-    });
-  }
-});
-  
-  
 </script>
 </body>
 </html>
