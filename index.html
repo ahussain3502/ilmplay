@@ -603,19 +603,6 @@ body[data-theme="dark"] #donationModal.open .donation-box {
 
 <script src="https://js.stripe.com/v3/"></script>
 <script>
-  console.log("JS loaded");
-
-if ("serviceWorker" in navigator) {
-  console.log("SW supported");
-
-  navigator.serviceWorker.register("/sw.js")
-    .then(reg => {
-      console.log("SW registered successfully:", reg);
-    })
-    .catch(err => {
-      console.error("SW registration failed:", err);
-    });
-}
   const donationModal = document.getElementById('donationModal');
   const supportBoxes = [document.getElementById('supportBox'), document.getElementById('supportBoxDesktop')];
   const closeDonation = donationModal.querySelector('.close-donation');
