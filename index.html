@@ -545,31 +545,7 @@ body[data-theme="dark"] #donationModal.open .donation-box {
 #close-ios-banner:hover {
   background: #f2f2f2;
 }
-  .up-next-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.75);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 10;
-}
-
-.up-next-box {
-  background: white;
-  padding: 20px;
-  border-radius: 16px;
-  text-align: center;
-  min-width: 200px;
-}
-
-#cancelAutoplay {
-  margin-top: 10px;
-  padding: 8px 14px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
+  
 </style>
 
 <link rel="manifest" href="/manifest.json">
@@ -678,19 +654,7 @@ if ("serviceWorker" in navigator) {
       }
     });
   });
- let currentList = [];
-let currentIndex = -1;
-let autoplayTimer = null;
 
-function openModal(video, list = [], index = 0) {
-  currentList = list;
-  currentIndex = index;
-
-  player.src = video.file;
-  modal.classList.add("open");
-
-  player.play().catch(() => {});
-}
  
 </script>
 
@@ -705,12 +669,7 @@ function openModal(video, list = [], index = 0) {
 <div id="modal" class="modal" aria-hidden="true">
   <div class="playerBox" role="dialog" aria-modal="true">
     <video id="player" controls playsinline preload="metadata"></video>
-    <div id="upNextOverlay" class="up-next-overlay" style="display:none;">
-  <div class="up-next-box">
-    <div id="upNextText">Next video in 5</div>
-    <button id="cancelAutoplay">Cancel</button>
-  </div>
-</div>
+
     <div class="modal-info">
       <div>
         <div id="modalTitle" class="modal-title"></div>
