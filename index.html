@@ -545,6 +545,23 @@ body[data-theme="dark"] #donationModal.open .donation-box {
 #close-ios-banner:hover {
   background: #f2f2f2;
 }
+  .playerBox {
+  position: relative;
+}
+
+.autoplay-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.hidden {
+  display: none;
+  }
 </style>
 
 <link rel="manifest" href="/manifest.json">
@@ -666,8 +683,19 @@ if ("serviceWorker" in navigator) {
 </main>
 
 <div id="modal" class="modal" aria-hidden="true">
+<div id="modal" class="modal" aria-hidden="true">
   <div class="playerBox" role="dialog" aria-modal="true">
+    
     <video id="player" controls playsinline preload="metadata"></video>
+
+    <!-- Autoplay Overlay (MUST be inside playerBox) -->
+    <div id="autoplayOverlay" class="autoplay-overlay hidden">
+      <div class="autoplay-box">
+        <p>Next video starts in <span id="countdown">5</span> seconds</p>
+        <button id="cancelAutoplay">Cancel</button>
+      </div>
+    </div>
+
     <div class="modal-info">
       <div>
         <div id="modalTitle" class="modal-title"></div>
@@ -675,9 +703,9 @@ if ("serviceWorker" in navigator) {
       </div>
       <button id="closeBtn" class="closeBtn" aria-label="Close">Close</button>
     </div>
+
   </div>
 </div>
-
 
 <div class="footer">© IlmPlay — Safe Islamic Videos for Kids</div> 
 
@@ -1034,6 +1062,12 @@ const CARTOONS = [
 
 document.addEventListener("DOMContentLoaded", () => {
 
+  const video = document.getElementById("player");
+const overlay = document.getElementById("autoplayOverlay");
+const countdownEl = document.getElementById("countdown");
+const cancelBtn = document.getElementById("cancelAutoplay");
+
+let countdownInterval;
   /* -----------------------------
       DONATION MODAL
   ----------------------------- */
@@ -1157,7 +1191,30 @@ if ("serviceWorker" in navigator) {
   modal.addEventListener("click", (e) => {
     if (e.target === modal) closeBtn.click();
   });
+  function startCountdown() {
+  let timeLeft = 5;
+  countdownEl.textContent = timeLeft;
 
+  overlay.classList.remove("hidden");
+
+  countdownInterval = setInterval(() => {
+    timeLeft--;
+    countdownEl.textContent = timeLeft;
+
+    if (timeLeft <= 0) {
+      clearInterval(countdownInterval);
+      overlay.classList.add("hidden");
+      playNextVideo(); // this must match your existing function
+    }
+  }, 1000);
+}
+
+video.addEventListener("ended", startCountdown);
+
+cancelBtn.addEventListener("click", () => {
+  clearInterval(countdownInterval);
+  overlay.classList.add("hidden");
+});
 
   /* -----------------------------
       NAVIGATION
