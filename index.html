@@ -545,6 +545,117 @@ body[data-theme="dark"] #donationModal.open .donation-box {
 #close-ios-banner:hover {
   background: #f2f2f2;
 }
+.playerBox{
+  position:relative;
+}
+
+/* ---------- overlay ---------- */
+
+.nextOverlay{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.85);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:10;
+}
+
+.hidden{
+  display:none;
+}
+
+/* ---------- up next ---------- */
+
+.upNextCard{
+  display:flex;
+  gap:20px;
+  background:#111;
+  padding:20px;
+  border-radius:14px;
+  color:white;
+  max-width:520px;
+}
+
+.upNextCard img{
+  width:200px;
+  height:120px;
+  object-fit:cover;
+  border-radius:10px;
+}
+
+.upNextLabel{
+  opacity:.7;
+  font-size:14px;
+}
+
+/* ---------- countdown circle ---------- */
+
+.countdownWrap{
+  position:relative;
+  width:60px;
+  height:60px;
+  margin:10px 0;
+}
+
+.countdownWrap span{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+}
+
+svg circle{
+  fill:none;
+  stroke-width:4;
+}
+
+.bg{
+  stroke:#444;
+}
+
+.progress{
+  stroke:#00e5ff;
+  stroke-dasharray:163;
+  stroke-dashoffset:0;
+  transform:rotate(-90deg);
+  transform-origin:center;
+  transition:stroke-dashoffset 1s linear;
+}
+
+/* ---------- autoplay toggle ---------- */
+
+.autoToggle{
+  font-size:14px;
+  margin-top:8px;
+}
+
+/* ---------- recommendations ---------- */
+
+.recommendPanel{
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  padding:10px;
+  background:#0d0d0d;
+}
+
+.recItem{
+  min-width:160px;
+  cursor:pointer;
+}
+
+.recItem img{
+  width:100%;
+  border-radius:8px;
+}
+
+.recItem div{
+  font-size:13px;
+  color:white;
+}
 </style>
 
 <link rel="manifest" href="/manifest.json">
@@ -667,14 +778,64 @@ if ("serviceWorker" in navigator) {
 
 <div id="modal" class="modal" aria-hidden="true">
   <div class="playerBox" role="dialog" aria-modal="true">
+
     <video id="player" controls playsinline preload="metadata"></video>
+
+    <!-- =====================
+         AUTOPLAY OVERLAY
+    ====================== -->
+    <div id="nextOverlay" class="nextOverlay hidden">
+
+      <div class="upNextCard">
+
+        <img id="nextThumb">
+
+        <div class="upNextInfo">
+          <div class="upNextLabel">Up Next</div>
+          <div id="nextTitle"></div>
+
+          <div class="countdownWrap">
+            <svg width="60" height="60">
+              <circle class="bg"
+                cx="30" cy="30" r="26"/>
+              <circle id="progressCircle"
+                class="progress"
+                cx="30" cy="30" r="26"/>
+            </svg>
+
+            <span id="count">5</span>
+          </div>
+
+          <button id="playNowBtn">Play Now</button>
+
+          <label class="autoToggle">
+            <input type="checkbox"
+                   id="autoplayToggle"
+                   checked>
+            Autoplay
+          </label>
+
+        </div>
+      </div>
+    </div>
+
+
+    <!-- =====================
+        RECOMMENDED PANEL
+    ====================== -->
+    <div id="recommendPanel" class="recommendPanel"></div>
+
+
     <div class="modal-info">
       <div>
         <div id="modalTitle" class="modal-title"></div>
         <div id="modalDesc" class="modal-desc"></div>
       </div>
-      <button id="closeBtn" class="closeBtn" aria-label="Close">Close</button>
+
+      <button id="closeBtn"
+        class="closeBtn">Close</button>
     </div>
+
   </div>
 </div>
 
@@ -1073,91 +1234,223 @@ if ("serviceWorker" in navigator) {
   });
 
 
-  /* -----------------------------
-      VIDEO GRID BUILDER
-  ----------------------------- */
+/* -----------------------------
+   VIDEO GRID BUILDER
+----------------------------- */
 
-  function buildRow(section, videos) {
-    const wrapper = document.createElement("div");
-    wrapper.className = "rowWrapper";
+// Make sure you have your arrays defined: STORIES, NASHEEDS, DUAS, CARTOONS, PLACEHOLDER
 
-    const row = document.createElement("div");
-    row.className = "row";
+function buildRow(sectionName, fullList, slice){
+  const wrapper = document.createElement("div");
+  wrapper.className = "rowWrapper";
 
-    videos.forEach((v) => {
-      const tile = document.createElement("div");
-      tile.className = "tile";
+  const row = document.createElement("div");
+  row.className = "row";
 
-      const img = document.createElement("img");
-      img.src = v.thumb || PLACEHOLDER;
-      img.alt = v.title;
+  slice.forEach(v => {
+    const tile = document.createElement("div");
+    tile.className = "tile";
 
-      const title = document.createElement("div");
-      title.className = "tile-title";
-      title.textContent = v.title;
+    const img = document.createElement("img");
+    img.src = v.thumb || PLACEHOLDER;
+    img.alt = v.title;
 
-      tile.appendChild(img);
-      tile.appendChild(title);
-      tile.addEventListener("click", () => openModal(v));
+    const title = document.createElement("div");
+    title.className = "tile-title";
+    title.textContent = v.title;
 
-      row.appendChild(tile);
-    });
+    tile.appendChild(img);
+    tile.appendChild(title);
 
-    wrapper.appendChild(row);
-    document.getElementById("rows-" + section).appendChild(wrapper);
-  }
+    // Click handler opens modal with playlist
+    tile.addEventListener("click", () =>
+      playFromList(fullList, v)
+    );
 
-  for (let i = 0; i < STORIES.length; i += 8)
-    buildRow("Stories", STORIES.slice(i, i + 8));
-
-  for (let i = 0; i < NASHEEDS.length; i += 8)
-    buildRow("Nasheeds", NASHEEDS.slice(i, i + 8));
-
-  for (let i = 0; i < DUAS.length; i += 8)
-    buildRow("Duas", DUAS.slice(i, i + 8));
-
-  for (let i = 0; i < CARTOONS.length; i += 8)
-    buildRow("Cartoons", CARTOONS.slice(i, i + 8));
-
-
-  /* -----------------------------
-      VIDEO MODAL
-  ----------------------------- */
-
-  const modal = document.getElementById("modal"),
-    player = document.getElementById("player"),
-    modalTitle = document.getElementById("modalTitle"),
-    modalDesc = document.getElementById("modalDesc"),
-    closeBtn = document.getElementById("closeBtn");
-
-  function openModal(v) {
-    player.src = v.file;
-    modalTitle.textContent = v.title;
-    modalDesc.textContent = v.desc;
-    modal.classList.add("open");
-    modal.setAttribute("aria-hidden", "false");
-
-    const playPromise = player.play();
-    if (playPromise && playPromise.catch) playPromise.catch(() => {});
-  }
-
-  closeBtn.addEventListener("click", () => {
-    modal.classList.remove("open");
-    modal.setAttribute("aria-hidden", "true");
-
-    try {
-      player.pause();
-      player.currentTime = 0;
-    } catch (e) {}
-
-    player.removeAttribute("src");
-    player.load();
+    row.appendChild(tile);
   });
 
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) closeBtn.click();
-  });
+  wrapper.appendChild(row);
 
+  document
+    .getElementById("rows-" + sectionName)
+    .appendChild(wrapper);
+}
+
+/* -----------------------------
+   BUILD ALL SECTIONS
+----------------------------- */
+for(let i=0;i<STORIES.length;i+=8)
+  buildRow("Stories",STORIES,STORIES.slice(i,i+8));
+
+for(let i=0;i<NASHEEDS.length;i+=8)
+  buildRow("Nasheeds",NASHEEDS,NASHEEDS.slice(i,i+8));
+
+for(let i=0;i<DUAS.length;i+=8)
+  buildRow("Duas",DUAS,DUAS.slice(i,i+8));
+
+for(let i=0;i<CARTOONS.length;i+=8)
+  buildRow("Cartoons",CARTOONS,CARTOONS.slice(i,i+8));
+
+
+/* -----------------------------
+   VIDEO MODAL & PLAYER
+----------------------------- */
+const modal = document.getElementById("modal");
+const player = document.getElementById("player");
+const modalTitle = document.getElementById("modalTitle");
+const modalDesc = document.getElementById("modalDesc");
+const closeBtn = document.getElementById("closeBtn");
+
+/* overlay */
+const overlay = document.getElementById("nextOverlay");
+const nextThumb = document.getElementById("nextThumb");
+const nextTitle = document.getElementById("nextTitle");
+const countEl = document.getElementById("count");
+const progressCircle = document.getElementById("progressCircle");
+const playNowBtn = document.getElementById("playNowBtn");
+const autoplayToggle = document.getElementById("autoplayToggle");
+const recommendPanel = document.getElementById("recommendPanel");
+
+/* -----------------------------
+   STATE
+----------------------------- */
+let playlist = [];
+let index = 0;
+let timer;
+
+
+/* -----------------------------
+   OPEN VIDEO
+----------------------------- */
+function openModal(v){
+  clearInterval(timer);
+  overlay.classList.add("hidden");
+
+  player.src = v.file;
+  modalTitle.textContent = v.title;
+  modalDesc.textContent = v.desc;
+
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden","false");
+
+  buildRecommendations();
+
+  player.play().catch(()=>{});
+}
+
+
+/* ---------- TILE CLICK ---------- */
+function playFromList(fullList, vid){
+  playlist = fullList;
+  index = fullList.indexOf(vid);
+  openModal(vid);
+}
+
+
+/* -----------------------------
+   VIDEO END → SHOW UP NEXT
+----------------------------- */
+player.addEventListener("ended",()=>{
+  if(!autoplayToggle.checked) return;
+  showUpNext();
+});
+
+function showUpNext(){
+  let nextIndex = (index+1) % playlist.length;
+  const nextVid = playlist[nextIndex];
+
+  nextThumb.src = nextVid.thumb;
+  nextTitle.textContent = nextVid.title;
+
+  overlay.classList.remove("hidden");
+
+  startCountdown(nextIndex);
+}
+
+
+/* -----------------------------
+   COUNTDOWN CIRCLE
+----------------------------- */
+function startCountdown(nextIndex){
+  let time = 5;
+  const circumference = 163; // for circle
+
+  countEl.textContent = time;
+  progressCircle.style.strokeDashoffset = 0;
+
+  timer = setInterval(()=>{
+    time--;
+    countEl.textContent = time;
+    progressCircle.style.strokeDashoffset =
+      circumference * (1 - time/5);
+
+    if(time <= 0){
+      clearInterval(timer);
+      index = nextIndex;
+      openModal(playlist[index]);
+    }
+  },1000);
+}
+
+
+/* -----------------------------
+   PLAY NOW BUTTON
+----------------------------- */
+playNowBtn.onclick = ()=>{
+  clearInterval(timer);
+  index = (index+1)%playlist.length;
+  openModal(playlist[index]);
+};
+
+
+/* -----------------------------
+   RECOMMENDED PANEL
+----------------------------- */
+function buildRecommendations(){
+  recommendPanel.innerHTML = "";
+
+  playlist.forEach((v,i)=>{
+    if(i===index) return;
+
+    const item = document.createElement("div");
+    item.className = "recItem";
+    item.innerHTML=`
+      <img src="${v.thumb}">
+      <div>${v.title}</div>
+    `;
+
+    item.onclick = ()=>{
+      index=i;
+      openModal(v);
+    };
+
+    recommendPanel.appendChild(item);
+  });
+}
+
+
+/* -----------------------------
+   CLOSE MODAL
+----------------------------- */
+closeBtn.onclick = closeModal;
+
+function closeModal(){
+  clearInterval(timer);
+  overlay.classList.add("hidden");
+
+  modal.classList.remove("open");
+  modal.setAttribute("aria-hidden","true");
+
+  player.pause();
+  player.removeAttribute("src");
+  player.load();
+}
+
+/* click outside modal closes it */
+modal.addEventListener("click",(e)=>{
+  if(e.target===modal) closeModal();
+});
 
   /* -----------------------------
       NAVIGATION
