@@ -1385,30 +1385,29 @@ if ("serviceWorker" in navigator) {
 ===================================================== */
 
 function buildRow(sectionName, fullList, slice){
+  const wrapper = document.createElement("div");
+  wrapper.className = "rowWrapper";
 
-  const wrapper=document.createElement("div");
-  wrapper.className="rowWrapper";
+  const row = document.createElement("div");
+  row.className = "row";
 
-  const row=document.createElement("div");
-  row.className="row";
+  slice.forEach(v => {
+    const tile = document.createElement("div");
+    tile.className = "tile";
 
-  slice.forEach(v=>{
+    const img = document.createElement("img");
+    img.src = v.thumb || PLACEHOLDER;
+    img.alt = v.title;
 
-    const tile=document.createElement("div");
-    tile.className="tile";
-
-    const img=document.createElement("img");
-    img.src=v.thumb || PLACEHOLDER;
-
-    const title=document.createElement("div");
-    title.className="tile-title";
-    title.textContent=v.title;
+    const title = document.createElement("div");
+    title.className = "tile-title";
+    title.textContent = v.title;
 
     tile.appendChild(img);
     tile.appendChild(title);
 
-    tile.addEventListener("click",()=>{
-      playFromList(fullList,v);
+    tile.addEventListener("click", ()=>{
+      playFromList(fullList, v);
     });
 
     row.appendChild(tile);
@@ -1416,150 +1415,209 @@ function buildRow(sectionName, fullList, slice){
 
   wrapper.appendChild(row);
 
-  document
-    .getElementById("rows-"+sectionName)
-    .appendChild(wrapper);
+  document.getElementById("rows-" + sectionName).appendChild(wrapper);
 }
 
+/* -----------------------------
+   BUILD ALL SECTIONS
+----------------------------- */
+for(let i=0; i<STORIES.length; i+=8)
+  buildRow("Stories", STORIES, STORIES.slice(i,i+8));
 
-/* BUILD SECTIONS */
+for(let i=0; i<NASHEEDS.length; i+=8)
+  buildRow("Nasheeds", NASHEEDS, NASHEEDS.slice(i,i+8));
 
-for(let i=0;i<STORIES.length;i+=8)
-  buildRow("Stories",STORIES,STORIES.slice(i,i+8));
+for(let i=0; i<DUAS.length; i+=8)
+  buildRow("Duas", DUAS, DUAS.slice(i,i+8));
 
-for(let i=0;i<NASHEEDS.length;i+=8)
-  buildRow("Nasheeds",NASHEEDS,NASHEEDS.slice(i,i+8));
-
-for(let i=0;i<DUAS.length;i+=8)
-  buildRow("Duas",DUAS,DUAS.slice(i,i+8));
-
-for(let i=0;i<CARTOONS.length;i+=8)
-  buildRow("Cartoons",CARTOONS,CARTOONS.slice(i,i+8));
+for(let i=0; i<CARTOONS.length; i+=8)
+  buildRow("Cartoons", CARTOONS, CARTOONS.slice(i,i+8));
 
 
 
 /* =====================================================
-   MODAL ELEMENTS
+   MODAL & PLAYER ELEMENTS
 ===================================================== */
+const modal = document.getElementById("modal");
+const player = document.getElementById("player");
+const modalTitle = document.getElementById("modalTitle");
+const modalDesc = document.getElementById("modalDesc");
+const closeBtn = document.getElementById("closeBtn");
 
-const modal=document.getElementById("modal");
-const player=document.getElementById("player");
-const modalTitle=document.getElementById("modalTitle");
-const modalDesc=document.getElementById("modalDesc");
-const closeBtn=document.getElementById("closeBtn");
+const overlay = document.getElementById("nextOverlay");
+const nextThumb = document.getElementById("nextThumb");
+const nextTitle = document.getElementById("nextTitle");
+const countEl = document.getElementById("count");
+const progressCircle = document.getElementById("progressCircle");
+const playNowBtn = document.getElementById("playNowBtn");
+const autoplayToggle = document.getElementById("autoplayToggle");
 
-const overlay=document.getElementById("nextOverlay");
-const nextThumb=document.getElementById("nextThumb");
-const nextTitle=document.getElementById("nextTitle");
-const countEl=document.getElementById("count");
-const progressCircle=document.getElementById("progressCircle");
-
-const autoplayToggle=
-  document.getElementById("autoplayToggle");
-
-
+/* =====================================================
+   RECOMMENDATION PANEL ELEMENTS
+===================================================== */
+const recommendPanel = document.getElementById("recommendPanel");
+const recItemsContainer = document.getElementById("recItems");
+const dragHandle = document.getElementById("dragHandle");
+const closeRecBtn = document.getElementById("closeRec");
 
 /* =====================================================
    PLAYER STATE
 ===================================================== */
-
-let playlist=[];
-let index=0;
-let timer;
-
-
+let playlist = [];
+let index = 0;
+let timer = null;
 
 /* =====================================================
    OPEN VIDEO
 ===================================================== */
-
-function playFromList(list,vid){
-  playlist=list;
-  index=list.indexOf(vid);
+function playFromList(list, vid){
+  playlist = list;
+  index = list.indexOf(vid);
   openModal(vid);
 }
 
 function openModal(v){
-
   clearInterval(timer);
 
   overlay?.classList.add("hidden");
 
-  player.src=v.file;
-  modalTitle.textContent=v.title;
-  modalDesc.textContent=v.desc;
+  // Hide recommendations initially
+  hidePanel();
+  buildRecommendations();
+
+  player.src = v.file;
+  modalTitle.textContent = v.title;
+  modalDesc.textContent = v.desc;
 
   modal.classList.add("open");
+  modal.setAttribute("aria-hidden", "false");
 
   player.play().catch(()=>{});
 }
 
-
-
 /* =====================================================
-   AUTOPLAY NEXT
+   VIDEO END → AUTOPLAY
 ===================================================== */
-
-player.addEventListener("ended",()=>{
-
+player.addEventListener("ended", ()=>{
   if(!autoplayToggle?.checked) return;
-
   showUpNext();
 });
 
+/* =====================================================
+   UP NEXT COUNTDOWN
+===================================================== */
 function showUpNext(){
+  const nextIndex = (index + 1) % playlist.length;
+  const nextVid = playlist[nextIndex];
 
-  const nextIndex=(index+1)%playlist.length;
-  const nextVid=playlist[nextIndex];
-
-  nextThumb.src=nextVid.thumb;
-  nextTitle.textContent=nextVid.title;
+  nextThumb.src = nextVid.thumb;
+  nextTitle.textContent = nextVid.title;
 
   overlay.classList.remove("hidden");
 
   startCountdown(nextIndex);
 }
 
-
-
 function startCountdown(nextIndex){
+  let time = 5;
+  const circumference = 163;
 
-  let time=5;
-  const circumference=163;
+  countEl.textContent = time;
+  progressCircle.style.strokeDashoffset = 0;
 
-  countEl.textContent=time;
-
-  timer=setInterval(()=>{
-
+  timer = setInterval(()=>{
     time--;
+    countEl.textContent = time;
+    progressCircle.style.strokeDashoffset = circumference*(1 - time/5);
 
-    countEl.textContent=time;
-
-    progressCircle.style.strokeDashoffset=
-      circumference*(1-time/5);
-
-    if(time<=0){
+    if(time <= 0){
       clearInterval(timer);
-      index=nextIndex;
+      index = nextIndex;
       openModal(playlist[index]);
     }
-
   },1000);
 }
 
+playNowBtn.onclick = ()=>{
+  clearInterval(timer);
+  index = (index + 1) % playlist.length;
+  openModal(playlist[index]);
+};
 
+/* =====================================================
+   BUILD RECOMMENDATIONS
+===================================================== */
+function buildRecommendations(){
+  if(!recItemsContainer) return;
+  recItemsContainer.innerHTML = "";
+
+  playlist.forEach((v,i)=>{
+    if(i === index) return;
+
+    const item = document.createElement("div");
+    item.className = "recItem";
+    item.innerHTML = `<img src="${v.thumb}"><div>${v.title}</div>`;
+
+    item.onclick = ()=>{
+      index = i;
+      openModal(v);
+      hidePanel();
+    };
+
+    recItemsContainer.appendChild(item);
+  });
+}
+
+/* =====================================================
+   RECOMMENDATION PANEL SHOW / HIDE
+===================================================== */
+function showPanel(){
+  recommendPanel?.classList.add("show");
+}
+function hidePanel(){
+  recommendPanel?.classList.remove("show");
+}
+closeRecBtn?.addEventListener("click", hidePanel);
+
+/* =====================================================
+   YOUTUBE-STYLE DRAG PANEL
+===================================================== */
+let startY = 0;
+let dragging = false;
+
+dragHandle?.addEventListener("pointerdown", (e)=>{
+  dragging = true;
+  startY = e.clientY;
+  recommendPanel.style.transition = "none";
+});
+
+window.addEventListener("pointermove", (e)=>{
+  if(!dragging) return;
+  const diff = startY - e.clientY;
+  if(diff > 0){
+    recommendPanel.style.bottom = Math.min(diff, 260) + "px";
+  }
+});
+
+window.addEventListener("pointerup", ()=>{
+  if(!dragging) return;
+  dragging = false;
+  recommendPanel.style.transition = "bottom .28s cubic-bezier(.22,.61,.36,1)";
+  const opened = parseInt(recommendPanel.style.bottom || "-260") > 120;
+  recommendPanel.style.bottom = opened ? "0px" : "-260px";
+});
 
 /* =====================================================
    CLOSE MODAL
 ===================================================== */
-
-closeBtn.onclick=closeModal;
-
+closeBtn.onclick = closeModal;
 function closeModal(){
-
   clearInterval(timer);
 
+  hidePanel();
+
   modal.classList.remove("open");
+  modal.setAttribute("aria-hidden", "true");
 
   player.pause();
   player.removeAttribute("src");
@@ -1568,11 +1626,9 @@ function closeModal(){
   overlay?.classList.add("hidden");
 }
 
-
-modal.addEventListener("click",(e)=>{
-  if(e.target===modal){
-    closeModal();
-  }
+/* click outside modal closes it */
+modal.addEventListener("click", (e)=>{
+  if(e.target === modal) closeModal();
 });
       NAVIGATION
   ----------------------------- */
