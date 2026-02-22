@@ -1538,7 +1538,326 @@ function startCountdown(nextIndex){
     }
   },1000);
 }
+/* =====================================================
+   VIDEO GRID BUILDER
+===================================================== */
 
+function buildRow(section, videos){
+
+  const wrapper=document.createElement("div");
+  wrapper.className="rowWrapper";
+
+  const row=document.createElement("div");
+  row.className="row";
+
+  videos.forEach(v=>{
+
+    const tile=document.createElement("div");
+    tile.className="tile";
+
+    const img=document.createElement("img");
+    img.src=v.thumb || PLACEHOLDER;
+    img.alt=v.title;
+
+    const title=document.createElement("div");
+    title.className="tile-title";
+    title.textContent=v.title;
+
+    tile.appendChild(img);
+    tile.appendChild(title);
+
+    /* IMPORTANT */
+    tile.addEventListener("click",()=>{
+      playFromList(window[section.toUpperCase()],v);
+    });
+
+    row.appendChild(tile);
+  });
+
+  wrapper.appendChild(row);
+  document
+    .getElementById("rows-"+section)
+    .appendChild(wrapper);
+}
+
+
+/* BUILD SECTIONS */
+
+for(let i=0;i<STORIES.length;i+=8)
+  buildRow("Stories",STORIES.slice(i,i+8));
+
+for(let i=0;i<NASHEEDS.length;i+=8)
+  buildRow("Nasheeds",NASHEEDS.slice(i,i+8));
+
+for(let i=0;i<DUAS.length;i+=8)
+  buildRow("Duas",DUAS.slice(i,i+8));
+
+for(let i=0;i<CARTOONS.length;i+=8)
+  buildRow("Cartoons",CARTOONS.slice(i,i+8));
+
+
+
+/* =====================================================
+   MODAL ELEMENTS
+===================================================== */
+
+const modal=document.getElementById("modal");
+const player=document.getElementById("player");
+const modalTitle=document.getElementById("modalTitle");
+const modalDesc=document.getElementById("modalDesc");
+const closeBtn=document.getElementById("closeBtn");
+
+/* autoplay */
+const autoplayToggle=
+  document.getElementById("autoplayToggle");
+
+/* up next overlay */
+const overlay=document.getElementById("nextOverlay");
+const nextThumb=document.getElementById("nextThumb");
+const nextTitle=document.getElementById("nextTitle");
+const countEl=document.getElementById("count");
+const progressCircle=
+  document.getElementById("progressCircle");
+const playNowBtn=
+  document.getElementById("playNowBtn");
+
+/* recommendations */
+const recommendPanel=
+  document.getElementById("recommendPanel");
+const recItemsContainer=
+  document.getElementById("recItems");
+const dragHandle=
+  document.getElementById("dragHandle");
+const closeRecBtn=
+  document.getElementById("closeRec");
+
+
+
+/* =====================================================
+   PLAYER STATE
+===================================================== */
+
+let playlist=[];
+let index=0;
+let timer;
+
+
+
+/* =====================================================
+   OPEN VIDEO
+===================================================== */
+
+function playFromList(fullList,vid){
+  playlist=fullList;
+  index=fullList.indexOf(vid);
+  openModal(vid);
+}
+
+
+function openModal(v){
+
+  clearInterval(timer);
+
+  overlay.classList.add("hidden");
+  hidePanel();
+  buildRecommendations();
+
+  player.src=v.file;
+  modalTitle.textContent=v.title;
+  modalDesc.textContent=v.desc;
+
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden","false");
+
+  player.play().catch(()=>{});
+}
+
+
+
+/* =====================================================
+   VIDEO END → AUTOPLAY
+===================================================== */
+
+player.addEventListener("ended",()=>{
+
+  if(!autoplayToggle?.checked) return;
+
+  showUpNext();
+});
+
+
+
+/* =====================================================
+   UP NEXT SYSTEM
+===================================================== */
+
+function showUpNext(){
+
+  let nextIndex=(index+1)%playlist.length;
+  const nextVid=playlist[nextIndex];
+
+  nextThumb.src=nextVid.thumb;
+  nextTitle.textContent=nextVid.title;
+
+  overlay.classList.remove("hidden");
+
+  startCountdown(nextIndex);
+}
+
+
+function startCountdown(nextIndex){
+
+  let time=5;
+  const circumference=163;
+
+  countEl.textContent=time;
+
+  timer=setInterval(()=>{
+
+    time--;
+
+    countEl.textContent=time;
+
+    progressCircle.style.strokeDashoffset=
+      circumference*(1-time/5);
+
+    if(time<=0){
+      clearInterval(timer);
+      index=nextIndex;
+      openModal(playlist[index]);
+    }
+
+  },1000);
+}
+
+
+playNowBtn.onclick=()=>{
+  clearInterval(timer);
+  index=(index+1)%playlist.length;
+  openModal(playlist[index]);
+};
+
+
+
+/* =====================================================
+   RECOMMENDATIONS BUILD
+===================================================== */
+
+function buildRecommendations(){
+
+  if(!recItemsContainer) return;
+
+  recItemsContainer.innerHTML="";
+
+  playlist.forEach((v,i)=>{
+
+    if(i===index) return;
+
+    const item=document.createElement("div");
+    item.className="recItem";
+
+    item.innerHTML=`
+      <img src="${v.thumb}">
+      <div>${v.title}</div>
+    `;
+
+    item.onclick=()=>{
+      index=i;
+      openModal(v);
+      hidePanel();
+    };
+
+    recItemsContainer.appendChild(item);
+  });
+}
+
+
+
+/* =====================================================
+   PANEL SHOW / HIDE
+===================================================== */
+
+function showPanel(){
+  recommendPanel.classList.add("show");
+}
+
+function hidePanel(){
+  recommendPanel.classList.remove("show");
+}
+
+closeRecBtn?.addEventListener("click",hidePanel);
+
+
+
+/* =====================================================
+   YOUTUBE DRAG PANEL
+===================================================== */
+
+let startY=0;
+let dragging=false;
+
+dragHandle?.addEventListener("pointerdown",(e)=>{
+  dragging=true;
+  startY=e.clientY;
+  recommendPanel.style.transition="none";
+});
+
+window.addEventListener("pointermove",(e)=>{
+
+  if(!dragging) return;
+
+  const diff=startY-e.clientY;
+
+  if(diff>0){
+    recommendPanel.style.bottom=
+      Math.min(diff,260)+"px";
+  }
+});
+
+window.addEventListener("pointerup",()=>{
+
+  if(!dragging) return;
+
+  dragging=false;
+
+  recommendPanel.style.transition=
+    "bottom .28s cubic-bezier(.22,.61,.36,1)";
+
+  const opened=
+    parseInt(recommendPanel.style.bottom||"-260")>120;
+
+  recommendPanel.style.bottom=
+    opened?"0px":"-260px";
+});
+
+
+
+/* =====================================================
+   CLOSE MODAL
+===================================================== */
+
+closeBtn.onclick=closeModal;
+
+function closeModal(){
+
+  hidePanel();
+
+  clearInterval(timer);
+  overlay.classList.add("hidden");
+
+  modal.classList.remove("open");
+  modal.setAttribute("aria-hidden","true");
+
+  player.pause();
+  player.removeAttribute("src");
+  player.load();
+}
+
+modal.addEventListener("click",(e)=>{
+  if(e.target===modal){
+    closeModal();
+  }
+});
 
 /* -----------------------------
    PLAY NOW BUTTON
@@ -1550,175 +1869,7 @@ playNowBtn.onclick = ()=>{
 };
 
 
-/* =================================================
-   RECOMMEND PANEL ELEMENTS
-================================================= */
 
-const recommendPanel =
-  document.getElementById("recommendPanel");
-
-const recItemsContainer =
-  document.getElementById("recItems");
-
-const dragHandle =
-  document.getElementById("dragHandle");
-
-const closeRecBtn =
-  document.getElementById("closeRec");
-
-
-/* =================================================
-   OPEN VIDEO (UPDATED ✅)
-================================================= */
-
-function openModal(v){
-
-  clearInterval(timer);
-
-  overlay.classList.add("hidden");
-
-  /* ✅ hide recommendations when opening */
-  hidePanel();
-
-  /* ✅ rebuild recommended videos */
-  buildRecommendations();
-
-  player.src = v.file;
-  modalTitle.textContent = v.title;
-  modalDesc.textContent = v.desc;
-
-  modal.classList.add("open");
-  modal.setAttribute("aria-hidden","false");
-
-  player.play().catch(()=>{});
-}
-
-
-/* =================================================
-   BUILD RECOMMENDATIONS
-================================================= */
-
-function buildRecommendations(){
-
-  recItemsContainer.innerHTML = "";
-
-  playlist.forEach((v,i)=>{
-
-    if(i === index) return;
-
-    const item = document.createElement("div");
-    item.className = "recItem";
-
-    item.innerHTML = `
-      <img src="${v.thumb}">
-      <div>${v.title}</div>
-    `;
-
-    item.onclick = ()=>{
-      index = i;
-      openModal(v);
-      hidePanel();
-    };
-
-    recItemsContainer.appendChild(item);
-  });
-}
-
-
-/* =================================================
-   PANEL SHOW / HIDE
-================================================= */
-
-function showPanel(){
-  recommendPanel.classList.add("show");
-}
-
-function hidePanel(){
-  recommendPanel.classList.remove("show");
-}
-
-closeRecBtn.onclick = hidePanel;
-
-
-/* =================================================
-   YOUTUBE-STYLE DRAG PANEL
-================================================= */
-
-let startY = 0;
-let currentY = 0;
-let dragging = false;
-
-dragHandle.addEventListener("pointerdown",(e)=>{
-  dragging = true;
-  startY = e.clientY;
-  recommendPanel.style.transition = "none";
-});
-
-window.addEventListener("pointermove",(e)=>{
-
-  if(!dragging) return;
-
-  currentY = e.clientY;
-  let diff = startY - currentY;
-
-  if(diff > 0){
-    recommendPanel.style.bottom =
-      Math.min(diff,260) + "px";
-  }
-});
-
-window.addEventListener("pointerup",()=>{
-
-  if(!dragging) return;
-
-  dragging = false;
-
-  recommendPanel.style.transition =
-    "bottom .25s ease";
-
-  const opened =
-    parseInt(recommendPanel.style.bottom) > 120;
-
-  recommendPanel.style.bottom =
-    opened ? "0px" : "-260px";
-});
-
-
-/* =================================================
-   CLOSE MODAL
-================================================= */
-
-closeBtn.onclick = closeModal;
-
-function closeModal(){
-
-  hidePanel();
-
-  clearInterval(timer);
-
-  overlay.classList.add("hidden");
-
-  modal.classList.remove("open");
-  modal.setAttribute("aria-hidden","true");
-
-  player.pause();
-  player.removeAttribute("src");
-  player.load();
-}
-
-
-/* =================================================
-   CLICK OUTSIDE CLOSE
-================================================= */
-
-modal.addEventListener("click",(e)=>{
-  if(e.target === modal){
-    closeModal();
-  }
-});
-  
-
-  /* -----------------------------
       NAVIGATION
   ----------------------------- */
 
