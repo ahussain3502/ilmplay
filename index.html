@@ -1539,6 +1539,19 @@ function startCountdown(nextIndex){
   },1000);
 }
 /* =====================================================
+   SECTION PLAYLIST MAP  ✅ FIXED
+===================================================== */
+
+const SECTIONS = {
+  Stories: STORIES,
+  Nasheeds: NASHEEDS,
+  Duas: DUAS,
+  Cartoons: CARTOONS
+};
+
+
+
+/* =====================================================
    VIDEO GRID BUILDER
 ===================================================== */
 
@@ -1566,9 +1579,9 @@ function buildRow(section, videos){
     tile.appendChild(img);
     tile.appendChild(title);
 
-    /* IMPORTANT */
+    /* ✅ FIXED CLICK SYSTEM */
     tile.addEventListener("click",()=>{
-      playFromList(window[section.toUpperCase()],v);
+      playFromList(SECTIONS[section],v);
     });
 
     row.appendChild(tile);
@@ -1581,7 +1594,10 @@ function buildRow(section, videos){
 }
 
 
-/* BUILD SECTIONS */
+
+/* =====================================================
+   BUILD ALL SECTIONS
+===================================================== */
 
 for(let i=0;i<STORIES.length;i+=8)
   buildRow("Stories",STORIES.slice(i,i+8));
@@ -1607,11 +1623,9 @@ const modalTitle=document.getElementById("modalTitle");
 const modalDesc=document.getElementById("modalDesc");
 const closeBtn=document.getElementById("closeBtn");
 
-/* autoplay */
 const autoplayToggle=
   document.getElementById("autoplayToggle");
 
-/* up next overlay */
 const overlay=document.getElementById("nextOverlay");
 const nextThumb=document.getElementById("nextThumb");
 const nextTitle=document.getElementById("nextTitle");
@@ -1621,7 +1635,6 @@ const progressCircle=
 const playNowBtn=
   document.getElementById("playNowBtn");
 
-/* recommendations */
 const recommendPanel=
   document.getElementById("recommendPanel");
 const recItemsContainer=
@@ -1658,7 +1671,7 @@ function openModal(v){
 
   clearInterval(timer);
 
-  overlay.classList.add("hidden");
+  overlay?.classList.add("hidden");
   hidePanel();
   buildRecommendations();
 
@@ -1688,7 +1701,7 @@ player.addEventListener("ended",()=>{
 
 
 /* =====================================================
-   UP NEXT SYSTEM
+   UP NEXT COUNTDOWN
 ===================================================== */
 
 function showUpNext(){
@@ -1740,7 +1753,7 @@ playNowBtn.onclick=()=>{
 
 
 /* =====================================================
-   RECOMMENDATIONS BUILD
+   RECOMMENDATIONS
 ===================================================== */
 
 function buildRecommendations(){
@@ -1777,12 +1790,12 @@ function buildRecommendations(){
    PANEL SHOW / HIDE
 ===================================================== */
 
-function showPanel(){
-  recommendPanel.classList.add("show");
+function hidePanel(){
+  recommendPanel?.classList.remove("show");
 }
 
-function hidePanel(){
-  recommendPanel.classList.remove("show");
+function showPanel(){
+  recommendPanel?.classList.add("show");
 }
 
 closeRecBtn?.addEventListener("click",hidePanel);
@@ -1790,7 +1803,7 @@ closeRecBtn?.addEventListener("click",hidePanel);
 
 
 /* =====================================================
-   YOUTUBE DRAG PANEL
+   YOUTUBE STYLE DRAG PANEL
 ===================================================== */
 
 let startY=0;
@@ -1843,7 +1856,7 @@ function closeModal(){
   hidePanel();
 
   clearInterval(timer);
-  overlay.classList.add("hidden");
+  overlay?.classList.add("hidden");
 
   modal.classList.remove("open");
   modal.setAttribute("aria-hidden","true");
@@ -1858,18 +1871,6 @@ modal.addEventListener("click",(e)=>{
     closeModal();
   }
 });
-
-/* -----------------------------
-   PLAY NOW BUTTON
------------------------------ */
-playNowBtn.onclick = ()=>{
-  clearInterval(timer);
-  index = (index+1)%playlist.length;
-  openModal(playlist[index]);
-};
-
-
-
       NAVIGATION
   ----------------------------- */
 
