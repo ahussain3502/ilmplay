@@ -1365,242 +1365,179 @@ for(let i=0;i<CARTOONS.length;i+=8)
 
 
 /* =====================================================
-   YOUTUBE STYLE PLAYER SYSTEM
+   YOUTUBE STYLE PLAYER SYSTEM (FIXED)
 ===================================================== */
-
-/* ---------- SAFE ELEMENT REFERENCES (90% FIX) ---------- */
-/* prevents "null" errors if DOM loads late */
-
-document.addEventListener("DOMContentLoaded", () => {
-
-const modal = document.getElementById("modal");
-const player = document.getElementById("player");
-const modalTitle = document.getElementById("modalTitle");
-const modalDesc = document.getElementById("modalDesc");
-const closeBtn = document.getElementById("closeBtn");
-
-/* up next overlay */
-const overlay = document.getElementById("nextOverlay");
-const nextThumb = document.getElementById("nextThumb");
-const nextTitle = document.getElementById("nextTitle");
-const countEl = document.getElementById("count");
-const progressCircle =
-  document.getElementById("progressCircle");
-
-const playNowBtn =
-  document.getElementById("playNowBtn");
-
-const autoplayToggle =
-  document.getElementById("autoplayToggle");
-
-const recommendPanel =
-  document.getElementById("recommendPanel");
-
-const sheet =
-  document.getElementById("recommendSheet");
-
-const sheetHandle =
-  document.getElementById("sheetHandle");
-
-const sheetClose =
-  document.getElementById("sheetClose");
-
 
 /* ---------- PLAYER STATE ---------- */
-
-let playlist = [];
-let index = 0;
+window.currentPlaylist = [];
+window.currentIndex = 0;
 let timer = null;
 
-
-/* =====================================================
-   OPEN VIDEO
-===================================================== */
-
-window.playFromList = function(fullList, vid){
-
-  playlist = fullList;
-  index = fullList.indexOf(vid);
-
+/* ---------- GLOBAL FUNCTION FOR TILES ---------- */
+function playFromList(fullList, vid){
+  window.currentPlaylist = fullList;
+  window.currentIndex = fullList.indexOf(vid);
   openModal(vid);
-};
-
-
-function openModal(v){
-
-  clearInterval(timer);
-
-  overlay.classList.add("hidden");
-
-  player.src = v.file;
-
-  modalTitle.textContent = v.title;
-  modalDesc.textContent = v.desc;
-
-  modal.classList.add("open");
-
-  buildRecommendations();
-
-  player.play().catch(()=>{});
 }
 
+/* ---------- SAFE ELEMENT REFERENCES ---------- */
+document.addEventListener("DOMContentLoaded", () => {
 
-/* =====================================================
-   VIDEO END → AUTOPLAY
-===================================================== */
+  const modal = document.getElementById("modal");
+  const player = document.getElementById("player");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalDesc = document.getElementById("modalDesc");
+  const closeBtn = document.getElementById("closeBtn");
 
-player.addEventListener("ended",()=>{
+  const overlay = document.getElementById("nextOverlay");
+  const nextThumb = document.getElementById("nextThumb");
+  const nextTitle = document.getElementById("nextTitle");
+  const countEl = document.getElementById("count");
+  const progressCircle = document.getElementById("progressCircle");
+  const playNowBtn = document.getElementById("playNowBtn");
+  const autoplayToggle = document.getElementById("autoplayToggle");
 
-  if(!autoplayToggle?.checked) return;
+  const recommendPanel = document.getElementById("recommendPanel");
+  const sheet = document.getElementById("recommendSheet");
+  const sheetHandle = document.getElementById("sheetHandle");
+  const sheetClose = document.getElementById("sheetClose");
 
-  showUpNext();
-});
+  /* =====================================================
+     OPEN VIDEO MODAL
+  ==================================================== */
+  function openModal(v){
+    clearInterval(timer);
+    overlay.classList.add("hidden");
 
+    player.src = v.file;
+    modalTitle.textContent = v.title;
+    modalDesc.textContent = v.desc;
 
-/* =====================================================
-   UP NEXT
-===================================================== */
+    modal.classList.add("open");
 
-function showUpNext(){
+    buildRecommendations();
 
-  if(!playlist.length) return;
-
-  const nextIndex =
-    (index + 1) % playlist.length;
-
-  const nextVid =
-    playlist[nextIndex];
-
-  nextThumb.src =
-    nextVid.thumb;
-
-  nextTitle.textContent =
-    nextVid.title;
-
-  overlay.classList.remove("hidden");
-
-  startCountdown(nextIndex);
-}
-
-
-/* =====================================================
-   COUNTDOWN
-===================================================== */
-
-function startCountdown(nextIndex){
-
-  let time = 5;
-
-  const circumference = 163;
-
-  countEl.textContent = time;
-
-  progressCircle.style.strokeDasharray =
-    circumference;
-
-  timer = setInterval(()=>{
-
-    time--;
-
-    countEl.textContent = time;
-
-    progressCircle.style.strokeDashoffset =
-      circumference * (1 - time/5);
-
-    if(time <= 0){
-
-      clearInterval(timer);
-
-      index = nextIndex;
-
-      openModal(playlist[index]);
+    // Desktop: auto show recommendations
+    if(window.innerWidth > 768){
+      sheet?.classList.add("open");
     }
 
-  },1000);
-}
+    player.play().catch(()=>{});
+  }
 
-
-/* play now button */
-
-playNowBtn?.addEventListener("click",()=>{
-
-  clearInterval(timer);
-
-  index = (index+1)%playlist.length;
-
-  openModal(playlist[index]);
-});
-
-
-/* =====================================================
-   RECOMMENDED VIDEOS
-===================================================== */
-
-function buildRecommendations(){
-
-  recommendPanel.innerHTML="";
-
-  playlist.forEach((v,i)=>{
-
-    if(i===index) return;
-
-    const item=document.createElement("div");
-    item.className="recItem";
-
-    item.innerHTML=`
-      <img src="${v.thumb}">
-      <div>${v.title}</div>
-    `;
-
-    item.onclick=()=>{
-      index=i;
-      openModal(v);
-    };
-
-    recommendPanel.appendChild(item);
+  /* =====================================================
+     VIDEO END → UP NEXT / AUTOPLAY
+  ==================================================== */
+  player.addEventListener("ended",()=>{
+    if(!autoplayToggle?.checked) return;
+    showUpNext();
   });
-}
 
+  function showUpNext(){
+    if(!window.currentPlaylist?.length) return;
 
-/* =====================================================
-   MOBILE SWIPE PANEL (YT STYLE)
-===================================================== */
+    const nextIndex = (window.currentIndex + 1) % window.currentPlaylist.length;
+    const nextVid = window.currentPlaylist[nextIndex];
 
-sheetHandle?.addEventListener("click",()=>{
-  sheet.classList.add("open");
+    nextThumb.src = nextVid.thumb;
+    nextTitle.textContent = nextVid.title;
+
+    overlay.classList.remove("hidden");
+
+    startCountdown(nextIndex);
+  }
+
+  /* =====================================================
+     COUNTDOWN
+  ==================================================== */
+  function startCountdown(nextIndex){
+    let time = 5;
+    const circumference = 163;
+
+    countEl.textContent = time;
+    progressCircle.style.strokeDasharray = circumference;
+
+    timer = setInterval(()=>{
+      time--;
+      countEl.textContent = time;
+      progressCircle.style.strokeDashoffset = circumference * (1 - time/5);
+
+      if(time <= 0){
+        clearInterval(timer);
+        window.currentIndex = nextIndex;
+        openModal(window.currentPlaylist[window.currentIndex]);
+      }
+    },1000);
+  }
+
+  /* =====================================================
+     PLAY NOW BUTTON
+  ==================================================== */
+  playNowBtn?.addEventListener("click",()=>{
+    clearInterval(timer);
+    window.currentIndex = (window.currentIndex+1)%window.currentPlaylist.length;
+    openModal(window.currentPlaylist[window.currentIndex]);
+  });
+
+  /* =====================================================
+     RECOMMENDED VIDEOS
+  ==================================================== */
+  function buildRecommendations(){
+    recommendPanel.innerHTML = "";
+
+    window.currentPlaylist.forEach((v,i)=>{
+      if(i === window.currentIndex) return;
+
+      const item = document.createElement("div");
+      item.className = "recItem";
+
+      item.innerHTML = `
+        <img src="${v.thumb}">
+        <div>${v.title}</div>
+      `;
+
+      item.onclick = ()=>{
+        window.currentIndex = i;
+        openModal(v);
+      };
+
+      recommendPanel.appendChild(item);
+    });
+  }
+
+  /* =====================================================
+     MOBILE SWIPE PANEL (YT STYLE)
+  ==================================================== */
+  sheetHandle?.addEventListener("click",()=>{
+    sheet?.classList.add("open");
+  });
+
+  sheetClose?.addEventListener("click",()=>{
+    sheet?.classList.remove("open");
+  });
+
+  /* =====================================================
+     CLOSE MODAL
+  ==================================================== */
+  closeBtn?.addEventListener("click", closeModal);
+
+  modal.addEventListener("click", (e)=>{
+    if(e.target === modal) closeModal();
+  });
+
+  function closeModal(){
+    clearInterval(timer);
+    modal.classList.remove("open");
+    overlay.classList.add("hidden");
+
+    player.pause();
+    player.removeAttribute("src");
+    player.load();
+
+    sheet?.classList.remove("open");
+  }
+
 });
-
-sheetClose?.addEventListener("click",()=>{
-  sheet.classList.remove("open");
-});
-
-
-/* =====================================================
-   CLOSE MODAL
-===================================================== */
-
-closeBtn.addEventListener("click",closeModal);
-
-modal.addEventListener("click",(e)=>{
-  if(e.target===modal) closeModal();
-});
-
-
-function closeModal(){
-
-  clearInterval(timer);
-
-  modal.classList.remove("open");
-
-  overlay.classList.add("hidden");
-
-  player.pause();
-  player.removeAttribute("src");
-  player.load();
-}
-
-});
-
 
   /* -----------------------------
       NAVIGATION
