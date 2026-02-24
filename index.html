@@ -634,86 +634,27 @@ svg circle{
 
 /* ---------- recommendations ---------- */
 
-#recommendWrapper{
-  width:100%;
-  background:#111;
-  border-top:1px solid #222;
-}
-
-#recommendPanel{
-  display:grid;
-  grid-template-columns:
-    repeat(auto-fill,minmax(220px,1fr));
-  gap:12px;
-  padding:15px;
+.recommendPanel{
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  padding:10px;
+  background:#0d0d0d;
 }
 
 .recItem{
+  min-width:160px;
   cursor:pointer;
 }
 
 .recItem img{
   width:100%;
-  border-radius:10px;
+  border-radius:8px;
 }
 
 .recItem div{
-  font-size:.9rem;
-  margin-top:6px;
-}
-@media(max-width:768px){
-
-#recommendWrapper{
-  position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  height:70vh;
-
-  background:#111;
-  border-radius:18px 18px 0 0;
-
-  transform:translateY(85%);
-  transition:.35s ease;
-
-  z-index:9999;
-}
-
-#recommendWrapper.open{
-  transform:translateY(0);
-}
-
-#recHandle{
-  position:sticky;
-  top:0;
-  background:#111;
-  padding:10px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.grabber{
-  width:45px;
-  height:5px;
-  background:#555;
-  border-radius:10px;
-  margin:auto;
-}
-
-#recClose{
-  background:none;
-  border:none;
+  font-size:13px;
   color:white;
-  font-size:18px;
-  cursor:pointer;
-}
-
-#recommendPanel{
-  overflow-y:auto;
-  height:100%;
-}
-
 }
 </style>
 
@@ -879,22 +820,10 @@ if ("serviceWorker" in navigator) {
     </div>
 
 
-   
-   <!-- =========================
-   RECOMMENDED PANEL
-========================= -->
-
-<div id="recommendWrapper">
-
-  <!-- mobile handle -->
-  <div id="recHandle">
-    <div class="grabber"></div>
-    <button id="recClose">✕</button>
-  </div>
-
-  <div id="recommendPanel"></div>
-
-</div>
+    <!-- =====================
+        RECOMMENDED PANEL
+    ====================== -->
+    <div id="recommendPanel" class="recommendPanel"></div>
 
 
     <div class="modal-info">
@@ -1364,179 +1293,163 @@ for(let i=0;i<CARTOONS.length;i+=8)
   buildRow("Cartoons",CARTOONS,CARTOONS.slice(i,i+8));
 
 
-/* =====================================================
-   YOUTUBE STYLE PLAYER SYSTEM (FIXED)
-===================================================== */
+/* -----------------------------
+   VIDEO MODAL & PLAYER
+----------------------------- */
+const modal = document.getElementById("modal");
+const player = document.getElementById("player");
+const modalTitle = document.getElementById("modalTitle");
+const modalDesc = document.getElementById("modalDesc");
+const closeBtn = document.getElementById("closeBtn");
 
-/* ---------- PLAYER STATE ---------- */
-window.currentPlaylist = [];
-window.currentIndex = 0;
-let timer = null;
+/* overlay */
+const overlay = document.getElementById("nextOverlay");
+const nextThumb = document.getElementById("nextThumb");
+const nextTitle = document.getElementById("nextTitle");
+const countEl = document.getElementById("count");
+const progressCircle = document.getElementById("progressCircle");
+const playNowBtn = document.getElementById("playNowBtn");
+const autoplayToggle = document.getElementById("autoplayToggle");
+const recommendPanel = document.getElementById("recommendPanel");
 
-/* ---------- GLOBAL FUNCTION FOR TILES ---------- */
+/* -----------------------------
+   STATE
+----------------------------- */
+let playlist = [];
+let index = 0;
+let timer;
+
+
+/* -----------------------------
+   OPEN VIDEO
+----------------------------- */
+function openModal(v){
+  clearInterval(timer);
+  overlay.classList.add("hidden");
+
+  player.src = v.file;
+  modalTitle.textContent = v.title;
+  modalDesc.textContent = v.desc;
+
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden","false");
+
+  buildRecommendations();
+
+  player.play().catch(()=>{});
+}
+
+
+/* ---------- TILE CLICK ---------- */
 function playFromList(fullList, vid){
-  window.currentPlaylist = fullList;
-  window.currentIndex = fullList.indexOf(vid);
+  playlist = fullList;
+  index = fullList.indexOf(vid);
   openModal(vid);
 }
 
-/* ---------- SAFE ELEMENT REFERENCES ---------- */
-document.addEventListener("DOMContentLoaded", () => {
 
-  const modal = document.getElementById("modal");
-  const player = document.getElementById("player");
-  const modalTitle = document.getElementById("modalTitle");
-  const modalDesc = document.getElementById("modalDesc");
-  const closeBtn = document.getElementById("closeBtn");
+/* -----------------------------
+   VIDEO END → SHOW UP NEXT
+----------------------------- */
+player.addEventListener("ended",()=>{
+  if(!autoplayToggle.checked) return;
+  showUpNext();
+});
 
-  const overlay = document.getElementById("nextOverlay");
-  const nextThumb = document.getElementById("nextThumb");
-  const nextTitle = document.getElementById("nextTitle");
-  const countEl = document.getElementById("count");
-  const progressCircle = document.getElementById("progressCircle");
-  const playNowBtn = document.getElementById("playNowBtn");
-  const autoplayToggle = document.getElementById("autoplayToggle");
+function showUpNext(){
+  let nextIndex = (index+1) % playlist.length;
+  const nextVid = playlist[nextIndex];
 
-  const recommendPanel = document.getElementById("recommendPanel");
-  const sheet = document.getElementById("recommendSheet");
-  const sheetHandle = document.getElementById("sheetHandle");
-  const sheetClose = document.getElementById("sheetClose");
+  nextThumb.src = nextVid.thumb;
+  nextTitle.textContent = nextVid.title;
 
-  /* =====================================================
-     OPEN VIDEO MODAL
-  ==================================================== */
-  function openModal(v){
-    clearInterval(timer);
-    overlay.classList.add("hidden");
+  overlay.classList.remove("hidden");
 
-    player.src = v.file;
-    modalTitle.textContent = v.title;
-    modalDesc.textContent = v.desc;
+  startCountdown(nextIndex);
+}
 
-    modal.classList.add("open");
 
-    buildRecommendations();
+/* -----------------------------
+   COUNTDOWN CIRCLE
+----------------------------- */
+function startCountdown(nextIndex){
+  let time = 5;
+  const circumference = 163; // for circle
 
-    // Desktop: auto show recommendations
-    if(window.innerWidth > 768){
-      sheet?.classList.add("open");
-    }
+  countEl.textContent = time;
+  progressCircle.style.strokeDashoffset = 0;
 
-    player.play().catch(()=>{});
-  }
-
-  /* =====================================================
-     VIDEO END → UP NEXT / AUTOPLAY
-  ==================================================== */
-  player.addEventListener("ended",()=>{
-    if(!autoplayToggle?.checked) return;
-    showUpNext();
-  });
-
-  function showUpNext(){
-    if(!window.currentPlaylist?.length) return;
-
-    const nextIndex = (window.currentIndex + 1) % window.currentPlaylist.length;
-    const nextVid = window.currentPlaylist[nextIndex];
-
-    nextThumb.src = nextVid.thumb;
-    nextTitle.textContent = nextVid.title;
-
-    overlay.classList.remove("hidden");
-
-    startCountdown(nextIndex);
-  }
-
-  /* =====================================================
-     COUNTDOWN
-  ==================================================== */
-  function startCountdown(nextIndex){
-    let time = 5;
-    const circumference = 163;
-
+  timer = setInterval(()=>{
+    time--;
     countEl.textContent = time;
-    progressCircle.style.strokeDasharray = circumference;
+    progressCircle.style.strokeDashoffset =
+      circumference * (1 - time/5);
 
-    timer = setInterval(()=>{
-      time--;
-      countEl.textContent = time;
-      progressCircle.style.strokeDashoffset = circumference * (1 - time/5);
+    if(time <= 0){
+      clearInterval(timer);
+      index = nextIndex;
+      openModal(playlist[index]);
+    }
+  },1000);
+}
 
-      if(time <= 0){
-        clearInterval(timer);
-        window.currentIndex = nextIndex;
-        openModal(window.currentPlaylist[window.currentIndex]);
-      }
-    },1000);
-  }
 
-  /* =====================================================
-     PLAY NOW BUTTON
-  ==================================================== */
-  playNowBtn?.addEventListener("click",()=>{
-    clearInterval(timer);
-    window.currentIndex = (window.currentIndex+1)%window.currentPlaylist.length;
-    openModal(window.currentPlaylist[window.currentIndex]);
+/* -----------------------------
+   PLAY NOW BUTTON
+----------------------------- */
+playNowBtn.onclick = ()=>{
+  clearInterval(timer);
+  index = (index+1)%playlist.length;
+  openModal(playlist[index]);
+};
+
+
+/* -----------------------------
+   RECOMMENDED PANEL
+----------------------------- */
+function buildRecommendations(){
+  recommendPanel.innerHTML = "";
+
+  playlist.forEach((v,i)=>{
+    if(i===index) return;
+
+    const item = document.createElement("div");
+    item.className = "recItem";
+    item.innerHTML=`
+      <img src="${v.thumb}">
+      <div>${v.title}</div>
+    `;
+
+    item.onclick = ()=>{
+      index=i;
+      openModal(v);
+    };
+
+    recommendPanel.appendChild(item);
   });
+}
 
-  /* =====================================================
-     RECOMMENDED VIDEOS
-  ==================================================== */
-  function buildRecommendations(){
-    recommendPanel.innerHTML = "";
 
-    window.currentPlaylist.forEach((v,i)=>{
-      if(i === window.currentIndex) return;
+/* -----------------------------
+   CLOSE MODAL
+----------------------------- */
+closeBtn.onclick = closeModal;
 
-      const item = document.createElement("div");
-      item.className = "recItem";
+function closeModal(){
+  clearInterval(timer);
+  overlay.classList.add("hidden");
 
-      item.innerHTML = `
-        <img src="${v.thumb}">
-        <div>${v.title}</div>
-      `;
+  modal.classList.remove("open");
+  modal.setAttribute("aria-hidden","true");
 
-      item.onclick = ()=>{
-        window.currentIndex = i;
-        openModal(v);
-      };
+  player.pause();
+  player.removeAttribute("src");
+  player.load();
+}
 
-      recommendPanel.appendChild(item);
-    });
-  }
-
-  /* =====================================================
-     MOBILE SWIPE PANEL (YT STYLE)
-  ==================================================== */
-  sheetHandle?.addEventListener("click",()=>{
-    sheet?.classList.add("open");
-  });
-
-  sheetClose?.addEventListener("click",()=>{
-    sheet?.classList.remove("open");
-  });
-
-  /* =====================================================
-     CLOSE MODAL
-  ==================================================== */
-  closeBtn?.addEventListener("click", closeModal);
-
-  modal.addEventListener("click", (e)=>{
-    if(e.target === modal) closeModal();
-  });
-
-  function closeModal(){
-    clearInterval(timer);
-    modal.classList.remove("open");
-    overlay.classList.add("hidden");
-
-    player.pause();
-    player.removeAttribute("src");
-    player.load();
-
-    sheet?.classList.remove("open");
-  }
-
+/* click outside modal closes it */
+modal.addEventListener("click",(e)=>{
+  if(e.target===modal) closeModal();
 });
 
   /* -----------------------------
