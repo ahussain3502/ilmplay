@@ -832,6 +832,18 @@ if ("serviceWorker" in navigator) {
 
     <video id="player" controls playsinline preload="metadata"></video>
 
+    <!-- Arrow Handle -->
+<div id="recommendArrow" class="recommend-arrow"></div>
+
+<!-- Recommended Overlay -->
+<div id="recommendedOverlay" class="recommended-overlay">
+
+  <button id="closeRecs" class="close-recs">✕</button>
+
+  <div class="recommended-row" id="recommendedRow">
+  </div>
+
+</div>
     <!-- =====================
          AUTOPLAY OVERLAY
     ====================== -->
@@ -869,25 +881,6 @@ if ("serviceWorker" in navigator) {
         </div>
       </div>
     </div>
-
-
-   <!-- ======================
- RECOMMENDED DRAWER
-====================== -->
-
-  <div id="recommendDrawer" class="recommendDrawer">
-
-    <div id="drawerHandle" class="drawerHandle"></div>
-
-    <div class="drawerHeader">
-      <span>Recommended</span>
-      <button id="drawerClose">✕</button>
-    </div>
-
-    <div id="recommendPanel" class="recommendPanel"></div>
-
-  </div>
-
 
     <div class="modal-info">
       <div>
