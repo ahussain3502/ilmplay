@@ -633,69 +633,18 @@ svg circle{
 }
 
 /* ---------- recommendations ---------- */
-  .recommendDrawer{
-  width:100%;
+
+.recommendPanel{
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  padding:10px;
   background:#0d0d0d;
 }
-  
-  .recommendPanel{
-  display:grid;
-  grid-template-columns:
-    repeat(auto-fill,minmax(220px,1fr));
-  gap:12px;
-  padding:15px;
-}
 
-@media(max-width:900px){
-
-.recommendDrawer{
-  position:fixed;
-  left:0;
-  right:0;
-  bottom:0;
-  height:70vh;
-
-  background:#111;
-  border-radius:18px 18px 0 0;
-
-  transform:translateY(85%);
-  transition:.35s ease;
-
-  z-index:50;
-}
-
-.recommendDrawer.open{
-  transform:translateY(0);
-}
-
-.drawerHandle{
-  width:50px;
-  height:5px;
-  background:#666;
-  margin:10px auto;
-  border-radius:5px;
-}
-
-.drawerHeader{
-  display:flex;
-  justify-content:space-between;
-  padding:10px 15px;
-  color:white;
-}
-
-.drawerHeader button{
-  background:none;
-  border:none;
-  color:white;
-  font-size:18px;
-  cursor:pointer;
-}
-
-}
-  
 .recItem{
+  min-width:160px;
   cursor:pointer;
-  color:white;
 }
 
 .recItem img{
@@ -705,7 +654,7 @@ svg circle{
 
 .recItem div{
   font-size:13px;
-  margin-top:4px;
+  color:white;
 }
 </style>
 
@@ -832,18 +781,6 @@ if ("serviceWorker" in navigator) {
 
     <video id="player" controls playsinline preload="metadata"></video>
 
-    <!-- Arrow Handle -->
-<div id="recommendArrow" class="recommend-arrow"></div>
-
-<!-- Recommended Overlay -->
-<div id="recommendedOverlay" class="recommended-overlay">
-
-  <button id="closeRecs" class="close-recs">✕</button>
-
-  <div class="recommended-row" id="recommendedRow">
-  </div>
-
-</div>
     <!-- =====================
          AUTOPLAY OVERLAY
     ====================== -->
@@ -881,6 +818,13 @@ if ("serviceWorker" in navigator) {
         </div>
       </div>
     </div>
+
+
+    <!-- =====================
+        RECOMMENDED PANEL
+    ====================== -->
+    <div id="recommendPanel" class="recommendPanel"></div>
+
 
     <div class="modal-info">
       <div>
@@ -1369,18 +1313,6 @@ const autoplayToggle = document.getElementById("autoplayToggle");
 const recommendPanel = document.getElementById("recommendPanel");
 
 /* -----------------------------
-   RECOMMEND DRAWER
------------------------------ */
-
-const drawer =
-  document.getElementById("recommendDrawer");
-
-const drawerHandle =
-  document.getElementById("drawerHandle");
-
-const drawerClose =
-  document.getElementById("drawerClose");
-/* -----------------------------
    STATE
 ----------------------------- */
 let playlist = [];
@@ -1403,13 +1335,6 @@ function openModal(v){
   modal.setAttribute("aria-hidden","false");
 
   buildRecommendations();
-
-/* desktop always visible */
-if(window.innerWidth > 900){
-  drawer.classList.add("open");
-}else{
-  drawer.classList.remove("open");
-}
 
   player.play().catch(()=>{});
 }
@@ -1616,13 +1541,6 @@ window.addEventListener("load", function () {
   }
 });
 
-  drawerHandle.onclick = ()=>{
-  drawer.classList.add("open");
-};
-
-drawerClose.onclick = ()=>{
-  drawer.classList.remove("open");
-};
 
 </script>
 </body>
