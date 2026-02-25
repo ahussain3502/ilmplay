@@ -633,18 +633,69 @@ svg circle{
 }
 
 /* ---------- recommendations ---------- */
-
-.recommendPanel{
-  display:flex;
-  gap:10px;
-  overflow-x:auto;
-  padding:10px;
+  .recommendDrawer{
+  width:100%;
   background:#0d0d0d;
 }
+  
+  .recommendPanel{
+  display:grid;
+  grid-template-columns:
+    repeat(auto-fill,minmax(220px,1fr));
+  gap:12px;
+  padding:15px;
+}
 
-.recItem{
-  min-width:160px;
+@media(max-width:900px){
+
+.recommendDrawer{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  height:70vh;
+
+  background:#111;
+  border-radius:18px 18px 0 0;
+
+  transform:translateY(85%);
+  transition:.35s ease;
+
+  z-index:50;
+}
+
+.recommendDrawer.open{
+  transform:translateY(0);
+}
+
+.drawerHandle{
+  width:50px;
+  height:5px;
+  background:#666;
+  margin:10px auto;
+  border-radius:5px;
+}
+
+.drawerHeader{
+  display:flex;
+  justify-content:space-between;
+  padding:10px 15px;
+  color:white;
+}
+
+.drawerHeader button{
+  background:none;
+  border:none;
+  color:white;
+  font-size:18px;
   cursor:pointer;
+}
+
+}
+  
+.recItem{
+  cursor:pointer;
+  color:white;
 }
 
 .recItem img{
@@ -654,7 +705,7 @@ svg circle{
 
 .recItem div{
   font-size:13px;
-  color:white;
+  margin-top:4px;
 }
 </style>
 
@@ -820,10 +871,22 @@ if ("serviceWorker" in navigator) {
     </div>
 
 
-    <!-- =====================
-        RECOMMENDED PANEL
-    ====================== -->
+   <!-- ======================
+ RECOMMENDED DRAWER
+====================== -->
+
+  <div id="recommendDrawer" class="recommendDrawer">
+
+    <div id="drawerHandle" class="drawerHandle"></div>
+
+    <div class="drawerHeader">
+      <span>Recommended</span>
+      <button id="drawerClose">✕</button>
+    </div>
+
     <div id="recommendPanel" class="recommendPanel"></div>
+
+  </div>
 
 
     <div class="modal-info">
@@ -1313,6 +1376,18 @@ const autoplayToggle = document.getElementById("autoplayToggle");
 const recommendPanel = document.getElementById("recommendPanel");
 
 /* -----------------------------
+   RECOMMEND DRAWER
+----------------------------- */
+
+const drawer =
+  document.getElementById("recommendDrawer");
+
+const drawerHandle =
+  document.getElementById("drawerHandle");
+
+const drawerClose =
+  document.getElementById("drawerClose");
+/* -----------------------------
    STATE
 ----------------------------- */
 let playlist = [];
@@ -1335,6 +1410,13 @@ function openModal(v){
   modal.setAttribute("aria-hidden","false");
 
   buildRecommendations();
+
+/* desktop always visible */
+if(window.innerWidth > 900){
+  drawer.classList.add("open");
+}else{
+  drawer.classList.remove("open");
+}
 
   player.play().catch(()=>{});
 }
@@ -1541,6 +1623,13 @@ window.addEventListener("load", function () {
   }
 });
 
+  drawerHandle.onclick = ()=>{
+  drawer.classList.add("open");
+};
+
+drawerClose.onclick = ()=>{
+  drawer.classList.remove("open");
+};
 
 </script>
 </body>
