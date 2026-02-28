@@ -545,9 +545,7 @@ body[data-theme="dark"] #donationModal.open .donation-box {
 #close-ios-banner:hover {
   background: #f2f2f2;
 }
-.playerBox{
-  position:relative;
-}
+
 
 /* ---------- overlay ---------- */
 
@@ -633,38 +631,118 @@ svg circle{
 }
 
 /* ---------- recommendations ---------- */
-  .recommendDrawer{
-  width:100%;
-  background:#0d0d0d;
-}
-  
-  .recommendPanel{
-  display:grid;
-  grid-template-columns:
-    repeat(auto-fill,minmax(220px,1fr));
-  gap:12px;
-  padding:15px;
+.playerBox {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
 }
 
-@media(max-width:900px){
-
+.recommendArrow {
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  z-index: 60;
+  text-shadow: 0 0 5px rgba(0,0,0,0.6);
 }
 
+.recommendArrow.show { opacity: 1; }
 
-  
-.recItem{
-  cursor:pointer;
-  color:white;
+.recommendDrawer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(18,18,18,0.95);
+  max-height: 220px;
+  transform: translateY(100%);
+  transition: transform 0.35s ease;
+  z-index: 55;
+  overflow-x: auto;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
 }
 
-.recItem img{
-  width:100%;
-  border-radius:8px;
+.recommendDrawer.show { transform: translateY(0); }
+
+.drawerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 15px;
+  color: white;
+  font-weight: bold;
+  margin-bottom: 8px;
 }
 
-.recItem div{
-  font-size:13px;
-  margin-top:4px;
+.drawerHeader button {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: white;
+  font-size: 20px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  text-align: center;
+  line-height: 28px;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.drawerHeader button:hover { opacity: 1; }
+
+.recommendPanel {
+  display: flex;
+  overflow-x: auto;
+  padding: 0 15px;
+}
+
+.recCard {
+  display: inline-block;
+  width: 160px;
+  margin-right: 12px;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.recCard img {
+  width: 100%;
+  border-radius: 6px;
+  display: block;
+}
+
+.recCard div {
+  color: white;
+  font-size: 13px;
+  margin-top: 4px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .recommendDrawer {
+    position: fixed;
+    max-height: 70vh;
+    background: rgba(18,18,18,0.97);
+    border-radius: 18px 18px 0 0;
+    transform: translateY(85%);
+    padding-bottom: 15px;
+  }
+
+  .recommendDrawer.show { transform: translateY(0); }
+  .recommendArrow { bottom: 60px; }
 }
 </style>
 
@@ -789,78 +867,55 @@ if ("serviceWorker" in navigator) {
 <div id="modal" class="modal" aria-hidden="true">
   <div class="playerBox" role="dialog" aria-modal="true">
 
+    <!-- VIDEO PLAYER -->
     <video id="player" controls playsinline preload="metadata"></video>
 
-    <!-- =====================
-         AUTOPLAY OVERLAY
-    ====================== -->
+    <!-- ARROW (OUTSIDE DRAWER!) -->
+    <div id="recommendArrow" class="recommendArrow">▲</div>
+
+    <!-- AUTOPLAY OVERLAY -->
     <div id="nextOverlay" class="nextOverlay hidden">
-
       <div class="upNextCard">
-
         <img id="nextThumb">
-
         <div class="upNextInfo">
           <div class="upNextLabel">Up Next</div>
           <div id="nextTitle"></div>
-
           <div class="countdownWrap">
             <svg width="60" height="60">
-              <circle class="bg"
-                cx="30" cy="30" r="26"/>
-              <circle id="progressCircle"
-                class="progress"
-                cx="30" cy="30" r="26"/>
+              <circle class="bg" cx="30" cy="30" r="26"/>
+              <circle id="progressCircle" class="progress" cx="30" cy="30" r="26"/>
             </svg>
-
             <span id="count">5</span>
           </div>
-
           <button id="playNowBtn">Play Now</button>
-
           <label class="autoToggle">
-            <input type="checkbox"
-                   id="autoplayToggle"
-                   checked>
+            <input type="checkbox" id="autoplayToggle" checked>
             Autoplay
           </label>
-
         </div>
       </div>
     </div>
 
-
-   <!-- ======================
- RECOMMENDED DRAWER
-====================== -->
-
-  <div id="recommendDrawer" class="recommendDrawer">
-
-    <div id="recArrow" class="recArrow">▲</div>
-
-    <div class="drawerHeader">
-      <span>Recommended</span>
-      <button id="drawerClose">✕</button>
+    <!-- RECOMMEND DRAWER -->
+    <div id="recommendDrawer" class="recommendDrawer">
+      <div class="drawerHeader">
+        <span>Recommended</span>
+        <button id="drawerClose" class="drawerClose">✕</button>
+      </div>
+      <div id="recommendPanel" class="recommendPanel"></div>
     </div>
 
-    <div id="recommendPanel" class="recommendPanel"></div>
-
-  </div>
-
-
+    <!-- VIDEO INFO -->
     <div class="modal-info">
       <div>
         <div id="modalTitle" class="modal-title"></div>
         <div id="modalDesc" class="modal-desc"></div>
       </div>
-
-      <button id="closeBtn"
-        class="closeBtn">Close</button>
+      <button id="closeBtn" class="closeBtn">Close</button>
     </div>
 
   </div>
 </div>
-
 
 <div class="footer">© IlmPlay — Safe Islamic Videos for Kids</div> 
 
@@ -1259,9 +1314,6 @@ if ("serviceWorker" in navigator) {
 /* -----------------------------
    VIDEO GRID BUILDER
 ----------------------------- */
-
-// Make sure you have your arrays defined: STORIES, NASHEEDS, DUAS, CARTOONS, PLACEHOLDER
-
 function buildRow(sectionName, fullList, slice){
   const wrapper = document.createElement("div");
   wrapper.className = "rowWrapper";
@@ -1284,7 +1336,6 @@ function buildRow(sectionName, fullList, slice){
     tile.appendChild(img);
     tile.appendChild(title);
 
-    // Click handler opens modal with playlist
     tile.addEventListener("click", () =>
       playFromList(fullList, v)
     );
@@ -1293,10 +1344,7 @@ function buildRow(sectionName, fullList, slice){
   });
 
   wrapper.appendChild(row);
-
-  document
-    .getElementById("rows-" + sectionName)
-    .appendChild(wrapper);
+  document.getElementById("rows-" + sectionName).appendChild(wrapper);
 }
 
 /* -----------------------------
@@ -1304,16 +1352,12 @@ function buildRow(sectionName, fullList, slice){
 ----------------------------- */
 for(let i=0;i<STORIES.length;i+=8)
   buildRow("Stories",STORIES,STORIES.slice(i,i+8));
-
 for(let i=0;i<NASHEEDS.length;i+=8)
   buildRow("Nasheeds",NASHEEDS,NASHEEDS.slice(i,i+8));
-
 for(let i=0;i<DUAS.length;i+=8)
   buildRow("Duas",DUAS,DUAS.slice(i,i+8));
-
 for(let i=0;i<CARTOONS.length;i+=8)
   buildRow("Cartoons",CARTOONS,CARTOONS.slice(i,i+8));
-
 
 /* -----------------------------
    VIDEO MODAL & PLAYER
@@ -1332,31 +1376,20 @@ const countEl = document.getElementById("count");
 const progressCircle = document.getElementById("progressCircle");
 const playNowBtn = document.getElementById("playNowBtn");
 const autoplayToggle = document.getElementById("autoplayToggle");
+
+/* RECOMMENDED DRAWER + ARROW */
+const recommendDrawer = document.getElementById("recommendDrawer");
+const recommendArrow = document.getElementById("recommendArrow");
+const drawerClose = document.getElementById("drawerClose");
 const recommendPanel = document.getElementById("recommendPanel");
 
-/* -----------------------------
-   RECOMMEND DRAWER
------------------------------ */
-
-const drawer =
-  document.getElementById("recommendDrawer");
-
-const drawerHandle =
-  document.getElementById("drawerHandle");
-
-const drawerClose =
-  document.getElementById("drawerClose");
-/* -----------------------------
-   STATE
------------------------------ */
+/* STATE */
 let playlist = [];
 let index = 0;
 let timer;
+let controlsTimer;
 
-
-/* -----------------------------
-   OPEN VIDEO
------------------------------ */
+/* OPEN VIDEO */
 function openModal(v){
   clearInterval(timer);
   overlay.classList.add("hidden");
@@ -1370,28 +1403,23 @@ function openModal(v){
 
   buildRecommendations();
 
-/* desktop always visible */
-if(window.innerWidth > 900){
-  drawer.classList.add("open");
-}else{
-  drawer.classList.remove("open");
-}
+  if(window.innerWidth > 900){
+    recommendDrawer.classList.add("show");
+  } else {
+    recommendDrawer.classList.remove("show");
+  }
 
   player.play().catch(()=>{});
 }
 
-
-/* ---------- TILE CLICK ---------- */
+/* TILE CLICK */
 function playFromList(fullList, vid){
   playlist = fullList;
   index = fullList.indexOf(vid);
   openModal(vid);
 }
 
-
-/* -----------------------------
-   VIDEO END → SHOW UP NEXT
------------------------------ */
+/* VIDEO END → SHOW UP NEXT */
 player.addEventListener("ended",()=>{
   if(!autoplayToggle.checked) return;
   showUpNext();
@@ -1409,13 +1437,10 @@ function showUpNext(){
   startCountdown(nextIndex);
 }
 
-
-/* -----------------------------
-   COUNTDOWN CIRCLE
------------------------------ */
+/* COUNTDOWN CIRCLE */
 function startCountdown(nextIndex){
   let time = 5;
-  const circumference = 163; // for circle
+  const circumference = 163;
 
   countEl.textContent = time;
   progressCircle.style.strokeDashoffset = 0;
@@ -1434,46 +1459,51 @@ function startCountdown(nextIndex){
   },1000);
 }
 
-
-/* -----------------------------
-   PLAY NOW BUTTON
------------------------------ */
+/* PLAY NOW BUTTON */
 playNowBtn.onclick = ()=>{
   clearInterval(timer);
   index = (index+1)%playlist.length;
   openModal(playlist[index]);
 };
 
-
-/* -----------------------------
-   RECOMMENDED PANEL
------------------------------ */
+/* BUILD RECOMMENDED PANEL */
 function buildRecommendations(){
   recommendPanel.innerHTML = "";
 
   playlist.forEach((v,i)=>{
     if(i===index) return;
 
-    const item = document.createElement("div");
-    item.className = "recItem";
-    item.innerHTML=`
+    const card = document.createElement("div");
+    card.className = "recCard";
+    card.innerHTML = `
       <img src="${v.thumb}">
       <div>${v.title}</div>
     `;
-
-    item.onclick = ()=>{
+    card.onclick = ()=>{
       index=i;
       openModal(v);
     };
-
-    recommendPanel.appendChild(item);
+    recommendPanel.appendChild(card);
   });
 }
 
+/* ARROW SHOW/HIDE ON CONTROLS */
+function showControls(){
+  recommendArrow.classList.add("show");
+  clearTimeout(controlsTimer);
+  controlsTimer = setTimeout(()=>{
+    recommendArrow.classList.remove("show");
+  },2500);
+}
 
-/* -----------------------------
-   CLOSE MODAL
------------------------------ */
+player.addEventListener("mousemove", showControls);
+player.addEventListener("touchstart", showControls);
+
+/* OPEN/CLOSE RECOMMENDATIONS */
+recommendArrow.onclick = ()=>recommendDrawer.classList.add("show");
+drawerClose.onclick = ()=>recommendDrawer.classList.remove("show");
+
+/* CLOSE MODAL */
 closeBtn.onclick = closeModal;
 
 function closeModal(){
@@ -1486,12 +1516,16 @@ function closeModal(){
   player.pause();
   player.removeAttribute("src");
   player.load();
+
+  recommendDrawer.classList.remove("show");
+  recommendArrow.classList.remove("show");
 }
 
 /* click outside modal closes it */
 modal.addEventListener("click",(e)=>{
   if(e.target===modal) closeModal();
 });
+
 
   /* -----------------------------
       NAVIGATION
