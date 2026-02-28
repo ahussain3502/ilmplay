@@ -638,22 +638,32 @@ svg circle{
   margin: 0 auto;
 }
 
+/* Desktop arrow */
 .recommendArrow {
   position: absolute;
-  bottom: 50px;
+  bottom: 60px; /* adjust above video timeline */
   left: 50%;
   transform: translateX(-50%);
-  font-size: 24px;
+  font-size: 32px; /* bigger */
   color: white;
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.25s ease;
   z-index: 60;
-  text-shadow: 0 0 5px rgba(0,0,0,0.6);
+  text-shadow: 0 0 6px rgba(0,0,0,0.8);
+  user-select: none;
 }
 
-.recommendArrow.show { opacity: 1; }
+.recommendArrow.show {
+  opacity: 1;
+}
 
+/* Mobile landscape */
+@media (max-width: 900px) {
+  .recommendArrow {
+    display: none; /* arrow hidden on mobile */
+  }
+}
 .recommendDrawer {
   position: absolute;
   bottom: 0;
@@ -706,6 +716,7 @@ svg circle{
   display: flex;
   overflow-x: auto;
   padding: 0 15px;
+  -webkit-overflow-scrolling: touch; /* smooth on iOS */
 }
 
 .recCard {
@@ -1336,9 +1347,8 @@ function buildRow(sectionName, fullList, slice){
     tile.appendChild(img);
     tile.appendChild(title);
 
-    tile.addEventListener("click", () =>
-      playFromList(fullList, v)
-    );
+    // click opens modal with full playlist
+    tile.addEventListener("click", () => playFromList(fullList, v));
 
     row.appendChild(tile);
   });
@@ -1387,9 +1397,10 @@ const recommendPanel = document.getElementById("recommendPanel");
 let playlist = [];
 let index = 0;
 let timer;
-let controlsTimer;
 
-/* OPEN VIDEO */
+/* -----------------------------
+   OPEN VIDEO
+----------------------------- */
 function openModal(v){
   clearInterval(timer);
   overlay.classList.add("hidden");
@@ -1403,23 +1414,25 @@ function openModal(v){
 
   buildRecommendations();
 
-  if(window.innerWidth > 900){
-    recommendDrawer.classList.add("show");
-  } else {
-    recommendDrawer.classList.remove("show");
-  }
+  // Desktop: drawer hidden by default until arrow shows in fullscreen
+  recommendDrawer.classList.remove("show");
+  recommendArrow.classList.remove("show");
 
   player.play().catch(()=>{});
 }
 
-/* TILE CLICK */
+/* -----------------------------
+   TILE CLICK
+----------------------------- */
 function playFromList(fullList, vid){
   playlist = fullList;
   index = fullList.indexOf(vid);
   openModal(vid);
 }
 
-/* VIDEO END → SHOW UP NEXT */
+/* -----------------------------
+   VIDEO END → SHOW UP NEXT
+----------------------------- */
 player.addEventListener("ended",()=>{
   if(!autoplayToggle.checked) return;
   showUpNext();
@@ -1433,11 +1446,12 @@ function showUpNext(){
   nextTitle.textContent = nextVid.title;
 
   overlay.classList.remove("hidden");
-
   startCountdown(nextIndex);
 }
 
-/* COUNTDOWN CIRCLE */
+/* -----------------------------
+   COUNTDOWN CIRCLE
+----------------------------- */
 function startCountdown(nextIndex){
   let time = 5;
   const circumference = 163;
@@ -1459,14 +1473,18 @@ function startCountdown(nextIndex){
   },1000);
 }
 
-/* PLAY NOW BUTTON */
+/* -----------------------------
+   PLAY NOW BUTTON
+----------------------------- */
 playNowBtn.onclick = ()=>{
   clearInterval(timer);
   index = (index+1)%playlist.length;
   openModal(playlist[index]);
 };
 
-/* BUILD RECOMMENDED PANEL */
+/* -----------------------------
+   BUILD RECOMMENDED PANEL
+----------------------------- */
 function buildRecommendations(){
   recommendPanel.innerHTML = "";
 
@@ -1487,23 +1505,64 @@ function buildRecommendations(){
   });
 }
 
-/* ARROW SHOW/HIDE ON CONTROLS */
-function showControls(){
-  recommendArrow.classList.add("show");
-  clearTimeout(controlsTimer);
-  controlsTimer = setTimeout(()=>{
+/* -----------------------------
+   FULLSCREEN ARROW LOGIC
+----------------------------- */
+function checkFullscreenArrow(){
+  const isFullscreen = document.fullscreenElement === modal;
+  const isDesktop = window.innerWidth > 900;
+
+  if(isFullscreen && isDesktop){
+    recommendArrow.classList.add("show");
+  } else {
     recommendArrow.classList.remove("show");
-  },2500);
+    recommendDrawer.classList.remove("show");
+  }
 }
 
-player.addEventListener("mousemove", showControls);
-player.addEventListener("touchstart", showControls);
+document.addEventListener("fullscreenchange", checkFullscreenArrow);
 
-/* OPEN/CLOSE RECOMMENDATIONS */
+/* arrow click → show drawer */
 recommendArrow.onclick = ()=>recommendDrawer.classList.add("show");
 drawerClose.onclick = ()=>recommendDrawer.classList.remove("show");
 
-/* CLOSE MODAL */
+/* -----------------------------
+   MOBILE DRAG FOR DRAWER
+----------------------------- */
+if(window.innerWidth <= 900){
+  let startY = 0;
+  let currentY = 0;
+  let dragging = false;
+
+  recommendDrawer.addEventListener("touchstart", e=>{
+    startY = e.touches[0].clientY;
+    dragging = true;
+    recommendDrawer.style.transition = "none";
+  });
+
+  recommendDrawer.addEventListener("touchmove", e=>{
+    if(!dragging) return;
+    currentY = e.touches[0].clientY;
+    let deltaY = Math.max(0, startY - currentY);
+    recommendDrawer.style.transform = `translateY(${Math.max(0,85 - deltaY/5)}%)`;
+  });
+
+  recommendDrawer.addEventListener("touchend", e=>{
+    dragging = false;
+    recommendDrawer.style.transition = "transform 0.35s ease";
+    if(startY - currentY > 30){
+      recommendDrawer.classList.add("show");
+      recommendDrawer.style.transform = "translateY(0)";
+    } else {
+      recommendDrawer.classList.remove("show");
+      recommendDrawer.style.transform = "translateY(85%)";
+    }
+  });
+}
+
+/* -----------------------------
+   CLOSE MODAL
+----------------------------- */
 closeBtn.onclick = closeModal;
 
 function closeModal(){
@@ -1525,7 +1584,6 @@ function closeModal(){
 modal.addEventListener("click",(e)=>{
   if(e.target===modal) closeModal();
 });
-
 
   /* -----------------------------
       NAVIGATION
