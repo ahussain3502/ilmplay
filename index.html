@@ -648,50 +648,9 @@ svg circle{
 
 @media(max-width:900px){
 
-.recommendDrawer{
-  position:fixed;
-  left:0;
-  right:0;
-  bottom:0;
-  height:70vh;
-
-  background:#111;
-  border-radius:18px 18px 0 0;
-
-  transform:translateY(85%);
-  transition:.35s ease;
-
-  z-index:50;
 }
 
-.recommendDrawer.open{
-  transform:translateY(0);
-}
 
-.drawerHandle{
-  width:50px;
-  height:5px;
-  background:#666;
-  margin:10px auto;
-  border-radius:5px;
-}
-
-.drawerHeader{
-  display:flex;
-  justify-content:space-between;
-  padding:10px 15px;
-  color:white;
-}
-
-.drawerHeader button{
-  background:none;
-  border:none;
-  color:white;
-  font-size:18px;
-  cursor:pointer;
-}
-
-}
   
 .recItem{
   cursor:pointer;
@@ -877,7 +836,7 @@ if ("serviceWorker" in navigator) {
 
   <div id="recommendDrawer" class="recommendDrawer">
 
-    <div id="drawerHandle" class="drawerHandle"></div>
+    <div id="recArrow" class="recArrow">▲</div>
 
     <div class="drawerHeader">
       <span>Recommended</span>
