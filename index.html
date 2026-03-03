@@ -630,17 +630,13 @@ svg circle{
   margin-top:8px;
 }
 
-/* ---------- recommendations ---------- */
-
 /* =====================================================
    RECOMMENDATIONS SYSTEM — FINAL UNIFIED VERSION
 ===================================================== */
 
-
 /* ===============================
    FULLSCREEN ARROW (DESKTOP)
 ================================ */
-
 .recommendArrow{
   position:fixed;
   left:50%;
@@ -668,11 +664,9 @@ svg circle{
   transform:translateX(-50%) translateY(0);
 }
 
-
 /* ===============================
    RECOMMEND DRAWER
 ================================ */
-
 .recommendDrawer{
   position:fixed;
   left:0;
@@ -700,16 +694,14 @@ svg circle{
   transform:translateY(0);
 }
 
-/* MOBILE HALF-OPEN STATE */
+/* MOBILE HALF-OPEN STATE (peek state for drag) */
 .recommendDrawer.mobile-ready{
   transform:translateY(70%);
 }
 
-
 /* ===============================
    DRAG HANDLE (MOBILE)
 ================================ */
-
 .drawerHandle{
   width:60px;
   height:6px;
@@ -718,11 +710,9 @@ svg circle{
   margin:10px auto;
 }
 
-
 /* ===============================
    CLOSE BUTTON (YOUTUBE STYLE)
 ================================ */
-
 .drawerClose{
   position:absolute;
   top:12px;
@@ -752,17 +742,16 @@ svg circle{
   background:rgba(255,255,255,.25);
 }
 
-
 /* ===============================
    RECOMMEND GRID
-   (3 VIDEOS PER ROW)
+   3 VIDEOS PER ROW, scrollable
 ================================ */
-
 .recommendPanel{
   flex:1;
 
   display:grid;
   grid-template-columns:repeat(3,1fr);
+  grid-auto-rows:minmax(90px, auto);
   gap:14px;
 
   padding:55px 16px 20px;
@@ -771,11 +760,9 @@ svg circle{
   -webkit-overflow-scrolling:touch;
 }
 
-
 /* ===============================
    VIDEO CARD
 ================================ */
-
 .recCard{
   cursor:pointer;
   transition:transform .2s;
@@ -804,11 +791,9 @@ svg circle{
   text-overflow:ellipsis;
 }
 
-
 /* ===============================
    BACKDROP BLUR
 ================================ */
-
 #drawerBackdrop{
   position:fixed;
   inset:0;
@@ -828,18 +813,26 @@ svg circle{
   pointer-events:auto;
 }
 
-
 /* ===============================
    MOBILE RULES
    Landscape Fullscreen Only
 ================================ */
-
 @media (max-width:900px) and (orientation:landscape){
 
+  /* Hide desktop arrow */
   .recommendArrow{
     display:none;
   }
 
+  /* Ensure drawer can be dragged fully */
+  .recommendDrawer{
+    height:75vh;
+    transform:translateY(88%);
+  }
+
+  .recommendDrawer.show{
+    transform:translateY(0);
+  }
 }
 </style>
 
@@ -979,15 +972,14 @@ if ("serviceWorker" in navigator) {
       preload="metadata">
     </video>
 
-
     <!-- ======================
          DESKTOP FULLSCREEN ARROW
+         (Shows only in fullscreen desktop)
     ======================= -->
     <div id="recommendArrow"
          class="recommendArrow">
       ▲
     </div>
-
 
     <!-- ======================
          AUTOPLAY OVERLAY
@@ -1040,9 +1032,9 @@ if ("serviceWorker" in navigator) {
       </div>
     </div>
 
-
     <!-- ======================
-         RECOMMENDATIONS PANEL
+         RECOMMENDATIONS DRAWER
+         (Desktop fullscreen & mobile landscape)
     ======================= -->
     <div id="recommendDrawer"
          class="recommendDrawer">
@@ -1050,10 +1042,10 @@ if ("serviceWorker" in navigator) {
       <!-- MOBILE DRAG HANDLE -->
       <div class="drawerHandle"></div>
 
-      <!-- CLOSE ARROW -->
+      <!-- CLOSE ARROW (desktop & mobile) -->
       <button id="drawerClose"
-        class="drawerClose">
-          ✕
+              class="drawerClose">
+        ✕
       </button>
 
       <!-- GRID HOLDER -->
@@ -1062,7 +1054,6 @@ if ("serviceWorker" in navigator) {
       </div>
 
     </div>
-
 
     <!-- ======================
          VIDEO INFO
@@ -1485,7 +1476,6 @@ if ("serviceWorker" in navigator) {
 ===================================================== */
 
 function buildRow(sectionName, fullList, slice){
-
   const wrapper=document.createElement("div");
   wrapper.className="rowWrapper";
 
@@ -1493,7 +1483,6 @@ function buildRow(sectionName, fullList, slice){
   row.className="row";
 
   slice.forEach(v=>{
-
     const tile=document.createElement("div");
     tile.className="tile";
 
@@ -1512,26 +1501,21 @@ function buildRow(sectionName, fullList, slice){
   });
 
   wrapper.appendChild(row);
-  document
-    .getElementById("rows-"+sectionName)
-    .appendChild(wrapper);
+  document.getElementById("rows-"+sectionName).appendChild(wrapper);
 }
-
 
 /* =====================================================
    BUILD SECTIONS
 ===================================================== */
 
-[STORIES,NASHEEDS,DUAS,CARTOONS]
-.forEach((list,i)=>{
+[STORIES,NASHEEDS,DUAS,CARTOONS].forEach((list,i)=>{
   const names=["Stories","Nasheeds","Duas","Cartoons"];
   for(let x=0;x<list.length;x+=8)
     buildRow(names[i],list,list.slice(x,x+8));
 });
 
-
 /* =====================================================
-   PLAYER + ELEMENTS
+   PLAYER ELEMENTS
 ===================================================== */
 
 const modal=document.getElementById("modal");
@@ -1556,27 +1540,24 @@ const recommendArrow=document.getElementById("recommendArrow");
 const drawerClose=document.getElementById("drawerClose");
 const recommendPanel=document.getElementById("recommendPanel");
 
-
 /* =====================================================
    STATE
 ===================================================== */
-
 let playlist=[];
 let index=0;
 let timer;
-
+let dragging=false;
+let startY=0;
+let currentY=0;
 
 /* =====================================================
    OPEN VIDEO
 ===================================================== */
-
 function openModal(v){
-
   clearInterval(timer);
   overlay.classList.add("hidden");
 
   player.src=v.file;
-
   modalTitle.textContent=v.title;
   modalDesc.textContent=v.desc;
 
@@ -1584,7 +1565,8 @@ function openModal(v){
 
   buildRecommendations();
 
-  recommendDrawer.classList.remove("show");
+  // Hide all by default
+  recommendDrawer.classList.remove("show","mobile-ready");
   recommendArrow.classList.remove("show");
 
   player.play().catch(()=>{});
@@ -1596,41 +1578,29 @@ function playFromList(fullList,vid){
   openModal(vid);
 }
 
-
 /* =====================================================
-   RECOMMENDATIONS GRID
+   BUILD RECOMMENDATIONS
 ===================================================== */
-
 function buildRecommendations(){
-
   recommendPanel.innerHTML="";
 
   playlist.forEach((v,i)=>{
-
     if(i===index) return;
 
     const card=document.createElement("div");
     card.className="recCard";
-
-    card.innerHTML=`
-      <img src="${v.thumb}">
-      <div>${v.title}</div>
-    `;
-
+    card.innerHTML=`<img src="${v.thumb}"><div>${v.title}</div>`;
     card.onclick=()=>{
       index=i;
       openModal(v);
     };
-
     recommendPanel.appendChild(card);
   });
 }
 
-
 /* =====================================================
    AUTOPLAY NEXT
 ===================================================== */
-
 player.addEventListener("ended",()=>{
   if(!autoplayToggle.checked) return;
 
@@ -1641,36 +1611,28 @@ player.addEventListener("ended",()=>{
   nextTitle.textContent=nextVid.title;
 
   overlay.classList.remove("hidden");
-
   startCountdown(nextIndex);
 });
 
-
 function startCountdown(nextIndex){
-
   let time=5;
   const circumference=163;
 
   countEl.textContent=time;
+  progressCircle.style.strokeDashoffset=0;
 
   timer=setInterval(()=>{
-
     time--;
-
     countEl.textContent=time;
-
-    progressCircle.style.strokeDashoffset=
-      circumference*(1-time/5);
+    progressCircle.style.strokeDashoffset=circumference*(1-time/5);
 
     if(time<=0){
       clearInterval(timer);
       index=nextIndex;
       openModal(playlist[index]);
     }
-
   },1000);
 }
-
 
 playNowBtn.onclick=()=>{
   clearInterval(timer);
@@ -1678,113 +1640,77 @@ playNowBtn.onclick=()=>{
   openModal(playlist[index]);
 };
 
-
 /* =====================================================
-   FULLSCREEN DETECTION
+   FULLSCREEN & UI UPDATE
 ===================================================== */
-
-document.addEventListener(
-  "fullscreenchange",
-  updateFullscreenUI
-);
-
-window.addEventListener(
-  "resize",
-  updateFullscreenUI
-);
-
-
-function updateFullscreenUI(){
-
+function updateUI(){
   const fullscreen=!!document.fullscreenElement;
   const mobile=isMobile();
   const landscape=isLandscape();
 
   recommendArrow.classList.remove("show");
-  recommendDrawer.classList.remove("show");
-  recommendDrawer.classList.remove("mobile-ready");
+  recommendDrawer.classList.remove("show","mobile-ready");
 
-  /* ---------- DESKTOP ---------- */
   if(fullscreen && !mobile){
+    // Desktop fullscreen
     recommendArrow.classList.add("show");
   }
-
-  /* ---------- MOBILE ---------- */
   if(fullscreen && mobile && landscape){
+    // Mobile landscape fullscreen
     recommendDrawer.classList.add("mobile-ready");
   }
 }
 
+document.addEventListener("fullscreenchange",updateUI);
+window.addEventListener("resize",updateUI);
 
 /* =====================================================
    DESKTOP ARROW
 ===================================================== */
-
 recommendArrow.onclick=()=>{
   recommendDrawer.classList.add("show");
 };
-
 drawerClose.onclick=()=>{
   recommendDrawer.classList.remove("show");
 };
 
-
 /* =====================================================
-   MOBILE DRAG SYSTEM
+   MOBILE DRAG
 ===================================================== */
-
-let startY=0;
-let currentY=0;
-let dragging=false;
-
 recommendDrawer.addEventListener("touchstart",e=>{
-
   if(!mobileFullscreenAllowed()) return;
-
   dragging=true;
   startY=e.touches[0].clientY;
   recommendDrawer.style.transition="none";
 });
 
 recommendDrawer.addEventListener("touchmove",e=>{
-
   if(!dragging) return;
-
   currentY=e.touches[0].clientY;
-
   const delta=startY-currentY;
-  const move=Math.max(0,70-delta/4);
-
-  recommendDrawer.style.transform=
-    `translateY(${move}%)`;
+  let move=Math.max(0,70-delta/4);
+  recommendDrawer.style.transform=`translateY(${move}%)`;
 });
 
 recommendDrawer.addEventListener("touchend",()=>{
-
   if(!dragging) return;
-
   dragging=false;
-
-  recommendDrawer.style.transition=
-    "transform .45s cubic-bezier(.22,.8,.25,1)";
-
+  recommendDrawer.style.transition="transform .45s cubic-bezier(.22,.8,.25,1)";
   if(startY-currentY>40){
     recommendDrawer.classList.add("show");
+    recommendDrawer.style.transform="translateY(0)";
   }else{
     recommendDrawer.classList.remove("show");
     recommendDrawer.classList.add("mobile-ready");
+    recommendDrawer.style.transform="";
   }
 });
-
 
 /* =====================================================
    CLOSE MODAL
 ===================================================== */
-
 closeBtn.onclick=closeModal;
-
 function closeModal(){
-
   clearInterval(timer);
 
   modal.classList.remove("open");
@@ -1793,30 +1719,17 @@ function closeModal(){
   player.removeAttribute("src");
   player.load();
 
-  recommendDrawer.classList.remove("show");
+  recommendDrawer.classList.remove("show","mobile-ready");
   recommendArrow.classList.remove("show");
 }
-
 
 /* =====================================================
    HELPERS
 ===================================================== */
-
-function isMobile(){
-  return window.innerWidth<=900;
-}
-
-function isLandscape(){
-  return window.innerWidth>
-         window.innerHeight;
-}
-
+function isMobile(){ return window.innerWidth<=900; }
+function isLandscape(){ return window.innerWidth>window.innerHeight; }
 function mobileFullscreenAllowed(){
-  return (
-    document.fullscreenElement &&
-    isMobile() &&
-    isLandscape()
-  );
+  return document.fullscreenElement && isMobile() && isLandscape();
 }
   /* -----------------------------
       NAVIGATION
