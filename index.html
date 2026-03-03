@@ -629,17 +629,11 @@ svg circle{
   font-size:14px;
   margin-top:8px;
 }
-/* =====================================================
-   RECOMMENDATIONS SYSTEM — FINAL UNIFIED VERSION
-===================================================== */
-
-/* ===============================
-   FULLSCREEN ARROW (DESKTOP)
-================================ */
+/* FULLSCREEN ARROW (DESKTOP) */
 .recommendArrow{
   position:fixed;
   left:50%;
-  bottom:90px; /* above progress bar */
+  bottom:85px;
   transform:translateX(-50%) translateY(20px);
   font-size:46px;
   color:#fff;
@@ -655,16 +649,14 @@ svg circle{
   transform:translateX(-50%) translateY(0);
 }
 
-/* ===============================
-   RECOMMEND DRAWER (OVER VIDEO)
-================================ */
+/* RECOMMEND DRAWER */
 .recommendDrawer{
   position:fixed;
   left:0;
   bottom:0;
   width:100%;
-  height:75vh;
-  background:rgba(18,18,18,.97);
+  height:78vh;
+  background:rgba(18,18,18,.98);
   backdrop-filter:blur(14px);
   border-radius:18px 18px 0 0;
   transform:translateY(100%);
@@ -674,20 +666,10 @@ svg circle{
   flex-direction:column;
   overflow:hidden;
 }
+.recommendDrawer.show{ transform:translateY(0); }
+.recommendDrawer.mobile-ready{ transform:translateY(70%); }
 
-/* Open state */
-.recommendDrawer.show{
-  transform:translateY(0);
-}
-
-/* MOBILE HALF-OPEN (peek) */
-.recommendDrawer.mobile-ready{
-  transform:translateY(65%);
-}
-
-/* ===============================
-   DRAG HANDLE (MOBILE)
-================================ */
+/* DRAG HANDLE */
 .drawerHandle{
   width:60px;
   height:6px;
@@ -696,9 +678,7 @@ svg circle{
   margin:10px auto;
 }
 
-/* ===============================
-   CLOSE BUTTON (YOUTUBE STYLE)
-================================ */
+/* CLOSE BUTTON */
 .drawerClose{
   position:absolute;
   top:12px;
@@ -719,9 +699,7 @@ svg circle{
 }
 .drawerClose:hover{ background:rgba(255,255,255,.25); }
 
-/* ===============================
-   RECOMMEND GRID (3 per row)
-================================ */
+/* RECOMMEND GRID */
 .recommendPanel{
   flex:1;
   display:grid;
@@ -733,13 +711,8 @@ svg circle{
   -webkit-overflow-scrolling:touch;
 }
 
-/* ===============================
-   VIDEO CARD
-================================ */
-.recCard{
-  cursor:pointer;
-  transition:transform .2s;
-}
+/* VIDEO CARD */
+.recCard{ cursor:pointer; transition:transform .2s; }
 .recCard:hover{ transform:scale(1.04); }
 .recCard img{
   width:100%;
@@ -757,9 +730,7 @@ svg circle{
   text-overflow:ellipsis;
 }
 
-/* ===============================
-   BACKDROP BLUR
-================================ */
+/* BACKDROP BLUR */
 #drawerBackdrop{
   position:fixed;
   inset:0;
@@ -772,27 +743,11 @@ svg circle{
 }
 #drawerBackdrop.show{ opacity:1; pointer-events:auto; }
 
-/* ===============================
-   MOBILE RULES (LANDSCAPE ONLY)
-================================ */
+/* MOBILE LANDSCAPE FULLSCREEN */
 @media (max-width:900px) and (orientation:landscape){
-
-  /* Hide desktop arrow */
   .recommendArrow{ display:none; }
-
-  /* Drawer peek state: 1.5 rows visible */
-  .recommendDrawer{
-    height:75vh;
-    transform:translateY(65%);
-  }
-
-  /* Drawer open state */
-  .recommendDrawer.show{
-    transform:translateY(0);
-  }
-
-  /* Allow drag */
-  .recommendDrawer.mobile-ready{ transform:translateY(65%); }
+  .recommendDrawer{ height:75vh; transform:translateY(88%); }
+  .recommendDrawer.show{ transform:translateY(0); }
 }
 </style>
 
@@ -916,7 +871,10 @@ if ("serviceWorker" in navigator) {
 <div id="modal" class="modal" aria-hidden="true">
 
   <!-- FULLSCREEN SAFE CONTAINER -->
-  <div id="playerContainer" class="playerBox" role="dialog" aria-modal="true">
+  <div id="playerContainer"
+       class="playerBox"
+       role="dialog"
+       aria-modal="true">
 
     <!-- VIDEO PLAYER -->
     <video id="player" controls playsinline webkit-playsinline preload="metadata"></video>
@@ -940,23 +898,21 @@ if ("serviceWorker" in navigator) {
           </div>
           <button id="playNowBtn">Play Now</button>
           <label class="autoToggle">
-            <input type="checkbox" id="autoplayToggle" checked>
-            Autoplay
+            <input type="checkbox" id="autoplayToggle" checked> Autoplay
           </label>
         </div>
       </div>
     </div>
 
-    <!-- RECOMMENDATIONS PANEL / DRAWER -->
+    <!-- RECOMMENDATIONS DRAWER -->
     <div id="recommendDrawer" class="recommendDrawer">
-
-      <!-- MOBILE DRAG HANDLE -->
+      <!-- DRAG HANDLE -->
       <div class="drawerHandle"></div>
 
       <!-- CLOSE BUTTON -->
       <button id="drawerClose" class="drawerClose">✕</button>
 
-      <!-- GRID HOLDER -->
+      <!-- RECOMMENDATIONS GRID -->
       <div id="recommendPanel" class="recommendPanel"></div>
     </div>
 
@@ -1436,7 +1392,6 @@ const recommendPanel = document.getElementById("recommendPanel");
 let playlist = [];
 let index = 0;
 let timer;
-
 let startY = 0, currentY = 0, dragging = false;
 
 /* =====================================================
@@ -1451,10 +1406,10 @@ function openModal(v){
   modalDesc.textContent = v.desc;
 
   modal.classList.add("open");
-
   buildRecommendations();
 
-  recommendDrawer.classList.remove("show");
+  // Reset drawer/arrow
+  recommendDrawer.classList.remove("show","mobile-ready");
   recommendArrow.classList.remove("show");
 
   player.play().catch(()=>{});
@@ -1535,38 +1490,33 @@ document.addEventListener("fullscreenchange", updateUI);
 window.addEventListener("resize", updateUI);
 
 function updateUI(){
-  const fullscreen = !!document.fullscreenElement;
+  const fsElem = document.fullscreenElement;
   const mobile = isMobile();
   const landscape = isLandscape();
 
+  // Reset
   recommendArrow.classList.remove("show");
-  recommendDrawer.classList.remove("show");
-  recommendDrawer.classList.remove("mobile-ready");
+  recommendDrawer.classList.remove("show","mobile-ready");
 
-  // Desktop fullscreen: show arrow above progress bar
-  if(fullscreen && !mobile){
+  // Desktop: arrow if modal or video is fullscreen
+  if(fsElem && !mobile){
     recommendArrow.classList.add("show");
   }
 
-  // Mobile landscape fullscreen: show peek drawer
-  if(fullscreen && mobile && landscape){
+  // Mobile: peek drawer in landscape fullscreen
+  if(fsElem && mobile && landscape){
     recommendDrawer.classList.add("mobile-ready");
   }
 }
 
 /* =====================================================
-   DESKTOP ARROW
+   DESKTOP ARROW CLICK
 ===================================================== */
-recommendArrow.onclick = ()=>{
-  recommendDrawer.classList.add("show");
-};
-
-drawerClose.onclick = ()=>{
-  recommendDrawer.classList.remove("show");
-};
+recommendArrow.onclick = ()=> recommendDrawer.classList.add("show");
+drawerClose.onclick = ()=> recommendDrawer.classList.remove("show");
 
 /* =====================================================
-   MOBILE DRAG
+   MOBILE DRAG SYSTEM
 ===================================================== */
 recommendDrawer.addEventListener("touchstart", e=>{
   if(!mobileFullscreenAllowed()) return;
@@ -1578,8 +1528,9 @@ recommendDrawer.addEventListener("touchstart", e=>{
 recommendDrawer.addEventListener("touchmove", e=>{
   if(!dragging) return;
   currentY = e.touches[0].clientY;
-  const delta = startY - currentY;
-  let move = Math.max(0, 65 - delta/2); // % translateY
+  let delta = startY - currentY;
+  // translateY in %: 0 (fully open) → 70 (peek)
+  let move = Math.min(Math.max(0, 70 - delta/2), 70);
   recommendDrawer.style.transform = `translateY(${move}%)`;
 });
 
@@ -1589,9 +1540,11 @@ recommendDrawer.addEventListener("touchend", ()=>{
   recommendDrawer.style.transition = "transform .45s cubic-bezier(.22,.8,.25,1)";
   if(startY - currentY > 40){
     recommendDrawer.classList.add("show");
+    recommendDrawer.style.transform = `translateY(0)`;
   } else {
     recommendDrawer.classList.remove("show");
     recommendDrawer.classList.add("mobile-ready");
+    recommendDrawer.style.transform = ``;
   }
 });
 
@@ -1599,17 +1552,15 @@ recommendDrawer.addEventListener("touchend", ()=>{
    CLOSE MODAL
 ===================================================== */
 closeBtn.onclick = closeModal;
-
 function closeModal(){
   clearInterval(timer);
 
   modal.classList.remove("open");
-
   player.pause();
   player.removeAttribute("src");
   player.load();
 
-  recommendDrawer.classList.remove("show");
+  recommendDrawer.classList.remove("show","mobile-ready");
   recommendArrow.classList.remove("show");
 }
 
@@ -1619,7 +1570,7 @@ function closeModal(){
 function isMobile(){ return window.innerWidth <= 900; }
 function isLandscape(){ return window.innerWidth > window.innerHeight; }
 function mobileFullscreenAllowed(){
-  return document.fullscreenElement && isMobile() && isLandscape();
+  return (document.fullscreenElement === player || document.fullscreenElement === modal) && isMobile() && isLandscape();
 }
   /* -----------------------------
       NAVIGATION
