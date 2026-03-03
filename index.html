@@ -1475,125 +1475,128 @@ if ("serviceWorker" in navigator) {
    VIDEO GRID BUILDER
 ===================================================== */
 
-function buildRow(sectionName, fullList, slice){
-  const wrapper=document.createElement("div");
-  wrapper.className="rowWrapper";
+function buildRow(sectionName, fullList, slice) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "rowWrapper";
 
-  const row=document.createElement("div");
-  row.className="row";
+  const row = document.createElement("div");
+  row.className = "row";
 
-  slice.forEach(v=>{
-    const tile=document.createElement("div");
-    tile.className="tile";
+  slice.forEach(v => {
+    const tile = document.createElement("div");
+    tile.className = "tile";
 
-    const img=document.createElement("img");
-    img.src=v.thumb||PLACEHOLDER;
+    const img = document.createElement("img");
+    img.src = v.thumb || PLACEHOLDER;
 
-    const title=document.createElement("div");
-    title.className="tile-title";
-    title.textContent=v.title;
+    const title = document.createElement("div");
+    title.className = "tile-title";
+    title.textContent = v.title;
 
-    tile.append(img,title);
+    tile.append(img, title);
 
-    tile.onclick=()=>playFromList(fullList,v);
+    tile.onclick = () => playFromList(fullList, v);
 
     row.appendChild(tile);
   });
 
   wrapper.appendChild(row);
-  document.getElementById("rows-"+sectionName).appendChild(wrapper);
+  document.getElementById("rows-" + sectionName).appendChild(wrapper);
 }
 
 /* =====================================================
    BUILD SECTIONS
 ===================================================== */
-
-[STORIES,NASHEEDS,DUAS,CARTOONS].forEach((list,i)=>{
-  const names=["Stories","Nasheeds","Duas","Cartoons"];
-  for(let x=0;x<list.length;x+=8)
-    buildRow(names[i],list,list.slice(x,x+8));
+[STORIES, NASHEEDS, DUAS, CARTOONS].forEach((list, i) => {
+  const names = ["Stories", "Nasheeds", "Duas", "Cartoons"];
+  for (let x = 0; x < list.length; x += 8)
+    buildRow(names[i], list, list.slice(x, x + 8));
 });
 
 /* =====================================================
-   PLAYER ELEMENTS
+   ELEMENT REFERENCES
 ===================================================== */
+const modal = document.getElementById("modal");
+const player = document.getElementById("player");
 
-const modal=document.getElementById("modal");
-const player=document.getElementById("player");
+const modalTitle = document.getElementById("modalTitle");
+const modalDesc = document.getElementById("modalDesc");
+const closeBtn = document.getElementById("closeBtn");
 
-const modalTitle=document.getElementById("modalTitle");
-const modalDesc=document.getElementById("modalDesc");
-const closeBtn=document.getElementById("closeBtn");
+const overlay = document.getElementById("nextOverlay");
+const nextThumb = document.getElementById("nextThumb");
+const nextTitle = document.getElementById("nextTitle");
 
-const overlay=document.getElementById("nextOverlay");
-const nextThumb=document.getElementById("nextThumb");
-const nextTitle=document.getElementById("nextTitle");
+const countEl = document.getElementById("count");
+const progressCircle = document.getElementById("progressCircle");
 
-const countEl=document.getElementById("count");
-const progressCircle=document.getElementById("progressCircle");
+const playNowBtn = document.getElementById("playNowBtn");
+const autoplayToggle = document.getElementById("autoplayToggle");
 
-const playNowBtn=document.getElementById("playNowBtn");
-const autoplayToggle=document.getElementById("autoplayToggle");
-
-const recommendDrawer=document.getElementById("recommendDrawer");
-const recommendArrow=document.getElementById("recommendArrow");
-const drawerClose=document.getElementById("drawerClose");
-const recommendPanel=document.getElementById("recommendPanel");
+const recommendDrawer = document.getElementById("recommendDrawer");
+const recommendArrow = document.getElementById("recommendArrow");
+const drawerClose = document.getElementById("drawerClose");
+const recommendPanel = document.getElementById("recommendPanel");
 
 /* =====================================================
    STATE
 ===================================================== */
-let playlist=[];
-let index=0;
+let playlist = [];
+let index = 0;
 let timer;
-let dragging=false;
-let startY=0;
-let currentY=0;
+let dragging = false;
+let startY = 0;
+let currentY = 0;
 
 /* =====================================================
    OPEN VIDEO
 ===================================================== */
-function openModal(v){
+function openModal(v) {
   clearInterval(timer);
   overlay.classList.add("hidden");
 
-  player.src=v.file;
-  modalTitle.textContent=v.title;
-  modalDesc.textContent=v.desc;
+  player.src = v.file;
+  modalTitle.textContent = v.title;
+  modalDesc.textContent = v.desc;
 
   modal.classList.add("open");
 
   buildRecommendations();
 
-  // Hide all by default
-  recommendDrawer.classList.remove("show","mobile-ready");
+  recommendDrawer.classList.remove("show", "mobile-ready");
   recommendArrow.classList.remove("show");
 
-  player.play().catch(()=>{});
+  player.play().catch(() => {});
 }
 
-function playFromList(fullList,vid){
-  playlist=fullList;
-  index=fullList.indexOf(vid);
+function playFromList(fullList, vid) {
+  playlist = fullList;
+  index = fullList.indexOf(vid);
   openModal(vid);
 }
 
 /* =====================================================
-   BUILD RECOMMENDATIONS
+   BUILD RECOMMENDATIONS GRID
 ===================================================== */
-function buildRecommendations(){
-  recommendPanel.innerHTML="";
+function buildRecommendations() {
+  recommendPanel.innerHTML = "";
 
-  playlist.forEach((v,i)=>{
-    if(i===index) return;
+  playlist.forEach((v, i) => {
+    if (i === index) return;
 
-    const card=document.createElement("div");
-    card.className="recCard";
-    card.innerHTML=`<img src="${v.thumb}"><div>${v.title}</div>`;
-    card.onclick=()=>{
-      index=i;
+    const card = document.createElement("div");
+    card.className = "recCard";
+
+    card.innerHTML = `
+      <img src="${v.thumb}">
+      <div>${v.title}</div>
+    `;
+
+    card.onclick = () => {
+      index = i;
       openModal(v);
     };
+
     recommendPanel.appendChild(card);
   });
 }
@@ -1601,136 +1604,164 @@ function buildRecommendations(){
 /* =====================================================
    AUTOPLAY NEXT
 ===================================================== */
-player.addEventListener("ended",()=>{
-  if(!autoplayToggle.checked) return;
+player.addEventListener("ended", () => {
+  if (!autoplayToggle.checked) return;
 
-  const nextIndex=(index+1)%playlist.length;
-  const nextVid=playlist[nextIndex];
+  const nextIndex = (index + 1) % playlist.length;
+  const nextVid = playlist[nextIndex];
 
-  nextThumb.src=nextVid.thumb;
-  nextTitle.textContent=nextVid.title;
+  nextThumb.src = nextVid.thumb;
+  nextTitle.textContent = nextVid.title;
 
   overlay.classList.remove("hidden");
   startCountdown(nextIndex);
 });
 
-function startCountdown(nextIndex){
-  let time=5;
-  const circumference=163;
+function startCountdown(nextIndex) {
+  let time = 5;
+  const circumference = 163;
+  countEl.textContent = time;
+  progressCircle.style.strokeDashoffset = 0;
 
-  countEl.textContent=time;
-  progressCircle.style.strokeDashoffset=0;
-
-  timer=setInterval(()=>{
+  timer = setInterval(() => {
     time--;
-    countEl.textContent=time;
-    progressCircle.style.strokeDashoffset=circumference*(1-time/5);
+    countEl.textContent = time;
+    progressCircle.style.strokeDashoffset =
+      circumference * (1 - time / 5);
 
-    if(time<=0){
+    if (time <= 0) {
       clearInterval(timer);
-      index=nextIndex;
+      index = nextIndex;
       openModal(playlist[index]);
     }
-  },1000);
+  }, 1000);
 }
 
-playNowBtn.onclick=()=>{
+playNowBtn.onclick = () => {
   clearInterval(timer);
-  index=(index+1)%playlist.length;
+  index = (index + 1) % playlist.length;
   openModal(playlist[index]);
 };
 
 /* =====================================================
-   FULLSCREEN & UI UPDATE
+   FULLSCREEN DETECTION HELPERS
 ===================================================== */
-function updateUI(){
-  const fullscreen=!!document.fullscreenElement;
-  const mobile=isMobile();
-  const landscape=isLandscape();
+function isMobile() {
+  return window.innerWidth <= 900;
+}
+
+function isLandscape() {
+  return window.innerWidth > window.innerHeight;
+}
+
+// Reliable video fullscreen detection for desktop & mobile
+function isVideoFullscreen() {
+  return (
+    document.fullscreenElement ||
+    document.webkitFullscreenElement ||
+    player.webkitDisplayingFullscreen
+  );
+}
+
+/* =====================================================
+   UI UPDATE FUNCTION
+===================================================== */
+function updateUI() {
+  const fullscreen = isVideoFullscreen();
+  const mobile = isMobile();
+  const landscape = isLandscape();
 
   recommendArrow.classList.remove("show");
-  recommendDrawer.classList.remove("show","mobile-ready");
+  recommendDrawer.classList.remove("show", "mobile-ready");
 
-  if(fullscreen && !mobile){
-    // Desktop fullscreen
+  // ---------- DESKTOP ----------
+  if (fullscreen && !mobile) {
     recommendArrow.classList.add("show");
+    positionDesktopArrow();
   }
-  if(fullscreen && mobile && landscape){
-    // Mobile landscape fullscreen
+
+  // ---------- MOBILE ----------
+  if (fullscreen && mobile && landscape) {
     recommendDrawer.classList.add("mobile-ready");
   }
 }
 
-document.addEventListener("fullscreenchange",updateUI);
-window.addEventListener("resize",updateUI);
+/* =====================================================
+   DESKTOP ARROW POSITION
+===================================================== */
+function positionDesktopArrow() {
+  if (!isVideoFullscreen() || isMobile()) return;
+  const rect = player.getBoundingClientRect();
+  recommendArrow.style.bottom = `${window.innerHeight - rect.bottom + 12}px`;
+}
 
 /* =====================================================
-   DESKTOP ARROW
+   EVENTS: FULLSCREEN / RESIZE
 ===================================================== */
-recommendArrow.onclick=()=>{
-  recommendDrawer.classList.add("show");
-};
-drawerClose.onclick=()=>{
-  recommendDrawer.classList.remove("show");
-};
+document.addEventListener("fullscreenchange", updateUI);
+document.addEventListener("webkitfullscreenchange", updateUI); // iOS Safari
+window.addEventListener("resize", updateUI);
 
 /* =====================================================
-   MOBILE DRAG
+   DESKTOP ARROW CLICK
 ===================================================== */
-recommendDrawer.addEventListener("touchstart",e=>{
-  if(!mobileFullscreenAllowed()) return;
-  dragging=true;
-  startY=e.touches[0].clientY;
-  recommendDrawer.style.transition="none";
+recommendArrow.onclick = () => recommendDrawer.classList.add("show");
+drawerClose.onclick = () => recommendDrawer.classList.remove("show");
+
+/* =====================================================
+   MOBILE DRAG SYSTEM
+===================================================== */
+recommendDrawer.addEventListener("touchstart", e => {
+  if (!isMobile() || !isLandscape() || !isVideoFullscreen()) return;
+  dragging = true;
+  startY = e.touches[0].clientY;
+  recommendDrawer.style.transition = "none";
 });
 
-recommendDrawer.addEventListener("touchmove",e=>{
-  if(!dragging) return;
-  currentY=e.touches[0].clientY;
-  const delta=startY-currentY;
-  let move=Math.max(0,70-delta/4);
-  recommendDrawer.style.transform=`translateY(${move}%)`;
+recommendDrawer.addEventListener("touchmove", e => {
+  if (!dragging) return;
+  currentY = e.touches[0].clientY;
+  const delta = startY - currentY;
+  const move = Math.max(0, 70 - delta / 4);
+  recommendDrawer.style.transform = `translateY(${move}%)`;
 });
 
-recommendDrawer.addEventListener("touchend",()=>{
-  if(!dragging) return;
-  dragging=false;
-  recommendDrawer.style.transition="transform .45s cubic-bezier(.22,.8,.25,1)";
-  if(startY-currentY>40){
+recommendDrawer.addEventListener("touchend", () => {
+  if (!dragging) return;
+  dragging = false;
+  recommendDrawer.style.transition =
+    "transform .45s cubic-bezier(.22,.8,.25,1)";
+
+  if (startY - currentY > 40) {
     recommendDrawer.classList.add("show");
-    recommendDrawer.style.transform="translateY(0)";
-  }else{
+    recommendDrawer.style.transform = "translateY(0)";
+  } else {
     recommendDrawer.classList.remove("show");
     recommendDrawer.classList.add("mobile-ready");
-    recommendDrawer.style.transform="";
+    recommendDrawer.style.transform = "";
   }
 });
 
 /* =====================================================
    CLOSE MODAL
 ===================================================== */
-closeBtn.onclick=closeModal;
-function closeModal(){
+closeBtn.onclick = closeModal;
+
+function closeModal() {
   clearInterval(timer);
-
   modal.classList.remove("open");
-
   player.pause();
   player.removeAttribute("src");
   player.load();
 
-  recommendDrawer.classList.remove("show","mobile-ready");
+  recommendDrawer.classList.remove("show", "mobile-ready");
   recommendArrow.classList.remove("show");
 }
 
-/* =====================================================
-   HELPERS
-===================================================== */
-function isMobile(){ return window.innerWidth<=900; }
-function isLandscape(){ return window.innerWidth>window.innerHeight; }
-function mobileFullscreenAllowed(){
-  return document.fullscreenElement && isMobile() && isLandscape();
-}
+/* Click outside modal closes it */
+modal.addEventListener("click", e => {
+  if (e.target === modal) closeModal();
+});
   /* -----------------------------
       NAVIGATION
   ----------------------------- */
