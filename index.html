@@ -1459,143 +1459,116 @@ if ("serviceWorker" in navigator) {
 /* =====================================================
    VIDEO GRID BUILDER
 ===================================================== */
-
 function buildRow(sectionName, fullList, slice){
+  const wrapper = document.createElement("div");
+  wrapper.className = "rowWrapper";
 
-  const wrapper=document.createElement("div");
-  wrapper.className="rowWrapper";
+  const row = document.createElement("div");
+  row.className = "row";
 
-  const row=document.createElement("div");
-  row.className="row";
+  slice.forEach(v => {
+    const tile = document.createElement("div");
+    tile.className = "tile";
 
-  slice.forEach(v=>{
+    const img = document.createElement("img");
+    img.src = v.thumb || PLACEHOLDER;
 
-    const tile=document.createElement("div");
-    tile.className="tile";
+    const title = document.createElement("div");
+    title.className = "tile-title";
+    title.textContent = v.title;
 
-    const img=document.createElement("img");
-    img.src=v.thumb||PLACEHOLDER;
-
-    const title=document.createElement("div");
-    title.className="tile-title";
-    title.textContent=v.title;
-
-    tile.append(img,title);
-    tile.onclick=()=>playFromList(fullList,v);
+    tile.append(img, title);
+    tile.onclick = () => playFromList(fullList, v);
 
     row.appendChild(tile);
   });
 
   wrapper.appendChild(row);
-  document
-    .getElementById("rows-"+sectionName)
-    .appendChild(wrapper);
+  document.getElementById("rows-" + sectionName).appendChild(wrapper);
 }
-
 
 /* =====================================================
    BUILD SECTIONS
 ===================================================== */
-
-[STORIES,NASHEEDS,DUAS,CARTOONS]
-.forEach((list,i)=>{
-
+[STORIES, NASHEEDS, DUAS, CARTOONS].forEach((list,i)=>{
   const names=["Stories","Nasheeds","Duas","Cartoons"];
-
-  for(let x=0;x<list.length;x+=8)
-    buildRow(names[i],list,list.slice(x,x+8));
+  for(let x=0;x<list.length;x+=8){
+    buildRow(names[i], list, list.slice(x,x+8));
+  }
 });
 
-
 /* =====================================================
-   PLAYER ELEMENTS
+   PLAYER + ELEMENTS
 ===================================================== */
+const modal = document.getElementById("modal");
+const player = document.getElementById("player");
+const modalTitle = document.getElementById("modalTitle");
+const modalDesc = document.getElementById("modalDesc");
+const closeBtn = document.getElementById("closeBtn");
 
-const modal=document.getElementById("modal");
-const player=document.getElementById("player");
+const overlay = document.getElementById("nextOverlay");
+const nextThumb = document.getElementById("nextThumb");
+const nextTitle = document.getElementById("nextTitle");
 
-const modalTitle=document.getElementById("modalTitle");
-const modalDesc=document.getElementById("modalDesc");
-const closeBtn=document.getElementById("closeBtn");
+const countEl = document.getElementById("count");
+const progressCircle = document.getElementById("progressCircle");
 
-const overlay=document.getElementById("nextOverlay");
-const nextThumb=document.getElementById("nextThumb");
-const nextTitle=document.getElementById("nextTitle");
+const playNowBtn = document.getElementById("playNowBtn");
+const autoplayToggle = document.getElementById("autoplayToggle");
 
-const countEl=document.getElementById("count");
-const progressCircle=document.getElementById("progressCircle");
-
-const playNowBtn=document.getElementById("playNowBtn");
-const autoplayToggle=document.getElementById("autoplayToggle");
-
-const recommendDrawer=document.getElementById("recommendDrawer");
-const recommendArrow=document.getElementById("recommendArrow");
-const drawerClose=document.getElementById("drawerClose");
-const recommendPanel=document.getElementById("recommendPanel");
-
+const recommendDrawer = document.getElementById("recommendDrawer");
+const recommendArrow = document.getElementById("recommendArrow");
+const drawerClose = document.getElementById("drawerClose");
+const recommendPanel = document.getElementById("recommendPanel");
 
 /* =====================================================
    STATE
 ===================================================== */
-
-let playlist=[];
-let index=0;
+let playlist = [];
+let index = 0;
 let timer;
-
 
 /* =====================================================
    OPEN VIDEO
 ===================================================== */
-
 function openModal(v){
-
   clearInterval(timer);
   overlay.classList.add("hidden");
 
-  player.src=v.file;
-
-  modalTitle.textContent=v.title;
-  modalDesc.textContent=v.desc;
+  player.src = v.file;
+  modalTitle.textContent = v.title;
+  modalDesc.textContent = v.desc;
 
   modal.classList.add("open");
-
   buildRecommendations();
 
-  setSheet(100);
+  // Reset drawer/arrow
+  recommendDrawer.classList.remove("show","mobile-ready");
   recommendArrow.classList.remove("show");
 
   player.play().catch(()=>{});
 }
 
-
-function playFromList(fullList,vid){
-  playlist=fullList;
-  index=fullList.indexOf(vid);
+function playFromList(fullList, vid){
+  playlist = fullList;
+  index = fullList.indexOf(vid);
   openModal(vid);
 }
-
 
 /* =====================================================
    BUILD RECOMMENDATIONS
 ===================================================== */
-
 function buildRecommendations(){
-
-  recommendPanel.innerHTML="";
+  recommendPanel.innerHTML = "";
 
   playlist.forEach((v,i)=>{
+    if(i === index) return;
 
-    if(i===index) return;
-
-    const card=document.createElement("div");
-    card.className="recCard";
-
-    card.innerHTML=
-      `<img src="${v.thumb}">
-       <div>${v.title}</div>`;
-
-    card.onclick=()=>{
-      index=i;
+    const card = document.createElement("div");
+    card.className = "recCard";
+    card.innerHTML = `<img src="${v.thumb}"><div>${v.title}</div>`;
+    card.onclick = ()=>{
+      index = i;
       openModal(v);
     };
 
@@ -1603,257 +1576,153 @@ function buildRecommendations(){
   });
 }
 
-
 /* =====================================================
    AUTOPLAY NEXT
 ===================================================== */
-
 player.addEventListener("ended",()=>{
-
   if(!autoplayToggle.checked) return;
 
-  const nextIndex=(index+1)%playlist.length;
-  const nextVid=playlist[nextIndex];
+  const nextIndex = (index+1) % playlist.length;
+  const nextVid = playlist[nextIndex];
 
-  nextThumb.src=nextVid.thumb;
-  nextTitle.textContent=nextVid.title;
-
+  nextThumb.src = nextVid.thumb;
+  nextTitle.textContent = nextVid.title;
   overlay.classList.remove("hidden");
 
   startCountdown(nextIndex);
 });
 
-
 function startCountdown(nextIndex){
+  let time = 5;
+  const circumference = 163;
+  countEl.textContent = time;
+  progressCircle.style.strokeDashoffset = 0;
 
-  let time=5;
-  const circumference=163;
-
-  countEl.textContent=time;
-
-  timer=setInterval(()=>{
-
+  timer = setInterval(()=>{
     time--;
+    countEl.textContent = time;
+    progressCircle.style.strokeDashoffset = circumference * (1 - time/5);
 
-    countEl.textContent=time;
-
-    progressCircle.style.strokeDashoffset=
-      circumference*(1-time/5);
-
-    if(time<=0){
+    if(time <= 0){
       clearInterval(timer);
-      index=nextIndex;
+      index = nextIndex;
       openModal(playlist[index]);
     }
-
   },1000);
 }
 
-
-playNowBtn.onclick=()=>{
+playNowBtn.onclick = ()=>{
   clearInterval(timer);
-  index=(index+1)%playlist.length;
+  index = (index+1) % playlist.length;
   openModal(playlist[index]);
 };
 
-
 /* =====================================================
-   YOUTUBE STYLE RECOMMENDATION SYSTEM
+   FULLSCREEN / UI DETECTION
 ===================================================== */
-
-const SNAP_OPEN=0;
-const SNAP_PEEK=72;
-const SNAP_CLOSED=100;
-
-let sheetY=SNAP_CLOSED;
-let startY=0;
-let startTime=0;
-let dragging=false;
-
-
-/* ---------- fullscreen detection ---------- */
+document.addEventListener("fullscreenchange", updateUI);
+window.addEventListener("resize", updateUI);
 
 function videoIsFullscreen(){
-
   return (
     document.fullscreenElement ||
-    player.matches(":fullscreen")
+    player.matches(":fullscreen") ||
+    modal.matches(":fullscreen") ||
+    window.innerHeight === screen.height
   );
 }
 
-
-document.addEventListener(
-  "fullscreenchange",
-  updateUI
-);
-
-window.addEventListener(
-  "resize",
-  updateUI
-);
-
-
 function updateUI(){
-
-  const fullscreen=videoIsFullscreen();
+  const fullscreen = videoIsFullscreen();
+  const mobile = isMobile();
+  const landscape = isLandscape();
 
   recommendArrow.classList.remove("show");
+  recommendDrawer.classList.remove("show","mobile-ready");
 
-  if(!fullscreen){
-    setSheet(SNAP_CLOSED);
-    return;
-  }
-
-  /* desktop */
-  if(!isMobile()){
+  // Desktop: arrow in fullscreen
+  if(fullscreen && !mobile){
     recommendArrow.classList.add("show");
   }
 
-  /* mobile landscape */
-  if(isMobile() && isLandscape()){
-    setSheet(SNAP_PEEK);
+  // Mobile landscape: peek drawer
+  if(fullscreen && mobile && landscape){
+    recommendDrawer.classList.add("mobile-ready");
   }
 }
 
+/* =====================================================
+   DESKTOP ARROW CLICK
+===================================================== */
+recommendArrow.addEventListener("click", ()=> recommendDrawer.classList.add("show"));
+drawerClose.addEventListener("click", ()=> recommendDrawer.classList.remove("show"));
 
-/* ---------- drawer positioning ---------- */
+/* =====================================================
+   MOBILE DRAG SYSTEM
+===================================================== */
+let startDragY = 0;
+let currentTranslate = 72;
+let draggingDrawer = false;
 
-function setSheet(percent){
+recommendDrawer.addEventListener("touchstart", e=>{
+  if(!videoIsFullscreen() || !isMobile() || !isLandscape()) return;
 
-  sheetY=percent;
-
-  recommendDrawer.style.transition=
-    "transform .42s cubic-bezier(.22,.8,.25,1)";
-
-  recommendDrawer.style.transform=
-    `translateY(${percent}%)`;
-}
-
-
-/* ---------- desktop arrow ---------- */
-
-recommendArrow.onclick=
-  ()=>setSheet(SNAP_OPEN);
-
-drawerClose.onclick=
-  ()=>setSheet(SNAP_PEEK);
-
-
-/* ---------- mobile drag ---------- */
-
-recommendDrawer.addEventListener(
-  "touchstart",
-  e=>{
-
-    if(!videoIsFullscreen()) return;
-    if(!isMobile()) return;
-
-    dragging=true;
-    startY=e.touches[0].clientY;
-    startTime=Date.now();
-
-    recommendDrawer.style.transition="none";
+  draggingDrawer = true;
+  startDragY = e.touches[0].clientY;
+  recommendDrawer.style.transition = "none";
 });
 
+recommendDrawer.addEventListener("touchmove", e=>{
+  if(!draggingDrawer) return;
 
-recommendDrawer.addEventListener(
-  "touchmove",
-  e=>{
-
-    if(!dragging) return;
-
-    const delta=startY-e.touches[0].clientY;
-
-    let pos=sheetY-delta/4;
-
-    pos=Math.max(
-      SNAP_OPEN,
-      Math.min(SNAP_CLOSED,pos)
-    );
-
-    recommendDrawer.style.transform=
-      `translateY(${pos}%)`;
+  const delta = startDragY - e.touches[0].clientY;
+  let newPos = currentTranslate - delta/4;
+  newPos = Math.max(0, Math.min(85,newPos));
+  recommendDrawer.style.transform = `translateY(${newPos}%)`;
 });
 
+recommendDrawer.addEventListener("touchend", e=>{
+  if(!draggingDrawer) return;
 
-recommendDrawer.addEventListener(
-  "touchend",
-  e=>{
+  draggingDrawer = false;
+  recommendDrawer.style.transition = "transform .4s cubic-bezier(.22,.8,.25,1)";
 
-    if(!dragging) return;
+  const endY = e.changedTouches[0].clientY;
+  const moved = startDragY - endY;
 
-    dragging=false;
-
-    const distance=
-      startY-e.changedTouches[0].clientY;
-
-    const velocity=
-      distance/(Date.now()-startTime);
-
-    let snap;
-
-    if(Math.abs(velocity)>0.5)
-      snap=velocity>0
-        ? SNAP_OPEN
-        : SNAP_PEEK;
-    else
-      snap=getSheetPos()<35
-        ? SNAP_OPEN
-        : SNAP_PEEK;
-
-    setSheet(snap);
+  if(moved > 60){
+    currentTranslate = 0;
+    recommendDrawer.classList.add("show");
+    recommendDrawer.style.transform = "translateY(0)";
+  } else {
+    currentTranslate = 72;
+    recommendDrawer.classList.remove("show");
+    recommendDrawer.classList.add("mobile-ready");
+    recommendDrawer.style.transform = `translateY(72%)`;
+  }
 });
-
-
-function getSheetPos(){
-
-  const matrix=
-    new WebKitCSSMatrix(
-      getComputedStyle(
-        recommendDrawer
-      ).transform
-    );
-
-  return Math.abs(
-    matrix.m42/
-    recommendDrawer.offsetHeight
-  )*100;
-}
-
 
 /* =====================================================
    CLOSE MODAL
 ===================================================== */
-
-closeBtn.onclick=closeModal;
-
+closeBtn.onclick = closeModal;
 function closeModal(){
-
   clearInterval(timer);
 
   modal.classList.remove("open");
-
   player.pause();
   player.removeAttribute("src");
   player.load();
 
-  setSheet(SNAP_CLOSED);
+  recommendDrawer.classList.remove("show","mobile-ready");
   recommendArrow.classList.remove("show");
 }
-
 
 /* =====================================================
    HELPERS
 ===================================================== */
-
-function isMobile(){
-  return window.innerWidth<=900;
-}
-
-function isLandscape(){
-  return window.innerWidth>
-         window.innerHeight;
-}
+function isMobile(){ return window.innerWidth <= 900; }
+function isLandscape(){ return window.innerWidth > window.innerHeight; }
   /* -----------------------------
       NAVIGATION
   ----------------------------- */
