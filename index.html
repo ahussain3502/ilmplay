@@ -628,23 +628,38 @@ svg circle{
 .autoToggle{
   font-size:14px;
   margin-top:8px;
-}/* =====================================================
-   RECOMMENDATIONS — YOUTUBE STYLE FINAL
+}
+  /* =====================================================
+   YOUTUBE POLISHED RECOMMENDATIONS
 ===================================================== */
 
 
 /* ===============================
-   DESKTOP FULLSCREEN ARROW
+   ARROW (YT STYLE)
 ================================ */
 .recommendArrow{
+
   position:fixed;
   left:50%;
-  bottom:110px;
+  bottom:95px;
 
   transform:translate(-50%,20px);
 
-  font-size:46px;
-  color:#fff;
+  width:42px;
+  height:42px;
+
+  border-radius:50%;
+
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(8px);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:18px;
+  color:white;
+
   cursor:pointer;
 
   opacity:0;
@@ -653,11 +668,13 @@ svg circle{
   z-index:2147483647;
 
   transition:
-    opacity .3s,
-    transform .3s;
+    opacity .35s ease,
+    transform .35s ease,
+    background .2s;
+}
 
-  text-shadow:0 0 18px rgba(0,0,0,.95);
-  user-select:none;
+.recommendArrow:hover{
+  background:rgba(0,0,0,.8);
 }
 
 .recommendArrow.show{
@@ -668,31 +685,7 @@ svg circle{
 
 
 /* ===============================
-   BACKDROP
-================================ */
-#drawerBackdrop{
-  position:fixed;
-  inset:0;
-
-  background:rgba(0,0,0,.45);
-  backdrop-filter:blur(8px);
-
-  opacity:0;
-  pointer-events:none;
-
-  transition:opacity .35s;
-
-  z-index:2147483645;
-}
-
-#drawerBackdrop.show{
-  opacity:1;
-  pointer-events:auto;
-}
-
-
-/* ===============================
-   DRAWER CONTAINER
+   DRAWER
 ================================ */
 .recommendDrawer{
 
@@ -713,88 +706,27 @@ svg circle{
 
   overflow:hidden;
 
-  z-index:2147483646;
-
   transform:translateY(100%);
   transition:transform .45s cubic-bezier(.22,.8,.25,1);
 
-  /* ✅ CRITICAL FIXES */
+  z-index:2147483646;
+
   touch-action:none;
   pointer-events:auto;
   will-change:transform;
 }
 
-
-/* ===============================
-   STATES
-================================ */
-
-/* OPEN */
 .recommendDrawer.show{
   transform:translateY(0);
 }
 
-/* MOBILE PEEK */
 .recommendDrawer.mobile-ready{
   transform:translateY(72%);
 }
 
 
 /* ===============================
-   DRAG HANDLE
-================================ */
-.drawerHandle{
-  width:60px;
-  height:6px;
-  background:#777;
-  border-radius:10px;
-
-  margin:12px auto 6px;
-
-  cursor:grab;
-}
-
-.drawerHandle:active{
-  cursor:grabbing;
-}
-
-
-/* ===============================
-   CLOSE BUTTON
-================================ */
-.drawerClose{
-  position:absolute;
-  top:12px;
-  right:16px;
-
-  width:34px;
-  height:34px;
-
-  border:none;
-  border-radius:50%;
-
-  background:rgba(255,255,255,.12);
-  color:white;
-
-  font-size:20px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  cursor:pointer;
-  z-index:5;
-
-  transition:background .2s;
-}
-
-.drawerClose:hover{
-  background:rgba(255,255,255,.25);
-}
-
-
-/* ===============================
-   RECOMMEND GRID
+   GRID
 ================================ */
 .recommendPanel{
 
@@ -802,45 +734,42 @@ svg circle{
 
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  grid-auto-rows:minmax(90px,auto);
 
   gap:14px;
 
-  padding:55px 16px 20px;
+  padding:60px 18px 25px;
 
   overflow-y:auto;
+
+  /* ✅ YOUTUBE MOMENTUM */
+  scroll-behavior:smooth;
+  overscroll-behavior:contain;
+
   -webkit-overflow-scrolling:touch;
 
-  /* allow scrolling but keep drag */
   touch-action:pan-y;
 }
 
 
 /* ===============================
-   VIDEO CARDS
+   CARDS
 ================================ */
 .recCard{
+  width:100%;
   cursor:pointer;
-  transition:transform .2s;
-}
-
-.recCard:hover{
-  transform:scale(1.04);
 }
 
 .recCard img{
   width:100%;
   aspect-ratio:16/9;
   object-fit:cover;
-
   border-radius:10px;
-  display:block;
 }
 
 .recCard div{
-  color:white;
   font-size:14px;
   margin-top:6px;
+  color:white;
 
   overflow:hidden;
   white-space:nowrap;
@@ -1497,7 +1426,7 @@ if ("serviceWorker" in navigator) {
   });
 
 /* =====================================================
-   FULL FIXED JS — YOUTUBE STYLE RECOMMENDATIONS
+   YOUTUBE-POLISHED RECOMMENDATIONS + PLAYER
 ===================================================== */
 
 /* ===============================
@@ -1575,9 +1504,13 @@ let dragging=false;
 let startY=0;
 let drawerY=72; // peek position
 
+/* Arrow auto-hide */
+let arrowTimer=null;
+let mouseActive=false;
+
 
 /* ===============================
-   FULLSCREEN DETECTION (FIXED)
+   FULLSCREEN DETECTION
 ================================ */
 function isFullscreen(){
   return (
@@ -1588,13 +1521,8 @@ function isFullscreen(){
   );
 }
 
-function isMobile(){
-  return window.innerWidth<=900;
-}
-
-function isLandscape(){
-  return window.innerWidth>window.innerHeight;
-}
+function isMobile(){ return window.innerWidth<=900; }
+function isLandscape(){ return window.innerWidth>window.innerHeight; }
 
 
 /* ===============================
@@ -1618,6 +1546,12 @@ function openModal(v){
   recommendArrow.classList.remove("show");
 
   player.play().catch(()=>{});
+
+  // Show arrow immediately
+  setTimeout(()=>{
+    updateUI();
+    showArrowTemporarily();
+  },200);
 }
 
 function playFromList(fullList,vid){
@@ -1705,7 +1639,7 @@ playNowBtn.onclick=()=>{
 
 
 /* ===============================
-   UI UPDATE (YT LOGIC)
+   UI UPDATE
 ================================ */
 function updateUI(){
 
@@ -1736,21 +1670,26 @@ window.addEventListener("resize",updateUI);
    DESKTOP ARROW
 ================================ */
 recommendArrow.onclick=()=>{
+
   drawerY=0;
+
   recommendDrawer.classList.add("show");
   recommendDrawer.style.transform="translateY(0)";
+
+  recommendArrow.classList.add("show");
 };
 
 drawerClose.onclick=()=>{
-  drawerY=72;
-  recommendDrawer.classList.remove("show");
-  recommendDrawer.style.transform=
-    `translateY(${drawerY}%)`;
+
+  drawerY=100;
+
+  recommendDrawer.classList.remove("show","mobile-ready");
+  recommendDrawer.style.transform="translateY(100%)";
 };
 
 
 /* ===============================
-   MOBILE DRAG (YOUTUBE STYLE)
+   MOBILE DRAG
 ================================ */
 recommendDrawer.addEventListener("touchstart",e=>{
 
@@ -1817,6 +1756,52 @@ function closeModal(){
   recommendDrawer.classList.remove("show","mobile-ready");
   recommendArrow.classList.remove("show");
 }
+
+
+/* ===============================
+   ARROW AUTO-HIDE + MOUSE DETECTION
+================================ */
+function showArrowTemporarily(){
+
+  if(!isFullscreen() || isMobile()) return;
+
+  recommendArrow.classList.add("show");
+
+  clearTimeout(arrowTimer);
+
+  arrowTimer=setTimeout(()=>{
+    recommendArrow.classList.remove("show");
+    mouseActive=false;
+  },2000);
+}
+
+document.addEventListener("mousemove",()=>{
+
+  if(!isFullscreen() || isMobile()) return;
+
+  if(!mouseActive){
+    mouseActive=true;
+    showArrowTemporarily();
+  }
+
+  clearTimeout(arrowTimer);
+
+  arrowTimer=setTimeout(()=>{
+    mouseActive=false;
+    recommendArrow.classList.remove("show");
+  },2000);
+});
+
+
+/* ===============================
+   SCROLL MOMENTUM
+================================ */
+recommendPanel.addEventListener("wheel",e=>{
+  recommendPanel.scrollBy({
+    top:e.deltaY,
+    behavior:"smooth"
+  });
+});
   /* -----------------------------
       NAVIGATION
   ----------------------------- */
