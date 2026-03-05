@@ -628,9 +628,8 @@ svg circle{
 .autoToggle{
   font-size:14px;
   margin-top:8px;
-}
-/* =====================================================
-   RECOMMENDATIONS — FINAL FIXED CSS
+}/* =====================================================
+   RECOMMENDATIONS — YOUTUBE STYLE FINAL
 ===================================================== */
 
 
@@ -640,7 +639,7 @@ svg circle{
 .recommendArrow{
   position:fixed;
   left:50%;
-  bottom:110px; /* ABOVE progress bar */
+  bottom:110px;
 
   transform:translate(-50%,20px);
 
@@ -669,9 +668,34 @@ svg circle{
 
 
 /* ===============================
-   RECOMMEND DRAWER
+   BACKDROP
+================================ */
+#drawerBackdrop{
+  position:fixed;
+  inset:0;
+
+  background:rgba(0,0,0,.45);
+  backdrop-filter:blur(8px);
+
+  opacity:0;
+  pointer-events:none;
+
+  transition:opacity .35s;
+
+  z-index:2147483645;
+}
+
+#drawerBackdrop.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+
+/* ===============================
+   DRAWER CONTAINER
 ================================ */
 .recommendDrawer{
+
   position:fixed;
   left:0;
   bottom:0;
@@ -684,26 +708,33 @@ svg circle{
 
   border-radius:18px 18px 0 0;
 
-  transform:translateY(100%);
-  transition:transform .45s cubic-bezier(.22,.8,.25,1);
-
-  z-index:2147483646;
-
   display:flex;
   flex-direction:column;
 
   overflow:hidden;
 
-  /* ✅ CRITICAL FOR MOBILE DRAG */
+  z-index:2147483646;
+
+  transform:translateY(100%);
+  transition:transform .45s cubic-bezier(.22,.8,.25,1);
+
+  /* ✅ CRITICAL FIXES */
   touch-action:none;
+  pointer-events:auto;
+  will-change:transform;
 }
+
+
+/* ===============================
+   STATES
+================================ */
 
 /* OPEN */
 .recommendDrawer.show{
   transform:translateY(0);
 }
 
-/* MOBILE PEEK STATE */
+/* MOBILE PEEK */
 .recommendDrawer.mobile-ready{
   transform:translateY(72%);
 }
@@ -717,6 +748,7 @@ svg circle{
   height:6px;
   background:#777;
   border-radius:10px;
+
   margin:12px auto 6px;
 
   cursor:grab;
@@ -745,12 +777,12 @@ svg circle{
   color:white;
 
   font-size:20px;
-  cursor:pointer;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
+  cursor:pointer;
   z-index:5;
 
   transition:background .2s;
@@ -765,6 +797,7 @@ svg circle{
    RECOMMEND GRID
 ================================ */
 .recommendPanel{
+
   flex:1;
 
   display:grid;
@@ -772,12 +805,13 @@ svg circle{
   grid-auto-rows:minmax(90px,auto);
 
   gap:14px;
+
   padding:55px 16px 20px;
 
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
 
-  /* prevents scroll stealing drag */
+  /* allow scrolling but keep drag */
   touch-action:pan-y;
 }
 
@@ -798,6 +832,7 @@ svg circle{
   width:100%;
   aspect-ratio:16/9;
   object-fit:cover;
+
   border-radius:10px;
   display:block;
 }
@@ -814,47 +849,21 @@ svg circle{
 
 
 /* ===============================
-   BACKDROP
-================================ */
-#drawerBackdrop{
-  position:fixed;
-  inset:0;
-
-  background:rgba(0,0,0,.45);
-  backdrop-filter:blur(8px);
-
-  opacity:0;
-  pointer-events:none;
-
-  transition:opacity .35s;
-
-  z-index:2147483645;
-}
-
-#drawerBackdrop.show{
-  opacity:1;
-  pointer-events:auto;
-}
-
-
-/* ===============================
    MOBILE LANDSCAPE
-   (YouTube Style)
+   (REAL YOUTUBE BEHAVIOR)
 ================================ */
 @media (max-width:900px) and (orientation:landscape){
 
-  /* hide desktop arrow */
   .recommendArrow{
     display:none;
   }
 
   .recommendDrawer{
     height:78vh;
-    transform:translateY(88%);
   }
 
   .recommendDrawer.mobile-ready{
-    transform:translateY(78%);
+    transform:translateY(72%);
   }
 
   .recommendDrawer.show{
@@ -990,32 +999,49 @@ if ("serviceWorker" in navigator) {
 
     <!-- VIDEO -->
     <video id="player"
-      controls
-      playsinline
-      webkit-playsinline
-      preload="metadata">
+           controls
+           playsinline
+           webkit-playsinline
+           preload="metadata">
     </video>
 
     <!-- AUTOPLAY OVERLAY -->
     <div id="nextOverlay" class="nextOverlay hidden">
+
       <div class="upNextCard">
+
         <img id="nextThumb">
+
         <div class="upNextInfo">
-          <div class="upNextLabel">Up Next</div>
+
+          <div class="upNextLabel">
+            Up Next
+          </div>
+
           <div id="nextTitle"></div>
 
           <div class="countdownWrap">
+
             <svg width="60" height="60">
-              <circle class="bg" cx="30" cy="30" r="26"></circle>
+              <circle class="bg"
+                      cx="30"
+                      cy="30"
+                      r="26"></circle>
+
               <circle id="progressCircle"
                       class="progress"
-                      cx="30" cy="30"
+                      cx="30"
+                      cy="30"
                       r="26"></circle>
             </svg>
+
             <span id="count">5</span>
+
           </div>
 
-          <button id="playNowBtn">Play Now</button>
+          <button id="playNowBtn">
+            Play Now
+          </button>
 
           <label class="autoToggle">
             <input type="checkbox"
@@ -1023,20 +1049,27 @@ if ("serviceWorker" in navigator) {
                    checked>
             Autoplay
           </label>
+
         </div>
       </div>
     </div>
 
     <!-- VIDEO INFO -->
     <div class="modal-info">
+
       <div>
-        <div id="modalTitle" class="modal-title"></div>
-        <div id="modalDesc" class="modal-desc"></div>
+        <div id="modalTitle"
+             class="modal-title"></div>
+
+        <div id="modalDesc"
+             class="modal-desc"></div>
       </div>
 
-      <button id="closeBtn" class="closeBtn">
+      <button id="closeBtn"
+              class="closeBtn">
         Close
       </button>
+
     </div>
 
   </div>
@@ -1049,15 +1082,22 @@ if ("serviceWorker" in navigator) {
 <div id="drawerBackdrop"></div>
 
 <!-- DESKTOP ARROW -->
-<div id="recommendArrow" class="recommendArrow">▲</div>
+<div id="recommendArrow"
+     class="recommendArrow">
+  ▲
+</div>
 
 <!-- RECOMMENDATIONS DRAWER -->
-<div id="recommendDrawer" class="recommendDrawer">
+<div id="recommendDrawer"
+     class="recommendDrawer">
 
-  <div id="drawerHandle" class="drawerHandle"></div>
+  <div id="drawerHandle"
+       class="drawerHandle"></div>
 
   <button id="drawerClose"
-          class="drawerClose">✕</button>
+          class="drawerClose">
+    ✕
+  </button>
 
   <div id="recommendPanel"
        class="recommendPanel"></div>
@@ -1457,219 +1497,326 @@ if ("serviceWorker" in navigator) {
   });
 
 /* =====================================================
-   FULL FIXED JS — DESKTOP ARROW + MOBILE DRAG
+   FULL FIXED JS — YOUTUBE STYLE RECOMMENDATIONS
 ===================================================== */
 
-/* VIDEO GRID BUILDER */
+/* ===============================
+   VIDEO GRID BUILDER
+================================ */
 function buildRow(sectionName, fullList, slice){
   const wrapper = document.createElement("div");
-  wrapper.className = "rowWrapper";
-  const row = document.createElement("div");
-  row.className = "row";
+  wrapper.className="rowWrapper";
 
-  slice.forEach(v => {
-    const tile = document.createElement("div");
-    tile.className = "tile";
-    const img = document.createElement("img");
-    img.src = v.thumb || PLACEHOLDER;
-    const title = document.createElement("div");
-    title.className = "tile-title";
-    title.textContent = v.title;
-    tile.append(img, title);
-    tile.onclick = () => playFromList(fullList, v);
+  const row=document.createElement("div");
+  row.className="row";
+
+  slice.forEach(v=>{
+    const tile=document.createElement("div");
+    tile.className="tile";
+
+    const img=document.createElement("img");
+    img.src=v.thumb || PLACEHOLDER;
+
+    const title=document.createElement("div");
+    title.className="tile-title";
+    title.textContent=v.title;
+
+    tile.append(img,title);
+    tile.onclick=()=>playFromList(fullList,v);
+
     row.appendChild(tile);
   });
 
   wrapper.appendChild(row);
-  document.getElementById("rows-" + sectionName).appendChild(wrapper);
+  document
+    .getElementById("rows-"+sectionName)
+    .appendChild(wrapper);
 }
 
-[STORIES, NASHEEDS, DUAS, CARTOONS].forEach((list,i)=>{
+[STORIES,NASHEEDS,DUAS,CARTOONS].forEach((list,i)=>{
   const names=["Stories","Nasheeds","Duas","Cartoons"];
   for(let x=0;x<list.length;x+=8){
-    buildRow(names[i], list, list.slice(x,x+8));
+    buildRow(names[i],list,list.slice(x,x+8));
   }
 });
 
-/* ELEMENTS */
-const modal = document.getElementById("modal");
-const player = document.getElementById("player");
-const modalTitle = document.getElementById("modalTitle");
-const modalDesc = document.getElementById("modalDesc");
-const closeBtn = document.getElementById("closeBtn");
-const overlay = document.getElementById("nextOverlay");
-const nextThumb = document.getElementById("nextThumb");
-const nextTitle = document.getElementById("nextTitle");
-const countEl = document.getElementById("count");
-const progressCircle = document.getElementById("progressCircle");
-const playNowBtn = document.getElementById("playNowBtn");
-const autoplayToggle = document.getElementById("autoplayToggle");
-const recommendDrawer = document.getElementById("recommendDrawer");
-const recommendArrow = document.getElementById("recommendArrow");
-const drawerClose = document.getElementById("drawerClose");
-const recommendPanel = document.getElementById("recommendPanel");
 
-/* STATE */
-let playlist = [];
-let index = 0;
+/* ===============================
+   ELEMENTS
+================================ */
+const modal=document.getElementById("modal");
+const player=document.getElementById("player");
+const modalTitle=document.getElementById("modalTitle");
+const modalDesc=document.getElementById("modalDesc");
+const closeBtn=document.getElementById("closeBtn");
+
+const overlay=document.getElementById("nextOverlay");
+const nextThumb=document.getElementById("nextThumb");
+const nextTitle=document.getElementById("nextTitle");
+const countEl=document.getElementById("count");
+const progressCircle=document.getElementById("progressCircle");
+const playNowBtn=document.getElementById("playNowBtn");
+const autoplayToggle=document.getElementById("autoplayToggle");
+
+const recommendDrawer=document.getElementById("recommendDrawer");
+const recommendArrow=document.getElementById("recommendArrow");
+const drawerClose=document.getElementById("drawerClose");
+const recommendPanel=document.getElementById("recommendPanel");
+
+
+/* ===============================
+   STATE
+================================ */
+let playlist=[];
+let index=0;
 let timer;
 
-/* MOBILE DRAG */
-let startY = 0, initialTranslate = 70, dragging = false;
+let dragging=false;
+let startY=0;
+let drawerY=72; // peek position
 
-/* OPEN VIDEO */
+
+/* ===============================
+   FULLSCREEN DETECTION (FIXED)
+================================ */
+function isFullscreen(){
+  return (
+    document.fullscreenElement ||
+    document.webkitFullscreenElement ||
+    player.webkitDisplayingFullscreen ||
+    player === document.activeElement
+  );
+}
+
+function isMobile(){
+  return window.innerWidth<=900;
+}
+
+function isLandscape(){
+  return window.innerWidth>window.innerHeight;
+}
+
+
+/* ===============================
+   OPEN VIDEO
+================================ */
 function openModal(v){
+
   clearInterval(timer);
   overlay.classList.add("hidden");
-  player.src = v.file;
-  modalTitle.textContent = v.title;
-  modalDesc.textContent = v.desc;
+
+  player.src=v.file;
+  modalTitle.textContent=v.title;
+  modalDesc.textContent=v.desc;
+
   modal.classList.add("open");
+
   buildRecommendations();
+
+  drawerY=72;
   recommendDrawer.classList.remove("show","mobile-ready");
   recommendArrow.classList.remove("show");
+
   player.play().catch(()=>{});
 }
 
-function playFromList(fullList, vid){
-  playlist = fullList;
-  index = fullList.indexOf(vid);
+function playFromList(fullList,vid){
+  playlist=fullList;
+  index=fullList.indexOf(vid);
   openModal(vid);
 }
 
-/* RECOMMENDATIONS */
+
+/* ===============================
+   RECOMMENDATIONS
+================================ */
 function buildRecommendations(){
-  recommendPanel.innerHTML = "";
+
+  recommendPanel.innerHTML="";
+
   playlist.forEach((v,i)=>{
+
     if(i===index) return;
-    const card = document.createElement("div");
+
+    const card=document.createElement("div");
     card.className="recCard";
-    card.innerHTML=`<img src="${v.thumb}"><div>${v.title}</div>`;
-    card.onclick = ()=>{
+
+    card.innerHTML=
+      `<img src="${v.thumb}">
+       <div>${v.title}</div>`;
+
+    card.onclick=()=>{
       index=i;
       openModal(v);
     };
+
     recommendPanel.appendChild(card);
   });
 }
 
-/* AUTOPLAY NEXT */
+
+/* ===============================
+   AUTOPLAY NEXT
+================================ */
 player.addEventListener("ended",()=>{
+
   if(!autoplayToggle.checked) return;
+
   const nextIndex=(index+1)%playlist.length;
   const nextVid=playlist[nextIndex];
+
   nextThumb.src=nextVid.thumb;
   nextTitle.textContent=nextVid.title;
+
   overlay.classList.remove("hidden");
   startCountdown(nextIndex);
 });
 
 function startCountdown(nextIndex){
+
   let time=5;
   const circumference=163;
+
   countEl.textContent=time;
   progressCircle.style.strokeDashoffset=0;
+
   timer=setInterval(()=>{
+
     time--;
     countEl.textContent=time;
-    progressCircle.style.strokeDashoffset=circumference*(1-time/5);
+
+    progressCircle.style.strokeDashoffset=
+      circumference*(1-time/5);
+
     if(time<=0){
       clearInterval(timer);
       index=nextIndex;
       openModal(playlist[index]);
     }
+
   },1000);
 }
 
-playNowBtn.onclick = ()=>{
+playNowBtn.onclick=()=>{
   clearInterval(timer);
   index=(index+1)%playlist.length;
   openModal(playlist[index]);
 };
 
-/* FULLSCREEN DETECTION */
-document.addEventListener("fullscreenchange", updateUI);
-window.addEventListener("resize", updateUI);
 
-function isFullscreen(){
-  return document.fullscreenElement || 
-         document.webkitFullscreenElement || 
-         document.mozFullScreenElement || 
-         document.msFullscreenElement;
-}
-
+/* ===============================
+   UI UPDATE (YT LOGIC)
+================================ */
 function updateUI(){
-  const mobile = window.innerWidth<=900;
-  const landscape = window.innerWidth>window.innerHeight;
 
-  // reset
   recommendArrow.classList.remove("show");
   recommendDrawer.classList.remove("show","mobile-ready");
 
-  // Desktop: arrow visible in fullscreen
-  if(isFullscreen() && !mobile){
+  if(!isFullscreen()) return;
+
+  /* DESKTOP */
+  if(!isMobile()){
     recommendArrow.classList.add("show");
+    return;
   }
 
-  // Mobile landscape: show peek drawer
-  if(isFullscreen() && mobile && landscape){
+  /* MOBILE LANDSCAPE */
+  if(isMobile() && isLandscape()){
     recommendDrawer.classList.add("mobile-ready");
-    recommendDrawer.style.transform=`translateY(${initialTranslate}%)`;
+    recommendDrawer.style.transform=
+      `translateY(${drawerY}%)`;
   }
 }
 
-/* DESKTOP ARROW */
-recommendArrow.addEventListener("click", ()=> recommendDrawer.classList.add("show"));
-drawerClose.addEventListener("click", ()=> recommendDrawer.classList.remove("show"));
+document.addEventListener("fullscreenchange",updateUI);
+window.addEventListener("resize",updateUI);
 
-/* MOBILE DRAG */
-recommendDrawer.addEventListener("touchstart", e=>{
-  if(!(isFullscreen() && isMobile() && isLandscape())) return;
+
+/* ===============================
+   DESKTOP ARROW
+================================ */
+recommendArrow.onclick=()=>{
+  drawerY=0;
+  recommendDrawer.classList.add("show");
+  recommendDrawer.style.transform="translateY(0)";
+};
+
+drawerClose.onclick=()=>{
+  drawerY=72;
+  recommendDrawer.classList.remove("show");
+  recommendDrawer.style.transform=
+    `translateY(${drawerY}%)`;
+};
+
+
+/* ===============================
+   MOBILE DRAG (YOUTUBE STYLE)
+================================ */
+recommendDrawer.addEventListener("touchstart",e=>{
+
+  if(!(isFullscreen() && isMobile() && isLandscape()))
+    return;
+
   dragging=true;
   startY=e.touches[0].clientY;
-  const style = window.getComputedStyle(recommendDrawer);
-  const matrix = new WebKitCSSMatrix(style.transform);
-  initialTranslate = matrix.m42/window.innerHeight*100 || 70;
   recommendDrawer.style.transition="none";
 });
 
-recommendDrawer.addEventListener("touchmove", e=>{
+recommendDrawer.addEventListener("touchmove",e=>{
+
   if(!dragging) return;
-  const delta = startY - e.touches[0].clientY;
-  let newTranslate = initialTranslate - delta/2;
-  newTranslate = Math.min(Math.max(0,newTranslate), 85);
-  recommendDrawer.style.transform=`translateY(${newTranslate}%)`;
+
+  const delta=startY-e.touches[0].clientY;
+
+  drawerY-=delta*0.15;
+  drawerY=Math.max(0,Math.min(85,drawerY));
+
+  recommendDrawer.style.transform=
+    `translateY(${drawerY}%)`;
+
+  startY=e.touches[0].clientY;
 });
 
-recommendDrawer.addEventListener("touchend", e=>{
+recommendDrawer.addEventListener("touchend",()=>{
+
   if(!dragging) return;
   dragging=false;
-  recommendDrawer.style.transition="transform .45s cubic-bezier(.22,.8,.25,1)";
-  const endY=e.changedTouches[0].clientY;
-  if(startY - endY > 40){
+
+  recommendDrawer.style.transition=
+   "transform .45s cubic-bezier(.22,.8,.25,1)";
+
+  if(drawerY<35){
+    drawerY=0;
     recommendDrawer.classList.add("show");
-    recommendDrawer.style.transform="translateY(0)";
-  } else {
+  }else{
+    drawerY=72;
     recommendDrawer.classList.remove("show");
     recommendDrawer.classList.add("mobile-ready");
-    recommendDrawer.style.transform=`translateY(${initialTranslate}%)`;
   }
+
+  recommendDrawer.style.transform=
+    `translateY(${drawerY}%)`;
 });
 
-/* CLOSE MODAL */
-closeBtn.onclick = closeModal;
+
+/* ===============================
+   CLOSE MODAL
+================================ */
+closeBtn.onclick=closeModal;
+
 function closeModal(){
+
   clearInterval(timer);
+
   modal.classList.remove("open");
+
   player.pause();
   player.removeAttribute("src");
   player.load();
+
   recommendDrawer.classList.remove("show","mobile-ready");
   recommendArrow.classList.remove("show");
 }
-
-function isMobile(){ return window.innerWidth<=900; }
-function isLandscape(){ return window.innerWidth>window.innerHeight; }
   /* -----------------------------
       NAVIGATION
   ----------------------------- */
