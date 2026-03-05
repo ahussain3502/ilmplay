@@ -638,12 +638,12 @@ svg circle{
 ================================ */
 .recommendArrow {
   position: fixed;
-  left: 50%;
+  left: 55%;           /* moved slightly to the right */
   bottom: 95px;
 
   transform: translate(-50%, 20px);
 
-  width: 36px;        /* smaller circle */
+  width: 36px;
   height: 36px;
 
   border-radius: 50%;
@@ -654,7 +654,7 @@ svg circle{
   align-items: center;
   justify-content: center;
 
-  font-size: 20px;     /* slightly bigger arrow */
+  font-size: 20px;
   color: white;
   cursor: pointer;
 
@@ -724,13 +724,11 @@ svg circle{
 
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-
-  gap: 14px;
-  padding: 60px 18px 25px;
+  gap: 10px;           /* slightly smaller gap */
+  padding: 20px 15px;  /* reduce padding to fit thumbnails better */
 
   overflow-y: auto;
 
-  /* momentum + smooth scrolling like YT */
   scroll-behavior: smooth;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
@@ -748,14 +746,14 @@ svg circle{
 
 .recCard img {
   width: 100%;
-  height: 120px;       /* fixed smaller height so 3 fit horizontally & fully visible */
+  height: 100px;       /* smaller so fully visible vertically */
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .recCard div {
-  font-size: 14px;
-  margin-top: 4px;
+  font-size: 13px;
+  margin-top: 3px;
   color: white;
 
   overflow: hidden;
@@ -799,7 +797,6 @@ svg circle{
    MOBILE LANDSCAPE
 ================================ */
 @media (max-width:900px) and (orientation:landscape){
-
   .recommendArrow {
     display: none;
   }
@@ -1441,7 +1438,6 @@ if ("serviceWorker" in navigator) {
   donationModal.addEventListener("click", (e) => {
     if (e.target === donationModal) closeDonationModal();
   });
-
 /* =====================================================
    YOUTUBE POLISHED RECOMMENDATIONS + PLAYER JS
 ===================================================== */
@@ -1450,7 +1446,7 @@ if ("serviceWorker" in navigator) {
    VIDEO GRID BUILDER
 ================================ */
 function buildRow(sectionName, fullList, slice){
-  const wrapper = document.createElement("div");
+  const wrapper=document.createElement("div");
   wrapper.className="rowWrapper";
 
   const row=document.createElement("div");
@@ -1474,9 +1470,7 @@ function buildRow(sectionName, fullList, slice){
   });
 
   wrapper.appendChild(row);
-  document
-    .getElementById("rows-"+sectionName)
-    .appendChild(wrapper);
+  document.getElementById("rows-"+sectionName).appendChild(wrapper);
 }
 
 [STORIES,NASHEEDS,DUAS,CARTOONS].forEach((list,i)=>{
@@ -1485,7 +1479,6 @@ function buildRow(sectionName, fullList, slice){
     buildRow(names[i],list,list.slice(x,x+8));
   }
 });
-
 
 /* ===============================
    ELEMENTS
@@ -1509,7 +1502,6 @@ const recommendArrow=document.getElementById("recommendArrow");
 const drawerClose=document.getElementById("drawerClose");
 const recommendPanel=document.getElementById("recommendPanel");
 
-
 /* ===============================
    STATE
 ================================ */
@@ -1519,11 +1511,10 @@ let timer;
 
 let dragging=false;
 let startY=0;
-let drawerY=72; // peek position
+let drawerY=72; // peek position in mobile landscape
 
 let arrowTimer=null;
 let mouseActive=false;
-
 
 /* ===============================
    FULLSCREEN DETECTION
@@ -1536,10 +1527,8 @@ function isFullscreen(){
     player === document.activeElement
   );
 }
-
 function isMobile(){ return window.innerWidth<=900; }
 function isLandscape(){ return window.innerWidth>window.innerHeight; }
-
 
 /* ===============================
    OPEN VIDEO
@@ -1575,7 +1564,6 @@ function playFromList(fullList,vid){
   openModal(vid);
 }
 
-
 /* ===============================
    RECOMMENDATIONS
 ================================ */
@@ -1597,7 +1585,6 @@ function buildRecommendations(){
     recommendPanel.appendChild(card);
   });
 }
-
 
 /* ===============================
    AUTOPLAY NEXT
@@ -1634,7 +1621,6 @@ function startCountdown(nextIndex){
       index=nextIndex;
       openModal(playlist[index]);
     }
-
   },1000);
 }
 
@@ -1643,7 +1629,6 @@ playNowBtn.onclick=()=>{
   index=(index+1)%playlist.length;
   openModal(playlist[index]);
 };
-
 
 /* ===============================
    UI UPDATE
@@ -1665,7 +1650,6 @@ function updateUI(){
 document.addEventListener("fullscreenchange",updateUI);
 window.addEventListener("resize",updateUI);
 
-
 /* ===============================
    DESKTOP ARROW
 ================================ */
@@ -1682,13 +1666,11 @@ drawerClose.onclick = () => {
   recommendDrawer.style.transform = "translateY(100%)";
 };
 
-
 /* ===============================
    MOBILE DRAG
 ================================ */
 recommendDrawer.addEventListener("touchstart",e=>{
-  if(!(isFullscreen() && isMobile() && isLandscape()))
-    return;
+  if(!(isMobile() && isLandscape())) return;
 
   dragging=true;
   startY=e.touches[0].clientY;
@@ -1724,7 +1706,6 @@ recommendDrawer.addEventListener("touchend",()=>{
   recommendDrawer.style.transform=`translateY(${drawerY}%)`;
 });
 
-
 /* ===============================
    CLOSE MODAL
 ================================ */
@@ -1741,12 +1722,11 @@ function closeModal(){
   recommendArrow.classList.remove("show");
 }
 
-
 /* ===============================
    ARROW AUTO-HIDE + MOUSE DETECTION
 ================================ */
 function showArrowTemporarily(){
-  if(!isFullscreen() || isMobile()) return;
+  if(isMobile()) return;
 
   recommendArrow.classList.add("show");
   clearTimeout(arrowTimer);
@@ -1758,7 +1738,7 @@ function showArrowTemporarily(){
 }
 
 document.addEventListener("mousemove",()=>{
-  if(!isFullscreen() || isMobile()) return;
+  if(isMobile()) return;
 
   if(!mouseActive){
     mouseActive=true;
@@ -1772,7 +1752,6 @@ document.addEventListener("mousemove",()=>{
     recommendArrow.classList.remove("show");
   },2000);
 });
-
 
 /* ===============================
    SCROLL MOMENTUM
