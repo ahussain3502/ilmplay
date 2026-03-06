@@ -630,7 +630,8 @@ svg circle{
   margin-top:8px;
 }
 /* =====================================================
-   YOUTUBE POLISHED RECOMMENDATIONS — FULL CSS
+   YOUTUBE POLISHED RECOMMENDATIONS — FINAL CSS
+   (with YouTube-style thumbnails)
 ===================================================== */
 
 /* ===============================
@@ -638,8 +639,8 @@ svg circle{
 ================================ */
 .recommendArrow {
   position: fixed;
-  left: 76%;          /* more right */
-  bottom: 87px;       /* slightly higher */
+  left: 76%;
+  bottom: 87px;
 
   width: 36px;
   height: 36px;
@@ -712,26 +713,25 @@ svg circle{
 
 /* ===============================
    RECOMMENDATIONS PANEL
+   — YouTube-style thumbnail layout
 ================================ */
 .recommendPanel {
   flex: 1;
 
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 per row fully */
-  gap: 8px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
 
-  padding: 20px 15px;
+  padding: 18px;
+  width: 100%;
+  box-sizing: border-box;
 
+  height: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
 
-  /* Smooth scroll like YouTube */
-  scroll-behavior: smooth;
-  overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;
-
-  /* Initial height shows 1 full row + ~3/4 second row */
-  max-height: calc((16/9 * 1fr) * 1.75); 
+  scroll-behavior: smooth;
 }
 
 /* ===============================
@@ -740,19 +740,30 @@ svg circle{
 .recCard {
   width: 100%;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
 }
 
+/* ===============================
+   THUMBNAIL
+================================ */
 .recCard img {
   width: 100%;
-  aspect-ratio: 16 / 9; /* ensures equal height */
+  height: auto;
+  aspect-ratio: 16 / 9; /* YouTube-style aspect ratio */
   object-fit: cover;
-  border-radius: 6px;
+  border-radius: 8px;
+  display: block;
 }
 
+/* ===============================
+   TITLE
+================================ */
 .recCard div {
   font-size: 13px;
-  margin-top: 3px;
-  color: white;
+  color: #fff;
+  margin-top: 4px;
+
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
