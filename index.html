@@ -630,8 +630,7 @@ svg circle{
   margin-top:8px;
 }
 /* =====================================================
-   YOUTUBE POLISHED RECOMMENDATIONS — FINAL CSS
-   (with YouTube-style thumbnails)
+   YOUTUBE POLISHED RECOMMENDATIONS — MERGED CSS
 ===================================================== */
 
 /* ===============================
@@ -639,8 +638,8 @@ svg circle{
 ================================ */
 .recommendArrow {
   position: fixed;
-  left: 76%;
-  bottom: 87px;
+  left: 76%;          /* more right */
+  bottom: 87px;       /* slightly higher */
 
   width: 36px;
   height: 36px;
@@ -712,17 +711,16 @@ svg circle{
 }
 
 /* ===============================
-   RECOMMENDATIONS PANEL
-   — YouTube-style thumbnail layout
+   RECOMMENDATIONS PANEL (YT STYLE WITH 3 FULL THUMBS)
 ================================ */
 .recommendPanel {
   flex: 1;
 
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr)); /* 3 per row full width */
   gap: 10px;
 
-  padding: 18px;
+  padding: 18px; /* consistent padding like original */
   width: 100%;
   box-sizing: border-box;
 
@@ -744,25 +742,19 @@ svg circle{
   flex-direction: column;
 }
 
-/* ===============================
-   THUMBNAIL
-================================ */
 .recCard img {
   width: 100%;
   height: auto;
-  aspect-ratio: 16 / 9; /* YouTube-style aspect ratio */
+  aspect-ratio: 16 / 9; /* keeps standard YouTube shape */
   object-fit: cover;
   border-radius: 8px;
   display: block;
 }
 
-/* ===============================
-   TITLE
-================================ */
 .recCard div {
   font-size: 13px;
-  color: #fff;
   margin-top: 4px;
+  color: white;
 
   overflow: hidden;
   white-space: nowrap;
