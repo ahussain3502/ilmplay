@@ -630,8 +630,48 @@ svg circle{
   margin-top:8px;
 }
 /* =====================================================
-   YOUTUBE POLISHED RECOMMENDATIONS — FIXED 3 THUMBS
+   YOUTUBE POLISHED RECOMMENDATIONS — MERGED CSS
 ===================================================== */
+
+/* ===============================
+   DESKTOP ARROW (YT STYLE)
+================================ */
+.recommendArrow {
+  position: fixed;
+  left: 76%;          /* more right */
+  bottom: 87px;       /* slightly higher */
+
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 20px;
+  color: white;
+  cursor: pointer;
+
+  opacity: 0;
+  pointer-events: none;
+
+  z-index: 2147483647;
+  transition: opacity .3s ease, transform .3s ease, background .2s;
+}
+
+.recommendArrow:hover {
+  background: rgba(0,0,0,0.75);
+}
+
+.recommendArrow.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+}
 
 /* ===============================
    RECOMMENDATIONS DRAWER
@@ -641,9 +681,12 @@ svg circle{
   left: 0;
   bottom: 0;
   width: 100%;
-  height: 60vh; /* smaller height so 3 thumbnails fit fully */
+
+  height: 80vh;
+
   background: rgba(18,18,18,0.98);
   backdrop-filter: blur(14px);
+
   border-radius: 18px 18px 0 0;
 
   display: flex;
@@ -652,19 +695,33 @@ svg circle{
 
   transform: translateY(100%);
   transition: transform .45s cubic-bezier(.22,.8,.25,1);
+
   z-index: 2147483646;
+  touch-action: none;
+  pointer-events: auto;
+  will-change: transform;
+}
+
+.recommendDrawer.show {
+  transform: translateY(0);
+}
+
+.recommendDrawer.mobile-ready {
+  transform: translateY(72%);
 }
 
 /* ===============================
-   RECOMMENDATIONS PANEL
+   RECOMMENDATIONS PANEL (YT STYLE WITH 3 FULL THUMBS)
 ================================ */
 .recommendPanel {
   flex: 1;
 
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 thumbnails fully horizontally */
-  gap: 6px; /* smaller gap */
-  padding: 10px; /* smaller padding */
+  grid-template-columns: repeat(3, minmax(0, 1fr)); /* 3 per row full width */
+  gap: 10px;
+
+  padding: 18px; /* consistent padding like original */
+  width: 100%;
   box-sizing: border-box;
 
   height: 100%;
@@ -687,15 +744,16 @@ svg circle{
 
 .recCard img {
   width: 100%;
-  aspect-ratio: 16/9; /* keep standard YouTube shape */
+  height: auto;
+  aspect-ratio: 16 / 9; /* keeps standard YouTube shape */
   object-fit: cover;
-  border-radius: 6px;
+  border-radius: 8px;
   display: block;
 }
 
 .recCard div {
-  font-size: 12px; /* slightly smaller title to fit under thumbnail */
-  margin-top: 3px;
+  font-size: 13px;
+  margin-top: 4px;
   color: white;
 
   overflow: hidden;
@@ -704,12 +762,12 @@ svg circle{
 }
 
 /* ===============================
-   CLOSE BUTTON
+   CLOSE BUTTON (YT STYLE)
 ================================ */
 .drawerClose {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 12px;
+  right: 12px;
   width: 28px;
   height: 28px;
 
@@ -728,58 +786,7 @@ svg circle{
 }
 
 .drawerClose:hover {
-  background: rgba(0,0,0,0.8);
-}
-
-/* ===============================
-   ARROWS
-================================ */
-.recommendArrow {
-  position: fixed;
-  left: 50%;
-  bottom: 145px;
-
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-
-  background: rgba(0,0,0,.55);
-  backdrop-filter: blur(6px);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 24px; /* bigger arrow */
-  color: #fff;
-  cursor: pointer;
-
-  opacity: 0;
-  pointer-events: none;
-
-  z-index: 2147483647;
-  transition: opacity .3s, transform .3s, background .2s;
-}
-
-.recommendArrow:hover {
-  background: rgba(0,0,0,.75);
-}
-
-.recommendArrow.show {
-  opacity: 1;
-  transform: translate(-50%, 0);
-  pointer-events: auto;
-}
-
-/* Down arrow above recommendations */
-.recommendArrow.down {
-  bottom: auto;
-  top: 8px;
-  transform: translateY(0);
-}
-
-.recommendArrow.down.show {
-  opacity: 1;
+  background: rgba(0,0,0,0.75);
 }
 
 /* ===============================
@@ -791,7 +798,7 @@ svg circle{
   }
 
   .recommendDrawer {
-    height: 72vh;
+    height: 78vh;
   }
 
   .recommendDrawer.mobile-ready {
@@ -1429,13 +1436,13 @@ if ("serviceWorker" in navigator) {
   });
 /* =====================================================
    YOUTUBE POLISHED VIDEO PLAYER + RECOMMENDATIONS
-   — FULL JS WITH AUTOPLAY + ARROW CONTROL
+   — FULL JS WITH AUTOPLAY
 ===================================================== */
 
 /* ===============================
    VIDEO GRID BUILDER
 ================================ */
-function buildRow(sectionName, fullList, slice) {
+function buildRow(sectionName, fullList, slice){
   const wrapper = document.createElement("div");
   wrapper.className = "rowWrapper";
 
@@ -1461,13 +1468,13 @@ function buildRow(sectionName, fullList, slice) {
 
   wrapper.appendChild(row);
   const sectionEl = document.getElementById("rows-" + sectionName);
-  if (sectionEl) sectionEl.appendChild(wrapper);
+  if(sectionEl) sectionEl.appendChild(wrapper);
 }
 
 /* Build grids for all categories */
 [STORIES, NASHEEDS, DUAS, CARTOONS].forEach((list, i) => {
   const names = ["Stories", "Nasheeds", "Duas", "Cartoons"];
-  for (let x = 0; x < list.length; x += 8) {
+  for(let x = 0; x < list.length; x += 8){
     buildRow(names[i], list, list.slice(x, x + 8));
   }
 });
@@ -1491,7 +1498,6 @@ const autoplayToggle = document.getElementById("autoplayToggle");
 
 const recommendDrawer = document.getElementById("recommendDrawer");
 const recommendArrow = document.getElementById("recommendArrow");
-const recommendArrowDown = document.getElementById("recommendArrowDown");
 const drawerClose = document.getElementById("drawerClose");
 const recommendPanel = document.getElementById("recommendPanel");
 
@@ -1509,32 +1515,13 @@ let drawerY = 72; // mobile peek
 /* ===============================
    UTILS
 ================================ */
-function isMobile() { return window.innerWidth <= 900; }
-function isLandscape() { return window.innerWidth > window.innerHeight; }
-
-/* ===============================
-   PLAYER CONTROL VISIBILITY
-================================ */
-function updateArrows() {
-  // Show up arrow only when player is playing
-  if (!player.paused && !recommendDrawer.classList.contains("show")) {
-    recommendArrow.classList.add("show");
-  } else {
-    recommendArrow.classList.remove("show");
-  }
-
-  // Show down arrow only if drawer is open
-  if (recommendDrawer.classList.contains("show")) {
-    recommendArrowDown.classList.add("show");
-  } else {
-    recommendArrowDown.classList.remove("show");
-  }
-}
+function isMobile(){ return window.innerWidth <= 900; }
+function isLandscape(){ return window.innerWidth > window.innerHeight; }
 
 /* ===============================
    OPEN VIDEO
 ================================ */
-function openModal(v) {
+function openModal(v){
   clearInterval(timer);
   overlay.classList.add("hidden");
 
@@ -1548,15 +1535,13 @@ function openModal(v) {
 
   // Reset drawer peek
   drawerY = 72;
-  recommendDrawer.classList.remove("show", "mobile-ready");
+  recommendDrawer.classList.remove("show","mobile-ready");
 
-  updateArrows();
-
-  // Force autoplay after user interaction
-  player.play().catch(() => console.log("Autoplay blocked, user must interact."));
+  // Show arrow once when modal opens
+  recommendArrow.classList.add("show");
 }
 
-function playFromList(fullList, vid) {
+function playFromList(fullList, vid){
   playlist = fullList;
   index = fullList.indexOf(vid);
   openModal(vid);
@@ -1565,31 +1550,47 @@ function playFromList(fullList, vid) {
 /* ===============================
    BUILD RECOMMENDATIONS
 ================================ */
-function buildRecommendations() {
+function buildRecommendations(){
   recommendPanel.innerHTML = "";
 
-  playlist.forEach((v, i) => {
-    if (i === index) return;
+  playlist.forEach((v,i)=>{
+    if(i===index) return;
 
     const card = document.createElement("div");
     card.className = "recCard";
     card.innerHTML = `<img src="${v.thumb}"><div>${v.title}</div>`;
 
-    card.onclick = () => {
+    card.onclick = ()=>{
       index = i;
-      openModal(v); // always uses openModal to ensure autoplay
+
+      // Play immediately (autoplay)
+      player.src = v.file;
+      modalTitle.textContent = v.title;
+      modalDesc.textContent = v.desc;
+      player.play().catch(()=>{});
+
+      // Close recommendations drawer
+      drawerY = 100;
+      recommendDrawer.classList.remove("show","mobile-ready");
+      recommendDrawer.style.transform = "translateY(100%)";
+
+      // Show arrow again after closing drawer
+      recommendArrow.classList.add("show");
+
+      // Rebuild recommendations
+      buildRecommendations();
     };
 
     recommendPanel.appendChild(card);
   });
-
-  updateArrows();
 }
 
 /* ===============================
    AUTOPLAY NEXT VIDEO
 ================================ */
-player.addEventListener("ended", () => {
+player.addEventListener("ended",()=>{
+  if(!autoplayToggle.checked) return;
+
   const nextIndex = (index + 1) % playlist.length;
   const nextVid = playlist[nextIndex];
 
@@ -1600,24 +1601,24 @@ player.addEventListener("ended", () => {
   startCountdown(nextIndex);
 });
 
-function startCountdown(nextIndex) {
+function startCountdown(nextIndex){
   let time = 5;
   const circumference = 163;
 
   countEl.textContent = time;
   progressCircle.style.strokeDashoffset = 0;
 
-  timer = setInterval(() => {
+  timer = setInterval(()=>{
     time--;
     countEl.textContent = time;
-    progressCircle.style.strokeDashoffset = circumference * (1 - time / 5);
+    progressCircle.style.strokeDashoffset = circumference * (1 - time/5);
 
-    if (time <= 0) {
+    if(time <= 0){
       clearInterval(timer);
       index = nextIndex;
-      openModal(playlist[index]); // autoplay next video
+      openModal(playlist[index]);
     }
-  }, 1000);
+  },1000);
 }
 
 playNowBtn.onclick = () => {
@@ -1634,41 +1635,32 @@ recommendArrow.onclick = () => {
   recommendDrawer.classList.add("show");
   recommendDrawer.style.transform = "translateY(0)";
 
+  // Hide arrow while drawer is open
   recommendArrow.classList.remove("show");
-  recommendArrowDown.classList.add("show");
-};
-
-recommendArrowDown.onclick = () => {
-  drawerY = 72;
-  recommendDrawer.classList.remove("show", "mobile-ready");
-  recommendDrawer.classList.add("mobile-ready");
-  recommendDrawer.style.transform = `translateY(${drawerY}%)`;
-
-  recommendArrow.classList.add("show");
 };
 
 /* CLOSE BUTTON */
 drawerClose.onclick = () => {
   drawerY = 100;
-  recommendDrawer.classList.remove("show", "mobile-ready");
+  recommendDrawer.classList.remove("show","mobile-ready");
   recommendDrawer.style.transform = "translateY(100%)";
 
+  // Show arrow again after closing
   recommendArrow.classList.add("show");
-  recommendArrowDown.classList.remove("show");
 };
 
 /* ===============================
    MOBILE DRAG
 ================================ */
 recommendDrawer.addEventListener("touchstart", e => {
-  if (!(isMobile() && isLandscape())) return;
+  if(!(isMobile() && isLandscape())) return;
   dragging = true;
   startY = e.touches[0].clientY;
   recommendDrawer.style.transition = "none";
 });
 
 recommendDrawer.addEventListener("touchmove", e => {
-  if (!dragging) return;
+  if(!dragging) return;
   const delta = startY - e.touches[0].clientY;
   drawerY -= delta * 0.15;
   drawerY = Math.max(0, Math.min(85, drawerY));
@@ -1676,12 +1668,12 @@ recommendDrawer.addEventListener("touchmove", e => {
   startY = e.touches[0].clientY;
 });
 
-recommendDrawer.addEventListener("touchend", () => {
-  if (!dragging) return;
+recommendDrawer.addEventListener("touchend", ()=>{
+  if(!dragging) return;
   dragging = false;
   recommendDrawer.style.transition = "transform .45s cubic-bezier(.22,.8,.25,1)";
 
-  if (drawerY < 35) {
+  if(drawerY < 35){
     drawerY = 0;
     recommendDrawer.classList.add("show");
   } else {
@@ -1703,18 +1695,9 @@ closeBtn.onclick = () => {
   player.removeAttribute("src");
   player.load();
 
-  recommendDrawer.classList.remove("show", "mobile-ready");
+  recommendDrawer.classList.remove("show","mobile-ready");
   recommendArrow.classList.remove("show");
-  recommendArrowDown.classList.remove("show");
 };
-
-/* ===============================
-   UPDATE ARROWS ON PLAYER EVENTS
-================================ */
-player.addEventListener("play", updateArrows);
-player.addEventListener("pause", updateArrows);
-player.addEventListener("ended", updateArrows);
-recommendDrawer.addEventListener("transitionend", updateArrows);
   /* -----------------------------
       NAVIGATION
   ----------------------------- */
@@ -1815,4 +1798,3 @@ drawerClose.onclick = ()=>{
 </script>
 </body>
 </html>
-    
