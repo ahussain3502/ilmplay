@@ -1535,37 +1535,55 @@ let dragging = false;
 let startY = 0;
 let drawerY = 72;
 
+let arrowTimer;
+
 /* ===============================
    UTILS
 ================================ */
 function isMobile(){ return window.innerWidth <= 900; }
 function isLandscape(){ return window.innerWidth > window.innerHeight; }
 
+
 /* ===============================
-   SHOW/HIDE ARROW BASED ON PLAYER CONTROLS
+   ARROW FOLLOWS PLAYER CONTROLS PERFECTLY
 ================================ */
-function updateArrowVisibility(){
-  // Hide arrow if drawer is open
-  if(recommendDrawer.classList.contains("show")) {
+
+let lastInteraction = 0;
+let arrowFrame;
+
+function updateArrow() {
+  const now = performance.now();
+  
+  // If drawer is open, always hide
+  if (recommendDrawer.classList.contains("show")) {
     recommendArrow.classList.remove("show");
-    return;
+  } else {
+    // Show arrow while user is active
+    if (now - lastInteraction < 2000) {
+      recommendArrow.classList.add("show");
+    } else {
+      recommendArrow.classList.remove("show");
+    }
   }
 
-  // Hide arrow if player controls are hidden
-  if(player.controls === false) {
-    recommendArrow.classList.remove("show");
-    return;
-  }
-
-  // Otherwise, show arrow immediately
-  recommendArrow.classList.add("show");
+  arrowFrame = requestAnimationFrame(updateArrow);
 }
 
-// Trigger on interactions with player
-player.addEventListener("mousemove", updateArrowVisibility);
-player.addEventListener("touchstart", updateArrowVisibility);
-player.addEventListener("click", updateArrowVisibility);
+function resetArrowTimer() {
+  lastInteraction = performance.now();
+}
 
+// Trigger on all user interactions
+player.addEventListener("mousemove", resetArrowTimer);
+player.addEventListener("touchstart", resetArrowTimer);
+player.addEventListener("click", resetArrowTimer);
+
+// Start the update loop
+updateArrow();
+
+// Hide arrow immediately when drawer opens or modal closes
+drawerClose.addEventListener("click", () => recommendArrow.classList.remove("show"));
+closeBtn.addEventListener("click", () => recommendArrow.classList.remove("show"));
 /* ===============================
    OPEN VIDEO
 ================================ */
@@ -1577,7 +1595,7 @@ function openModal(v){
   modalTitle.textContent = v.title;
   modalDesc.textContent = v.desc;
 
-  player.play().catch(()=>{}); // autoplay always
+  player.play().catch(()=>{});
 
   modal.classList.add("open");
 
@@ -1586,7 +1604,7 @@ function openModal(v){
   drawerY = 72;
   recommendDrawer.classList.remove("show","mobile-ready");
 
-  recommendArrow.classList.remove("show"); // hide arrow initially
+  recommendArrow.classList.remove("show");
 }
 
 function playFromList(fullList, vid){
@@ -1620,7 +1638,7 @@ function buildRecommendations(){
       recommendDrawer.classList.remove("show","mobile-ready");
       recommendDrawer.style.transform = "translateY(100%)";
 
-      recommendArrow.classList.remove("show"); // arrow hidden while drawer is open
+      recommendArrow.classList.remove("show");
 
       buildRecommendations();
     };
@@ -1679,7 +1697,7 @@ recommendArrow.onclick = () => {
   recommendDrawer.classList.add("show");
   recommendDrawer.style.transform = "translateY(0)";
 
-  recommendArrow.classList.remove("show"); // arrow hidden while drawer open
+  recommendArrow.classList.remove("show");
 };
 
 /* CLOSE BUTTON */
@@ -1688,7 +1706,7 @@ drawerClose.onclick = () => {
   recommendDrawer.classList.remove("show","mobile-ready");
   recommendDrawer.style.transform = "translateY(100%)";
 
-  recommendArrow.classList.remove("show"); // keep hidden
+  recommendArrow.classList.remove("show");
 };
 
 /* ===============================
@@ -1739,7 +1757,7 @@ closeBtn.onclick = () => {
   player.load();
 
   recommendDrawer.classList.remove("show","mobile-ready");
-  recommendArrow.classList.remove("show"); // hidden when modal closed
+  recommendArrow.classList.remove("show");
 };
   /* -----------------------------
       NAVIGATION
