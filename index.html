@@ -638,8 +638,8 @@ svg circle{
 ================================ */
 .recommendArrow {
   position: fixed;
-  left: 76%;          /* more right */
-  bottom: 80px;       /* slightly higher */
+  left: 50%;          /* more right */
+  bottom: 29%;       /* slightly higher */
 
   width: 36px;
   height: 36px;
@@ -1533,13 +1533,38 @@ let timer;
 
 let dragging = false;
 let startY = 0;
-let drawerY = 72; // mobile peek
+let drawerY = 72;
 
 /* ===============================
    UTILS
 ================================ */
 function isMobile(){ return window.innerWidth <= 900; }
 function isLandscape(){ return window.innerWidth > window.innerHeight; }
+
+/* ===============================
+   SHOW/HIDE ARROW BASED ON PLAYER CONTROLS
+================================ */
+function updateArrowVisibility(){
+  // Hide arrow if drawer is open
+  if(recommendDrawer.classList.contains("show")) {
+    recommendArrow.classList.remove("show");
+    return;
+  }
+
+  // Hide arrow if player controls are hidden
+  if(player.controls === false) {
+    recommendArrow.classList.remove("show");
+    return;
+  }
+
+  // Otherwise, show arrow immediately
+  recommendArrow.classList.add("show");
+}
+
+// Trigger on interactions with player
+player.addEventListener("mousemove", updateArrowVisibility);
+player.addEventListener("touchstart", updateArrowVisibility);
+player.addEventListener("click", updateArrowVisibility);
 
 /* ===============================
    OPEN VIDEO
@@ -1552,16 +1577,16 @@ function openModal(v){
   modalTitle.textContent = v.title;
   modalDesc.textContent = v.desc;
 
+  player.play().catch(()=>{}); // autoplay always
+
   modal.classList.add("open");
 
   buildRecommendations();
 
-  // Reset drawer peek
   drawerY = 72;
   recommendDrawer.classList.remove("show","mobile-ready");
 
-  // Show arrow once when modal opens
-  recommendArrow.classList.add("show");
+  recommendArrow.classList.remove("show"); // hide arrow initially
 }
 
 function playFromList(fullList, vid){
@@ -1586,21 +1611,17 @@ function buildRecommendations(){
     card.onclick = ()=>{
       index = i;
 
-      // Play immediately (autoplay)
       player.src = v.file;
       modalTitle.textContent = v.title;
       modalDesc.textContent = v.desc;
       player.play().catch(()=>{});
 
-      // Close recommendations drawer
       drawerY = 100;
       recommendDrawer.classList.remove("show","mobile-ready");
       recommendDrawer.style.transform = "translateY(100%)";
 
-      // Show arrow again after closing drawer
-      recommendArrow.classList.add("show");
+      recommendArrow.classList.remove("show"); // arrow hidden while drawer is open
 
-      // Rebuild recommendations
       buildRecommendations();
     };
 
@@ -1658,8 +1679,7 @@ recommendArrow.onclick = () => {
   recommendDrawer.classList.add("show");
   recommendDrawer.style.transform = "translateY(0)";
 
-  // Hide arrow while drawer is open
-  recommendArrow.classList.remove("show");
+  recommendArrow.classList.remove("show"); // arrow hidden while drawer open
 };
 
 /* CLOSE BUTTON */
@@ -1668,8 +1688,7 @@ drawerClose.onclick = () => {
   recommendDrawer.classList.remove("show","mobile-ready");
   recommendDrawer.style.transform = "translateY(100%)";
 
-  // Show arrow again after closing
-  recommendArrow.classList.add("show");
+  recommendArrow.classList.remove("show"); // keep hidden
 };
 
 /* ===============================
@@ -1704,6 +1723,7 @@ recommendDrawer.addEventListener("touchend", ()=>{
     recommendDrawer.classList.remove("show");
     recommendDrawer.classList.add("mobile-ready");
   }
+
   recommendDrawer.style.transform = `translateY(${drawerY}%)`;
 });
 
@@ -1719,7 +1739,7 @@ closeBtn.onclick = () => {
   player.load();
 
   recommendDrawer.classList.remove("show","mobile-ready");
-  recommendArrow.classList.remove("show");
+  recommendArrow.classList.remove("show"); // hidden when modal closed
 };
   /* -----------------------------
       NAVIGATION
