@@ -639,7 +639,7 @@ svg circle{
 .recommendArrow {
   position: fixed;
   left: 76%;          /* more right */
-  bottom: 87px;       /* slightly higher */
+  bottom: 80px;       /* slightly higher */
 
   width: 36px;
   height: 36px;
@@ -652,7 +652,7 @@ svg circle{
   align-items: center;
   justify-content: center;
 
-  font-size: 20px;
+  font-size: 38px;
   color: white;
   cursor: pointer;
 
@@ -673,6 +673,22 @@ svg circle{
   pointer-events: auto;
 }
 
+.recommendArrow span {
+  display: inline-block;       /* keep as inline-block */
+  transform: translateY(5px); /* negative = move up, positive = move down */
+}
+
+/* Flip the arrow upside down to point up */
+.recommendArrow .up-arrow {
+  display: inline-block;      /* required for transform */
+  transform: rotate(180deg) translateY(-6px); /* flips ⌄ upside down */
+  font-size: 38px;            /* adjust size as needed */
+  line-height: 1;             /* optional, reset line height */
+  
+
+}
+
+
 /* ===============================
    RECOMMENDATIONS DRAWER
 ================================ */
@@ -683,6 +699,8 @@ svg circle{
   width: 100%;
 
   height: 80vh;
+
+  
 
   background: rgba(18,18,18,0.98);
   backdrop-filter: blur(14px);
@@ -720,7 +738,7 @@ svg circle{
   grid-template-columns: repeat(3, minmax(0, 1fr)); /* 3 per row full width */
   gap: 10px;
 
-  padding: 18px; /* consistent padding like original */
+  padding: 50px 18px 18px 18px; /* consistent padding like original */
   width: 100%;
   box-sizing: border-box;
 
@@ -766,15 +784,16 @@ svg circle{
 ================================ */
 .drawerClose {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 28px;
-  height: 28px;
+  top: 5px;
+  right: 672px;
+  width: 35px;
+  height: 35px;
+  
 
   border-radius: 50%;
   background: rgba(0,0,0,0.5);
   color: white;
-  font-size: 16px;
+  font-size: 30px;
 
   display: flex;
   align-items: center;
@@ -787,6 +806,11 @@ svg circle{
 
 .drawerClose:hover {
   background: rgba(0,0,0,0.75);
+}
+/* Move the ❌ slightly up without moving the circle */
+.drawerClose span {
+  display: inline-block;
+  transform: translateY(-6px); /* negative = up, positive = down */
 }
 
 /* ===============================
@@ -1021,11 +1045,10 @@ if ("serviceWorker" in navigator) {
 <div id="drawerBackdrop"></div>
 
 <!-- DESKTOP ARROW -->
-<div id="recommendArrow"
-     class="recommendArrow">
-  ▲
-</div>
 
+<div id="recommendArrow" class="recommendArrow">
+  <span class="up-arrow">⌄</span>
+</div>
 <!-- RECOMMENDATIONS DRAWER -->
 <div id="recommendDrawer"
      class="recommendDrawer">
@@ -1035,7 +1058,7 @@ if ("serviceWorker" in navigator) {
 
   <button id="drawerClose"
           class="drawerClose">
-    ✕
+   <span>⌄</span> 
   </button>
 
   <div id="recommendPanel"
