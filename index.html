@@ -814,28 +814,30 @@ svg circle{
 }
 
 /* ===============================
-   MOBILE LANDSCAPE
+   MOBILE LANDSCAPE RECOMMENDATIONS
+   (ONLY LANDSCAPE MOBILE)
 ================================ */
 @media (max-width:900px) and (orientation:landscape){
 
-  .recommendArrow{
-    display:none;
-  }
-
+  /* Disable original drawer system */
   .recommendDrawer{
-    display:none;
+    display:none !important;
   }
 
-  /* Up Arrow centered above player controls */
+  .recommendArrow{
+    display:none !important;
+  }
+
+  /* Centered arrow above player controls */
   .mobileRecArrow{
     position:absolute;
-    bottom:80px;              /* sits above player controls */
+    bottom:70px;
     left:50%;
     transform:translateX(-50%);
     width:48px;
     height:48px;
     border-radius:50%;
-    background:rgba(0,0,0,0.6);
+    background:rgba(0,0,0,0.65);
     color:white;
     font-size:30px;
     display:none;
@@ -843,7 +845,7 @@ svg circle{
     justify-content:center;
     cursor:pointer;
     z-index:1001;
-    transition:transform .25s ease, background .2s ease;
+    transition:background .2s ease;
   }
 
   .mobileRecArrow.show{
@@ -851,26 +853,30 @@ svg circle{
   }
 
   .mobileRecArrow:hover{
-    background:rgba(0,0,0,0.8);
+    background:rgba(0,0,0,0.85);
   }
 
-  /* Recommendations panel */
+  /* Recommendation drawer panel */
   .mobileRecPanel{
     position:absolute;
     bottom:0;
     left:0;
     width:100%;
     height:70%;
+
     background:rgba(18,18,18,0.98);
     backdrop-filter:blur(12px);
+
     border-radius:12px 12px 0 0;
-    padding:50px 16px 20px 16px;
+
+    padding:50px 16px 20px;
 
     display:grid;
-    grid-template-columns:repeat(3,1fr); /* 3 per row */
+    grid-template-columns:repeat(3,1fr);
     gap:12px;
 
     overflow-y:auto;
+
     z-index:1000;
 
     transform:translateY(100%);
@@ -881,22 +887,29 @@ svg circle{
     transform:translateY(0);
   }
 
+  /* Down arrow to close */
   .mobileRecClose{
     position:absolute;
     top:10px;
     left:50%;
     transform:translateX(-50%) rotate(180deg);
+
     width:34px;
     height:34px;
+
     border-radius:50%;
     background:rgba(0,0,0,0.55);
     color:white;
+
     font-size:22px;
+
     display:flex;
     align-items:center;
     justify-content:center;
+
     cursor:pointer;
   }
+
 }
 </style>
 
@@ -1667,9 +1680,8 @@ closeBtn.addEventListener("click", () => {
   player.load();
   recommendDrawer.classList.remove("show","mobile-ready");
   hideArrow();
-  // hide mobile landscape
-  mobileRecArrow.classList.remove("show");
-  mobileRecPanel.classList.add("hidden");
+  // hide mobile landscape UI
+  hideMobileLandscapeUI();
 });
 
 recommendArrow.onclick = () => {
@@ -1708,18 +1720,15 @@ function openModal(v){
 
   hideArrow();
 
-  // Mobile landscape: hide arrow initially
+  // MOBILE LANDSCAPE: show new arrow
   if(isMobile() && isLandscape()){
-    mobileRecArrow.classList.remove("show");
-    mobileRecPanel.classList.add("hidden");
-    recommendDrawer.style.display = "none"; // hide old drawer
-    recommendArrow.style.display = "none";
-  } else {
-    recommendDrawer.style.display = "";
-    recommendArrow.style.display = "";
+    showMobileLandscapeArrow();
   }
 }
 
+/* ===============================
+   PLAY VIDEO FROM LIST
+================================ */
 function playFromList(fullList, vid){
   playlist = fullList;
   index = fullList.indexOf(vid);
@@ -1835,41 +1844,43 @@ recommendDrawer.addEventListener("touchend", ()=>{
 });
 
 /* ===============================
-   MOBILE LANDSCAPE: SHOW RECOMMENDATIONS
+   MOBILE LANDSCAPE RECOMMENDATIONS
 ================================ */
 
-// Show arrow automatically when modal opens (mobile landscape only)
-if(isMobile() && isLandscape()){
-  mobileRecArrow.classList.add("show");
-}
-
-// Also allow tap on video to reveal arrow again
-player.addEventListener("click", () => {
+// Show arrow only in mobile landscape
+function showMobileLandscapeArrow(){
   if(isMobile() && isLandscape()){
     mobileRecArrow.classList.add("show");
   }
-});
+}
 
+// Hide arrow + panel when closing modal
+function hideMobileLandscapeUI(){
+  mobileRecArrow.classList.remove("show");
+  mobileRecPanel.classList.remove("show");
+}
+
+// Open recommendations panel
 mobileRecArrow.addEventListener("click", () => {
 
   if(!(isMobile() && isLandscape())) return;
 
   mobileRecPanel.innerHTML = "";
 
-  // Close arrow above panel
-  const closeBtn = document.createElement("div");
-  closeBtn.className = "mobileRecClose";
-  closeBtn.innerHTML = "⌄";
+  /* Down arrow to close panel */
+  const closeArrow = document.createElement("div");
+  closeArrow.className = "mobileRecClose";
+  closeArrow.innerHTML = "⌄";
 
-  closeBtn.onclick = () => {
+  closeArrow.onclick = () => {
     mobileRecPanel.classList.remove("show");
-    mobileRecArrow.classList.add("show");
   };
 
-  mobileRecPanel.appendChild(closeBtn);
+  mobileRecPanel.appendChild(closeArrow);
 
-  // Build video cards (3 per row like desktop)
+  /* Build recommendations (3 per row) */
   playlist.forEach((v,i)=>{
+
     if(i === index) return;
 
     const card = document.createElement("div");
@@ -1891,20 +1902,22 @@ mobileRecArrow.addEventListener("click", () => {
       player.play().catch(()=>{});
 
       mobileRecPanel.classList.remove("show");
-      mobileRecArrow.classList.add("show");
+
     };
 
     mobileRecPanel.appendChild(card);
+
   });
 
-  // Slide panel up
   mobileRecPanel.classList.add("show");
 
 });
+
 /* ===============================
    CLOSE MODAL
 ================================ */
 closeBtn.onclick = () => {
+
   clearInterval(timer);
   modal.classList.remove("open");
 
@@ -1914,6 +1927,9 @@ closeBtn.onclick = () => {
 
   recommendDrawer.classList.remove("show","mobile-ready");
   recommendArrow.classList.remove("show");
+
+  hideMobileLandscapeUI();
+
 };
   /* -----------------------------
       NAVIGATION
