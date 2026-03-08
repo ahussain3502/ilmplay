@@ -1535,7 +1535,7 @@ let dragging = false;
 let startY = 0;
 let drawerY = 72;
 
-let arrowTimer;
+let arrowIdleTimer;
 
 /* ===============================
    UTILS
@@ -1543,47 +1543,113 @@ let arrowTimer;
 function isMobile(){ return window.innerWidth <= 900; }
 function isLandscape(){ return window.innerWidth > window.innerHeight; }
 
-
 /* ===============================
-   ARROW FOLLOWS PLAYER CONTROLS PERFECTLY
+   UP ARROW VISIBILITY CONTROLLED BY MOUSE AND MODAL
+   — Updated version
 ================================ */
 
-let lastInteraction = 0;
-let arrowFrame;
+let lastMouseX = 0;
+let lastMouseY = 0;
 
-function updateArrow() {
-  const now = performance.now();
-  
-  // If drawer is open, always hide
-  if (recommendDrawer.classList.contains("show")) {
-    recommendArrow.classList.remove("show");
-  } else {
-    // Show arrow while user is active
-    if (now - lastInteraction < 2000) {
-      recommendArrow.classList.add("show");
-    } else {
-      recommendArrow.classList.remove("show");
-    }
+// Hide arrow initially
+recommendArrow.classList.remove("show");
+
+// Track if mouse is over player or arrow
+let mouseOverVideoOrArrow = false;
+
+// Function to hide arrow
+function hideArrow() {
+  recommendArrow.classList.remove("show");
+}
+
+// Function to show arrow (only if modal is open and drawer is closed)
+function showArrow() {
+  if (!modal.classList.contains("open") || recommendDrawer.classList.contains("show")) return;
+  recommendArrow.classList.add("show");
+}
+
+// Reset the 2s idle timer
+function resetArrowIdleTimer() {
+  clearTimeout(arrowIdleTimer);
+  arrowIdleTimer = setTimeout(() => {
+    if (!mouseOverVideoOrArrow) hideArrow();
+  }, 2000);
+}
+
+/* ===== Mouse events ===== */
+// Mouse enters video
+player.addEventListener("mouseenter", () => {
+  mouseOverVideoOrArrow = true;
+  showArrow();
+  resetArrowIdleTimer();
+});
+
+// Mouse leaves video
+player.addEventListener("mouseleave", () => {
+  mouseOverVideoOrArrow = false;
+  hideArrow();
+  clearTimeout(arrowIdleTimer);
+});
+
+// Mouse enters arrow
+recommendArrow.addEventListener("mouseenter", () => {
+  mouseOverVideoOrArrow = true;
+  showArrow();
+  clearTimeout(arrowIdleTimer);
+});
+
+// Mouse leaves arrow
+recommendArrow.addEventListener("mouseleave", () => {
+  mouseOverVideoOrArrow = false;
+  resetArrowIdleTimer();
+});
+
+// Mouse moves over video
+player.addEventListener("mousemove", (e) => {
+  if (!modal.classList.contains("open") || recommendDrawer.classList.contains("show")) return;
+
+  // Only trigger if mouse actually moved
+  if (e.clientX !== lastMouseX || e.clientY !== lastMouseY) {
+    lastMouseX = e.clientX;
+    lastMouseY = e.clientY;
+
+    showArrow();
+    resetArrowIdleTimer();
   }
+});
 
-  arrowFrame = requestAnimationFrame(updateArrow);
-}
+/* ===== Drawer and modal control ===== */
+// Hide arrow immediately when modal closes
+closeBtn.addEventListener("click", () => {
+  clearInterval(timer);
+  modal.classList.remove("open");
 
-function resetArrowTimer() {
-  lastInteraction = performance.now();
-}
+  player.pause();
+  player.removeAttribute("src");
+  player.load();
 
-// Trigger on all user interactions
-player.addEventListener("mousemove", resetArrowTimer);
-player.addEventListener("touchstart", resetArrowTimer);
-player.addEventListener("click", resetArrowTimer);
+  recommendDrawer.classList.remove("show","mobile-ready");
+  hideArrow();
+});
 
-// Start the update loop
-updateArrow();
+// Hide arrow when drawer opens
+recommendArrow.onclick = () => {
+  drawerY = 0;
+  recommendDrawer.classList.add("show");
+  recommendDrawer.style.transform = "translateY(0)";
 
-// Hide arrow immediately when drawer opens or modal closes
-drawerClose.addEventListener("click", () => recommendArrow.classList.remove("show"));
-closeBtn.addEventListener("click", () => recommendArrow.classList.remove("show"));
+  hideArrow();
+};
+
+// Hide arrow when drawer closes
+drawerClose.onclick = () => {
+  drawerY = 100;
+  recommendDrawer.classList.remove("show","mobile-ready");
+  recommendDrawer.style.transform = "translateY(100%)";
+
+  hideArrow();
+};
+
 /* ===============================
    OPEN VIDEO
 ================================ */
@@ -1604,7 +1670,7 @@ function openModal(v){
   drawerY = 72;
   recommendDrawer.classList.remove("show","mobile-ready");
 
-  recommendArrow.classList.remove("show");
+  hideArrow();
 }
 
 function playFromList(fullList, vid){
@@ -1638,7 +1704,7 @@ function buildRecommendations(){
       recommendDrawer.classList.remove("show","mobile-ready");
       recommendDrawer.style.transform = "translateY(100%)";
 
-      recommendArrow.classList.remove("show");
+      hideArrow();
 
       buildRecommendations();
     };
@@ -1687,26 +1753,6 @@ playNowBtn.onclick = () => {
   clearInterval(timer);
   index = (index + 1) % playlist.length;
   openModal(playlist[index]);
-};
-
-/* ===============================
-   DESKTOP ARROW BEHAVIOR
-================================ */
-recommendArrow.onclick = () => {
-  drawerY = 0;
-  recommendDrawer.classList.add("show");
-  recommendDrawer.style.transform = "translateY(0)";
-
-  recommendArrow.classList.remove("show");
-};
-
-/* CLOSE BUTTON */
-drawerClose.onclick = () => {
-  drawerY = 100;
-  recommendDrawer.classList.remove("show","mobile-ready");
-  recommendDrawer.style.transform = "translateY(100%)";
-
-  recommendArrow.classList.remove("show");
 };
 
 /* ===============================
