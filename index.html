@@ -819,19 +819,12 @@ svg circle{
 ================================ */
 @media (max-width:900px) and (orientation:landscape){
 
-  /* Do NOT disable desktop arrow */
-  .recommendArrow{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    margin:0 auto;
-    left:0;
-    right:0;
-  }
-
-  /* Use the same drawer as desktop */
-  .recommendDrawer{
-    height:80vh;
+  .recommendDrawer .recommendArrow{
+    position:absolute;
+    top:8px;
+    left:50%;
+    transform:translateX(-50%);
+    margin:0;
   }
 
   /* Keep the same recommendations grid */
