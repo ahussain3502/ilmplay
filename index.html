@@ -815,125 +815,25 @@ svg circle{
 
 /* ===============================
    MOBILE LANDSCAPE
+   (USE DESKTOP SYSTEM EXACTLY)
 ================================ */
 @media (max-width:900px) and (orientation:landscape){
 
-  /* completely neutralize original drawer */
-  #recommendDrawer{
-    display:none !important;
-    height:0 !important;
-    transform:none !important;
-    pointer-events:none !important;
-  }
-
-  #recommendArrow{
-    display:none !important;
-  }
-
-  /* centered arrow above controls */
-  #mobileRecArrow{
-    position:absolute;
-    bottom:75px;
-    left:50%;
-    transform:translateX(-50%);
-    width:42px;
-    height:42px;
-    border-radius:50%;
-    background:rgba(0,0,0,0.7);
-    color:white;
-    font-size:26px;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:1002;
-  }
-
-  #mobileRecArrow.show{
+  /* Do NOT disable desktop arrow */
+  .recommendArrow{
     display:flex;
   }
 
-  /* recommendations panel */
-  #mobileRecPanel{
-    position:absolute;
-    bottom:0;
-    left:0;
-    width:100%;
-    height:65%;
-    background:rgba(18,18,18,0.98);
-    border-radius:12px 12px 0 0;
-
-    padding:38px 8px 10px;
-
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:8px;
-
-    overflow-y:auto;
-
-    transform:translateY(100%);
-    transition:transform .4s ease;
-
-    z-index:1001;
+  /* Use the same drawer as desktop */
+  .recommendDrawer{
+    height:80vh;
   }
 
-  #mobileRecPanel.show{
-    transform:translateY(0);
+  /* Keep the same recommendations grid */
+  .recommendPanel{
+    grid-template-columns: repeat(3, minmax(0,1fr));
   }
 
-  /* close arrow */
-  .mobileRecClose{
-    position:absolute;
-    top:8px;
-    left:50%;
-    transform:translateX(-50%) rotate(180deg);
-
-    width:30px;
-    height:30px;
-
-    border-radius:50%;
-    background:rgba(0,0,0,0.6);
-
-    color:white;
-    font-size:20px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-
-  /* recommendation card */
-  #mobileRecPanel .recCard{
-    display:flex;
-    flex-direction:column;
-
-    background:#1a1a1a;
-    border-radius:6px;
-
-    overflow:hidden;
-  }
-
-  /* CLEAN 16:9 THUMBNAILS */
-  #mobileRecPanel .recCard img{
-    width:100%;
-    height:auto;
-    aspect-ratio:16/9;
-    object-fit:cover;
-    display:block;
-  }
-
-  /* titles */
-  #mobileRecPanel .recCard div{
-    font-size:11px;
-    padding:5px;
-    text-align:center;
-    line-height:1.2;
-  }
-
-}
-
-/* hide drawer when modal closed */
-#modal:not(.open) #recommendDrawer{
-  display:none !important;
 }
 
 /* ===============================
