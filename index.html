@@ -843,15 +843,45 @@ svg circle{
 ================================ */
 @media (max-width:900px) and (orientation:portrait){
 
-  /* move arrow higher */
   #mobileRecArrow{
     bottom:120px;
   }
 
-  /* show one video per row */
   #mobileRecPanel{
-    grid-template-columns:1fr;
+    grid-template-columns:1fr !important; /* force one column */
     height:70%;
+    padding:40px 10px 10px; /* optional: nice spacing */
+    gap:10px;
+  }
+
+  /* Make sure recCard fills full width */
+  #mobileRecPanel .recCard{
+    width:100% !important;
+    display:block !important;
+  }
+
+  #mobileRecPanel .recCard img{
+    width:100% !important;
+    height:auto;
+    aspect-ratio:16/9;
+    object-fit:cover;
+  }
+
+  /* Close arrow stays centered above panel */
+  .mobileRecClose{
+    position:absolute;
+    top:8px;
+    left:50%;
+    transform:translateX(-50%) rotate(180deg);
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    background:rgba(0,0,0,0.6);
+    color:white;
+    font-size:20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
   }
 
 }
