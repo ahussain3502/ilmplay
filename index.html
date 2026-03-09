@@ -813,18 +813,24 @@ svg circle{
   transform: translateY(-6px); /* negative = up, positive = down */
 }
 
+/* ===============================
+   MOBILE LANDSCAPE
+================================ */
 @media (max-width:900px) and (orientation:landscape){
 
-  /* disable original drawer system */
+  /* completely neutralize original drawer */
   #recommendDrawer{
     display:none !important;
+    height:0 !important;
+    transform:none !important;
+    pointer-events:none !important;
   }
 
   #recommendArrow{
     display:none !important;
   }
 
-  /* centered up arrow */
+  /* centered arrow above controls */
   #mobileRecArrow{
     position:absolute;
     bottom:75px;
@@ -846,7 +852,7 @@ svg circle{
     display:flex;
   }
 
-  /* recommendation panel */
+  /* recommendations panel */
   #mobileRecPanel{
     position:absolute;
     bottom:0;
@@ -855,13 +861,18 @@ svg circle{
     height:65%;
     background:rgba(18,18,18,0.98);
     border-radius:12px 12px 0 0;
-    padding:40px 10px 10px;
+
+    padding:38px 8px 10px;
+
     display:grid;
     grid-template-columns:repeat(3,1fr);
-    gap:10px;
+    gap:8px;
+
     overflow-y:auto;
+
     transform:translateY(100%);
     transition:transform .4s ease;
+
     z-index:1001;
   }
 
@@ -875,12 +886,16 @@ svg circle{
     top:8px;
     left:50%;
     transform:translateX(-50%) rotate(180deg);
+
     width:30px;
     height:30px;
+
     border-radius:50%;
     background:rgba(0,0,0,0.6);
+
     color:white;
     font-size:20px;
+
     display:flex;
     align-items:center;
     justify-content:center;
@@ -890,34 +905,48 @@ svg circle{
   #mobileRecPanel .recCard{
     display:flex;
     flex-direction:column;
+
     background:#1a1a1a;
     border-radius:6px;
+
     overflow:hidden;
   }
 
-  /* FIXED 16:9 THUMBNAILS */
+  /* CLEAN 16:9 THUMBNAILS */
   #mobileRecPanel .recCard img{
     width:100%;
+    height:auto;
     aspect-ratio:16/9;
     object-fit:cover;
+    display:block;
   }
 
+  /* titles */
   #mobileRecPanel .recCard div{
     font-size:11px;
-    padding:4px;
+    padding:5px;
     text-align:center;
+    line-height:1.2;
   }
 
 }
+
+/* hide drawer when modal closed */
 #modal:not(.open) #recommendDrawer{
-  display:none;
+  display:none !important;
 }
+
+/* ===============================
+   MOBILE PORTRAIT
+================================ */
 @media (max-width:900px) and (orientation:portrait){
 
+  /* move arrow higher */
   #mobileRecArrow{
-    bottom:110px;
+    bottom:120px;
   }
 
+  /* show one video per row */
   #mobileRecPanel{
     grid-template-columns:1fr;
     height:70%;
