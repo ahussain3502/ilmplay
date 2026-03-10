@@ -815,82 +815,74 @@ svg circle{
 
 /* ===============================
    MOBILE LANDSCAPE
-   (USE DESKTOP SYSTEM EXACTLY + TOUCH FIX)
+   (USE DESKTOP SYSTEM EXACTLY)
 ================================ */
 @media (max-width:900px) and (orientation:landscape){
 
-  /* larger tap target for arrow */
+   /* Do NOT disable desktop arrow */
   .recommendArrow{
     display:flex;
-    width:46px;
-    height:46px;
   }
 
-  /* ensure arrow is always clickable */
-  .recommendArrow,
-  .recommendArrow *{
-    pointer-events:auto;
-  }
-
-  /* drawer height same as desktop */
+  /* Use the same drawer as desktop */
   .recommendDrawer{
     height:80vh;
   }
 
-  /* keep 3 per row */
+  /* Keep the same recommendations grid */
   .recommendPanel{
     grid-template-columns: repeat(3, minmax(0,1fr));
   }
-
-  /* center close arrow properly */
   .drawerClose{
-    left:50%;
-    right:auto;
-    transform:translateX(-50%);
+    left:48%;
   }
-
 }
-
+/* ===============================
+   MOBILE PORTRAIT (FULL THUMBNAIL VISIBLE)
+================================ */
 @media (max-width:900px) and (orientation:portrait){
 
+  /* arrow position */
   .recommendArrow{
     bottom:310px;
-    width:46px;
-    height:46px;
   }
 
+  /* drawer height */
   .recommendDrawer{
     height:65vh;
   }
 
+  /* 1 video per row */
   .recommendPanel{
     grid-template-columns:1fr !important;
     gap:12px;
     padding:50px 0 16px 0;
-    justify-items:center;
   }
 
+  /* smaller centered card container */
   .recCard{
-    width:63%;
-    margin-left:auto;
-    margin-right:auto;
-  }
+  width:63%;
+  margin-left:10px;
+ }
 
+  /* thumbnail fully visible */
   .recCard img{
     width:100%;
     height:auto;
     aspect-ratio:16/9;
-    object-fit:contain;
+    object-fit:contain;   /* ensures entire image fits */
     background:#000;
     border-radius:8px;
   }
 
+  /* title text */
   .recCard div{
     font-size:13px;
     margin-top:6px;
     text-align:center;
   }
 
+  /* center drawer close arrow */
   .drawerClose{
     left:50%;
     right:auto;
