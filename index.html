@@ -838,7 +838,7 @@ svg circle{
   }
 }
 /* ===============================
-   MOBILE PORTRAIT (FULL THUMBNAIL VISIBLE)
+   MOBILE PORTRAIT (FULL THUMB FIX)
 ================================ */
 @media (max-width:900px) and (orientation:portrait){
 
@@ -852,37 +852,38 @@ svg circle{
     height:65vh;
   }
 
-  /* 1 video per row */
+  /* panel spacing */
   .recommendPanel{
     grid-template-columns:1fr !important;
     gap:12px;
-    padding:50px 0 16px 0;
+
+    padding:50px 16px 16px 16px; /* equal left/right spacing */
   }
 
-  /* smaller centered card container */
+  /* card fills row */
   .recCard{
-  width:70%;
-  margin-left:12px;
- }
+    width:100%;
+  }
 
   /* thumbnail fully visible */
   .recCard img{
     width:100%;
     height:auto;
     aspect-ratio:16/9;
-    object-fit:contain;   /* ensures entire image fits */
+    object-fit:contain;
     background:#000;
     border-radius:8px;
+
+    max-height:150px; /* keeps it from getting huge */
   }
 
-  /* title text */
+  /* title */
   .recCard div{
     font-size:13px;
     margin-top:6px;
-    text-align:center;
   }
 
-  /* center drawer close arrow */
+  /* center close arrow */
   .drawerClose{
     left:50%;
     right:auto;
