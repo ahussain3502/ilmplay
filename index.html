@@ -842,47 +842,34 @@ svg circle{
 ================================ */
 @media (max-width:900px) and (orientation:portrait){
 
-  /* arrow position */
-  .recommendArrow{
-    bottom:310px;
-  }
-
-  /* drawer height */
-  .recommendDrawer{
-    height:65vh;
-  }
-
-  /* 1 video per row */
   .recommendPanel{
     grid-template-columns:1fr !important;
     gap:12px;
     padding:50px 0 16px 0;
+    justify-items:center; /* ensure cards are centered */
   }
 
-  /* smaller centered card container */
   .recCard{
-  width:63%;
-  margin-left:10px;
- }
+    width:280px;        /* fixed pixel width */
+    margin-left:auto;    /* center horizontally */
+    margin-right:auto;
+  }
 
-  /* thumbnail fully visible */
   .recCard img{
     width:100%;
     height:auto;
     aspect-ratio:16/9;
-    object-fit:contain;   /* ensures entire image fits */
+    object-fit:contain;
     background:#000;
     border-radius:8px;
   }
 
-  /* title text */
   .recCard div{
     font-size:13px;
     margin-top:6px;
     text-align:center;
   }
 
-  /* center drawer close arrow */
   .drawerClose{
     left:50%;
     right:auto;
