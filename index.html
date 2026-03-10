@@ -839,53 +839,56 @@ svg circle{
 }
 
 /* ===============================
-   MOBILE PORTRAIT (1 VIDEO PER ROW)
+   MOBILE PORTRAIT (FIXED SIZE)
 ================================ */
 @media (max-width:900px) and (orientation:portrait){
 
-  /* raise the arrow slightly for phones */
+  /* move arrow higher */
   .recommendArrow{
-    bottom: 120px;
+    bottom:120px;
   }
 
-  /* make drawer slightly taller for scrolling */
+  /* slightly shorter drawer */
   .recommendDrawer{
-    height: 75vh;
+    height:70vh;
   }
 
-  /* ONE video per row */
+  /* ONE video per row with smaller spacing */
   .recommendPanel{
-    grid-template-columns: 1fr !important;
-    gap: 14px;
+    grid-template-columns:1fr !important;
+    gap:10px;
 
-    padding: 60px 14px 20px 14px;
+    padding:50px 10px 14px 10px;
   }
 
-  /* make card fill screen width */
+  /* smaller container */
   .recCard{
-    width: 100%;
+    width:100%;
+    max-width:92%;
+    margin:0 auto;
   }
 
-  /* large youtube-style thumbnail */
+  /* smaller thumbnail */
   .recCard img{
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
-    border-radius: 10px;
+    width:100%;
+    height:auto;
+    aspect-ratio:16/9;
+    object-fit:cover;
+
+    border-radius:8px;
   }
 
-  /* make text slightly larger for phones */
+  /* slightly smaller title */
   .recCard div{
-    font-size: 15px;
-    margin-top: 6px;
+    font-size:13px;
+    margin-top:4px;
   }
 
-  /* center the drawer close arrow */
+  /* center drawer close arrow */
   .drawerClose{
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
+    left:50%;
+    right:auto;
+    transform:translateX(-50%);
   }
 
 }
