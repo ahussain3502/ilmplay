@@ -1615,10 +1615,12 @@ let mouseOverVideoOrArrow = false;
 recommendArrow.classList.remove("show");
 
 function hideArrow() { recommendArrow.classList.remove("show"); }
+
 function showArrow() {
   if (!modal.classList.contains("open") || recommendDrawer.classList.contains("show")) return;
   recommendArrow.classList.add("show");
 }
+
 function resetArrowIdleTimer() {
   clearTimeout(arrowIdleTimer);
   arrowIdleTimer = setTimeout(() => {
@@ -1628,12 +1630,17 @@ function resetArrowIdleTimer() {
 
 player.addEventListener("mouseenter", () => { mouseOverVideoOrArrow = true; showArrow(); resetArrowIdleTimer(); });
 player.addEventListener("mouseleave", () => { mouseOverVideoOrArrow = false; hideArrow(); clearTimeout(arrowIdleTimer); });
+
 recommendArrow.addEventListener("mouseenter", () => { mouseOverVideoOrArrow = true; showArrow(); clearTimeout(arrowIdleTimer); });
 recommendArrow.addEventListener("mouseleave", () => { mouseOverVideoOrArrow = false; resetArrowIdleTimer(); });
+
 player.addEventListener("mousemove", (e) => {
   if (!modal.classList.contains("open") || recommendDrawer.classList.contains("show")) return;
+
   if (e.clientX !== lastMouseX || e.clientY !== lastMouseY) {
-    lastMouseX = e.clientX; lastMouseY = e.clientY;
+    lastMouseX = e.clientX;
+    lastMouseY = e.clientY;
+
     showArrow();
     resetArrowIdleTimer();
   }
@@ -1642,24 +1649,21 @@ player.addEventListener("mousemove", (e) => {
 /* ===============================
    DRAWER AND MODAL CONTROL
 ================================ */
-closeBtn.addEventListener("click", () => {
-  clearInterval(timer);
-  modal.classList.remove("open");
-  player.pause();
-  player.removeAttribute("src");
-  player.load();
-  recommendDrawer.classList.remove("show","mobile-ready");
-  hideArrow();
-  // hide mobile landscape UI
-  hideMobileLandscapeUI();
-});
 
-recommendArrow.onclick = () => {
+function openRecommendDrawer(){
+
+  /* Prevent ghost taps */
+  if(!recommendArrow.classList.contains("show")) return;
+
   drawerY = 0;
   recommendDrawer.classList.add("show");
   recommendDrawer.style.transform = "translateY(0)";
   hideArrow();
-};
+}
+
+/* Samsung touch fix */
+recommendArrow.addEventListener("touchstart", openRecommendDrawer, {passive:true});
+recommendArrow.addEventListener("click", openRecommendDrawer);
 
 drawerClose.onclick = () => {
   drawerY = 100;
@@ -1671,7 +1675,9 @@ drawerClose.onclick = () => {
 /* ===============================
    OPEN VIDEO
 ================================ */
+
 function openModal(v){
+
   clearInterval(timer);
   overlay.classList.add("hidden");
 
@@ -1690,7 +1696,6 @@ function openModal(v){
 
   hideArrow();
 
-  // MOBILE LANDSCAPE: show new arrow
   if(isMobile() && isLandscape()){
     showMobileLandscapeArrow();
   }
@@ -1699,6 +1704,7 @@ function openModal(v){
 /* ===============================
    PLAY VIDEO FROM LIST
 ================================ */
+
 function playFromList(fullList, vid){
   playlist = fullList;
   index = fullList.indexOf(vid);
@@ -1708,10 +1714,13 @@ function playFromList(fullList, vid){
 /* ===============================
    BUILD RECOMMENDATIONS
 ================================ */
+
 function buildRecommendations(){
+
   recommendPanel.innerHTML = "";
 
   playlist.forEach((v,i)=>{
+
     if(i===index) return;
 
     const card = document.createElement("div");
@@ -1719,10 +1728,13 @@ function buildRecommendations(){
     card.innerHTML = `<img src="${v.thumb}"><div>${v.title}</div>`;
 
     card.onclick = ()=>{
+
       index = i;
+
       player.src = v.file;
       modalTitle.textContent = v.title;
       modalDesc.textContent = v.desc;
+
       player.play().catch(()=>{});
 
       drawerY = 100;
@@ -1741,68 +1753,90 @@ function buildRecommendations(){
 /* ===============================
    AUTOPLAY NEXT VIDEO
 ================================ */
+
 player.addEventListener("ended",()=>{
+
   if(!autoplayToggle.checked) return;
+
   const nextIndex = (index + 1) % playlist.length;
   const nextVid = playlist[nextIndex];
 
   nextThumb.src = nextVid.thumb;
   nextTitle.textContent = nextVid.title;
+
   overlay.classList.remove("hidden");
 
   startCountdown(nextIndex);
 });
 
 function startCountdown(nextIndex){
+
   let time = 5;
   const circumference = 163;
+
   countEl.textContent = time;
   progressCircle.style.strokeDashoffset = 0;
 
   timer = setInterval(()=>{
+
     time--;
+
     countEl.textContent = time;
-    progressCircle.style.strokeDashoffset = circumference * (1 - time/5);
+
+    progressCircle.style.strokeDashoffset =
+      circumference * (1 - time/5);
+
     if(time <= 0){
+
       clearInterval(timer);
+
       index = nextIndex;
       openModal(playlist[index]);
+
     }
+
   },1000);
 }
 
 playNowBtn.onclick = () => {
-  clearInterval(timer);
-  index = (index + 1) % playlist.length;
-  openModal(playlist[index]);
-};
 
+  clearInterval(timer);
+
+  index = (index + 1) % playlist.length;
+
+  openModal(playlist[index]);
+
+};
 
 /* ===============================
    MOBILE LANDSCAPE RECOMMENDATIONS
 ================================ */
 
-// Show arrow only in mobile landscape
 function showMobileLandscapeArrow(){
+
   if(isMobile() && isLandscape()){
     mobileRecArrow.classList.add("show");
   }
+
 }
 
-// Hide arrow + panel when closing modal
 function hideMobileLandscapeUI(){
+
   mobileRecArrow.classList.remove("show");
   mobileRecPanel.classList.remove("show");
+
 }
 
-// Open recommendations panel
-mobileRecArrow.addEventListener("click", () => {
+/* OPEN MOBILE RECOMMENDATIONS */
+
+function openMobileRecommendations(){
+
+  if(!mobileRecArrow.classList.contains("show")) return;
 
   if(!(isMobile() && isLandscape())) return;
 
   mobileRecPanel.innerHTML = "";
 
-  /* Down arrow to close panel */
   const closeArrow = document.createElement("div");
   closeArrow.className = "mobileRecClose";
   closeArrow.innerHTML = "⌄";
@@ -1813,7 +1847,6 @@ mobileRecArrow.addEventListener("click", () => {
 
   mobileRecPanel.appendChild(closeArrow);
 
-  /* Build recommendations (3 per row) */
   playlist.forEach((v,i)=>{
 
     if(i === index) return;
@@ -1846,14 +1879,20 @@ mobileRecArrow.addEventListener("click", () => {
 
   mobileRecPanel.classList.add("show");
 
-});
+}
+
+/* Samsung touch fix */
+mobileRecArrow.addEventListener("touchstart", openMobileRecommendations, {passive:true});
+mobileRecArrow.addEventListener("click", openMobileRecommendations);
 
 /* ===============================
    CLOSE MODAL
 ================================ */
+
 closeBtn.onclick = () => {
 
   clearInterval(timer);
+
   modal.classList.remove("open");
 
   player.pause();
