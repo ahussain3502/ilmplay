@@ -629,6 +629,29 @@ svg circle{
   font-size:14px;
   margin-top:8px;
 }
+#playNowBtn {
+  background: linear-gradient(135deg, #00e5ff, #00aaff); /* subtle gradient */
+  color: #111; /* contrast text color */
+  font-weight: 600;
+  font-size: 16px; /* larger text */
+  padding: 10px 20px; /* bigger button area */
+  border: none;
+  border-radius: 12px; /* rounded corners */
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  margin-top: 12px; /* space below countdown */
+}
+
+#playNowBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+}
+
+#playNowBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
 /* =====================================================
    YOUTUBE POLISHED RECOMMENDATIONS — MERGED CSS
 ===================================================== */
@@ -1790,62 +1813,74 @@ function buildRecommendations(){
 
   });
 }
-
 /* ===============================
    AUTOPLAY NEXT VIDEO
 ================================ */
-player.addEventListener("ended",()=>{
+player.addEventListener("ended", () => {
 
-  if(!autoplayToggle.checked) return;
-
+  // Show next video overlay even if autoplay is off
   const nextIndex = (index + 1) % playlist.length;
   const nextVid = playlist[nextIndex];
-
   nextThumb.src = nextVid.thumb;
   nextTitle.textContent = nextVid.title;
-
   overlay.classList.remove("hidden");
 
-  startCountdown(nextIndex);
+  // Only start countdown if autoplay is checked
+  if (autoplayToggle.checked) {
+    startCountdown(nextIndex);
+  }
 
 });
 
+// Start countdown for autoplay
 function startCountdown(nextIndex){
-
   let time = 5;
   const circumference = 163;
 
   countEl.textContent = time;
   progressCircle.style.strokeDashoffset = 0;
 
-  timer = setInterval(()=>{
+  // Clear any existing countdown to avoid duplicates
+  clearInterval(timer);
+
+  timer = setInterval(() => {
+
+    // If user unticks autoplay, stop countdown immediately
+    if (!autoplayToggle.checked) {
+      clearInterval(timer);
+      countEl.textContent = ""; // optional: clear countdown text
+      progressCircle.style.strokeDashoffset = 0; // reset circle
+      return;
+    }
 
     time--;
     countEl.textContent = time;
+    progressCircle.style.strokeDashoffset = circumference * (1 - time / 5);
 
-    progressCircle.style.strokeDashoffset =
-      circumference * (1 - time/5);
-
-    if(time <= 0){
-
+    if (time <= 0) {
       clearInterval(timer);
       index = nextIndex;
-
       openModal(playlist[index]);
-
     }
 
-  },1000);
-
+  }, 1000);
 }
 
+// Play now button
 playNowBtn.onclick = () => {
-
   clearInterval(timer);
   index = (index + 1) % playlist.length;
   openModal(playlist[index]);
-
 };
+
+// Stop countdown immediately if user unticks autoplay
+autoplayToggle.addEventListener("change", () => {
+  if (!autoplayToggle.checked) {
+    clearInterval(timer);
+    countEl.textContent = ""; // optional: clear countdown display
+    progressCircle.style.strokeDashoffset = 0; // reset progress
+  }
+});
 
 /* ===============================
    MOBILE LANDSCAPE RECOMMENDATIONS
