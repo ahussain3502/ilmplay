@@ -629,29 +629,46 @@ svg circle{
   font-size:14px;
   margin-top:8px;
 }
+.buttonRow {
+  display: flex;
+  gap: 12px; /* space between buttons */
+  margin-top: 12px;
+}
+
+/* Play Now button style */
 #playNowBtn {
-  background: linear-gradient(135deg, #00e5ff, #00aaff); /* subtle gradient */
-  color: #111; /* contrast text color */
+  background: linear-gradient(135deg, #00e5ff, #00aaff);
+  color: #111;
   font-weight: 600;
-  font-size: 16px; /* larger text */
-  padding: 10px 20px; /* bigger button area */
+  font-size: 16px;
+  padding: 10px 20px;
   border: none;
-  border-radius: 12px; /* rounded corners */
+  border-radius: 12px;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  margin-top: 12px; /* space below countdown */
+  flex: 1; /* expands equally in row */
 }
 
-#playNowBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+#playNowBtn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.35); }
+#playNowBtn:active { transform: translateY(0); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
+/* Cancel button style (same as Play Now for consistency) */
+#cancelBtn {
+  background: linear-gradient(135deg, #ff4d4f, #ff1a1a); /* red gradient */
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  flex: 1;
 }
 
-#playNowBtn:active {
-  transform: translateY(0);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
+#cancelBtn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.35); }
+#cancelBtn:active { transform: translateY(0); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 /* =====================================================
    YOUTUBE POLISHED RECOMMENDATIONS — MERGED CSS
 ===================================================== */
@@ -1039,54 +1056,36 @@ if ("serviceWorker" in navigator) {
            preload="metadata">
     </video>
 
-    <!-- AUTOPLAY OVERLAY -->
-    <div id="nextOverlay" class="nextOverlay hidden">
+    
+ <!-- AUTOPLAY OVERLAY -->
+<div id="nextOverlay" class="nextOverlay hidden">
 
-      <div class="upNextCard">
+  <div class="upNextCard">
 
-        <img id="nextThumb">
+    <img id="nextThumb">
 
-        <div class="upNextInfo">
+    <div class="upNextInfo">
 
-          <div class="upNextLabel">
-            Up Next
-          </div>
+      <div class="upNextLabel">Up Next</div>
 
-          <div id="nextTitle"></div>
+      <div id="nextTitle"></div>
 
-          <div class="countdownWrap">
-
-            <svg width="60" height="60">
-              <circle class="bg"
-                      cx="30"
-                      cy="30"
-                      r="26"></circle>
-
-              <circle id="progressCircle"
-                      class="progress"
-                      cx="30"
-                      cy="30"
-                      r="26"></circle>
-            </svg>
-
-            <span id="count">5</span>
-
-          </div>
-
-          <button id="playNowBtn">
-            Play Now
-          </button>
-
-          <label class="autoToggle">
-            <input type="checkbox"
-                   id="autoplayToggle"
-                   checked>
-            Autoplay
-          </label>
-
-        </div>
+      <div class="countdownWrap">
+        <svg width="60" height="60">
+          <circle class="bg" cx="30" cy="30" r="26"></circle>
+          <circle id="progressCircle" class="progress" cx="30" cy="30" r="26"></circle>
+        </svg>
+        <span id="count">5</span>
       </div>
+
+      <div class="buttonRow">
+        <button id="playNowBtn">Play Now</button>
+        <button id="cancelBtn">Cancel</button>
+      </div>
+
     </div>
+  </div>
+</div>
 
     <!-- VIDEO INFO -->
     <div class="modal-info">
@@ -1814,74 +1813,66 @@ function buildRecommendations(){
   });
 }
 /* ===============================
-   AUTOPLAY NEXT VIDEO
+   NEXT VIDEO OVERLAY (Play Now + Cancel)
 ================================ */
+
+// Show next video overlay when video ends
 player.addEventListener("ended", () => {
 
-  // Show next video overlay even if autoplay is off
+  // Determine next video in playlist
   const nextIndex = (index + 1) % playlist.length;
   const nextVid = playlist[nextIndex];
+
+  // Update overlay content
   nextThumb.src = nextVid.thumb;
   nextTitle.textContent = nextVid.title;
   overlay.classList.remove("hidden");
 
-  // Only start countdown if autoplay is checked
-  if (autoplayToggle.checked) {
-    startCountdown(nextIndex);
-  }
+  // Reset countdown
+  countEl.textContent = 5;
+  progressCircle.style.strokeDashoffset = 0;
 
+  // Start countdown
+  startCountdown(nextIndex);
 });
 
-// Start countdown for autoplay
+// Countdown function for next video
 function startCountdown(nextIndex){
   let time = 5;
   const circumference = 163;
 
-  countEl.textContent = time;
-  progressCircle.style.strokeDashoffset = 0;
-
-  // Clear any existing countdown to avoid duplicates
+  // Clear any previous interval
   clearInterval(timer);
 
   timer = setInterval(() => {
-
-    // If user unticks autoplay, stop countdown immediately
-    if (!autoplayToggle.checked) {
-      clearInterval(timer);
-      countEl.textContent = ""; // optional: clear countdown text
-      progressCircle.style.strokeDashoffset = 0; // reset circle
-      return;
-    }
-
     time--;
     countEl.textContent = time;
     progressCircle.style.strokeDashoffset = circumference * (1 - time / 5);
 
-    if (time <= 0) {
+    if(time <= 0){
       clearInterval(timer);
       index = nextIndex;
+      overlay.classList.add("hidden");
       openModal(playlist[index]);
     }
-
   }, 1000);
 }
 
-// Play now button
+// Play Now button functionality
 playNowBtn.onclick = () => {
   clearInterval(timer);
   index = (index + 1) % playlist.length;
+  overlay.classList.add("hidden");
   openModal(playlist[index]);
 };
 
-// Stop countdown immediately if user unticks autoplay
-autoplayToggle.addEventListener("change", () => {
-  if (!autoplayToggle.checked) {
-    clearInterval(timer);
-    countEl.textContent = ""; // optional: clear countdown display
-    progressCircle.style.strokeDashoffset = 0; // reset progress
-  }
-});
-
+// Cancel button functionality
+cancelBtn.onclick = () => {
+  clearInterval(timer);            // stop countdown immediately
+  overlay.classList.add("hidden"); // hide overlay
+  countEl.textContent = "";        // reset countdown text
+  progressCircle.style.strokeDashoffset = 0; // reset circle
+};
 /* ===============================
    MOBILE LANDSCAPE RECOMMENDATIONS
 ================================ */
