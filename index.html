@@ -631,10 +631,11 @@ svg circle{
 }
 .buttonRow{
   display:flex;
-  gap:12px;
+  gap:10px;
   margin-top:12px;
 
-  justify-content:flex-start; /* moves buttons slightly left */
+  justify-content:flex-start;
+  margin-left:-6px; /* moves buttons slightly left */
 }
 
 /* shared button style */
@@ -643,15 +644,15 @@ svg circle{
   font-weight:600;
   font-size:16px;
 
-  padding:8px 24px; /* less vertical, more horizontal */
+  padding:7px 22px; /* slightly less vertical, enough horizontal */
 
   border:none;
   border-radius:12px;
   cursor:pointer;
 
-  white-space:nowrap; /* prevents "Play Now" from wrapping */
+  white-space:nowrap; /* prevents Play Now wrapping */
 
-  min-width:140px; /* ensures both buttons stay same width */
+  min-width:130px; /* keeps both buttons same size */
 
   transition:transform .2s ease, box-shadow .2s ease;
 }
