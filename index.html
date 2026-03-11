@@ -633,45 +633,37 @@ svg circle{
   display:flex;
   gap:10px;
   margin-top:12px;
-
-  justify-content:flex-start;
-  margin-left:-6px; /* moves buttons slightly left */
+  margin-left:-6px;   /* moves both buttons slightly left */
 }
 
-/* shared button style */
+/* BOTH BUTTONS */
 #playNowBtn,
 #cancelBtn{
+  flex:0 0 140px;        /* fixed width so text fits */
+  white-space:nowrap;    /* prevents "Play Now" wrapping */
+  padding:8px 16px;      /* less vertical height */
+  font-size:15px;
   font-weight:600;
-  font-size:16px;
-
-  padding:7px 22px; /* slightly less vertical, enough horizontal */
-
   border:none;
-  border-radius:12px;
+  border-radius:10px;
   cursor:pointer;
-
-  white-space:nowrap; /* prevents Play Now wrapping */
-
-  min-width:130px; /* keeps both buttons same size */
-
   transition:transform .2s ease, box-shadow .2s ease;
 }
 
-/* Play Now button */
+/* Play Now */
 #playNowBtn{
   background:linear-gradient(135deg,#00e5ff,#00aaff);
   color:#111;
   box-shadow:0 4px 10px rgba(0,0,0,.3);
 }
 
-/* Cancel button */
+/* Cancel */
 #cancelBtn{
   background:linear-gradient(135deg,#ff4d4f,#ff1a1a);
   color:#fff;
-  box-shadow:0 4px 10px rgba(0,0,0,.3);
 }
 
-/* hover effects */
+/* Hover effects */
 #playNowBtn:hover,
 #cancelBtn:hover{
   transform:translateY(-2px);
