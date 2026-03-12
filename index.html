@@ -1607,19 +1607,14 @@ const recommendPanel = document.getElementById("recommendPanel");
    FULLSCREEN FIX (so overlay works)
 ================================ */
 document.addEventListener("fullscreenchange", () => {
-
   if(document.fullscreenElement === player){
-
     document.exitFullscreen();
-
     setTimeout(()=>{
       if(!document.fullscreenElement){
         modal.requestFullscreen().catch(()=>{});
       }
     },50);
-
   }
-
 });
 
 /* ===============================
@@ -1836,6 +1831,7 @@ function buildRecommendations(){
    NEXT VIDEO OVERLAY (Play Now + Cancel)
 ================================ */
 
+// Show next video overlay when video ends
 player.addEventListener("ended", () => {
 
   const nextIndex = (index + 1) % playlist.length;
@@ -1851,6 +1847,7 @@ player.addEventListener("ended", () => {
   startCountdown(nextIndex);
 });
 
+// Countdown function for next video
 function startCountdown(nextIndex){
   let time = 5;
   const circumference = 163;
