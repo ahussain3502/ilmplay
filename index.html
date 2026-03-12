@@ -1628,6 +1628,21 @@ function isMobile(){ return window.innerWidth <= 900; }
 function isLandscape(){ return window.innerWidth > window.innerHeight; }
 
 /* ===============================
+   FULLSCREEN FIX (keeps overlay visible)
+================================ */
+document.addEventListener("fullscreenchange", () => {
+
+  if(document.fullscreenElement === player){
+    document.exitFullscreen().then(()=>{
+      if(!document.fullscreenElement){
+        modal.requestFullscreen().catch(()=>{});
+      }
+    });
+  }
+
+});
+
+/* ===============================
    ARROW VISIBILITY CONTROL (DESKTOP)
 ================================ */
 let lastMouseX = 0;
@@ -1812,36 +1827,30 @@ function buildRecommendations(){
 
   });
 }
+
 /* ===============================
    NEXT VIDEO OVERLAY (Play Now + Cancel)
 ================================ */
 
-// Show next video overlay when video ends
 player.addEventListener("ended", () => {
 
-  // Determine next video in playlist
   const nextIndex = (index + 1) % playlist.length;
   const nextVid = playlist[nextIndex];
 
-  // Update overlay content
   nextThumb.src = nextVid.thumb;
   nextTitle.textContent = nextVid.title;
   overlay.classList.remove("hidden");
 
-  // Reset countdown
   countEl.textContent = 5;
   progressCircle.style.strokeDashoffset = 0;
 
-  // Start countdown
   startCountdown(nextIndex);
 });
 
-// Countdown function for next video
 function startCountdown(nextIndex){
   let time = 5;
   const circumference = 163;
 
-  // Clear any previous interval
   clearInterval(timer);
 
   timer = setInterval(() => {
@@ -1858,7 +1867,6 @@ function startCountdown(nextIndex){
   }, 1000);
 }
 
-// Play Now button functionality
 playNowBtn.onclick = () => {
   clearInterval(timer);
   index = (index + 1) % playlist.length;
@@ -1866,13 +1874,13 @@ playNowBtn.onclick = () => {
   openModal(playlist[index]);
 };
 
-// Cancel button functionality
 cancelBtn.onclick = () => {
-  clearInterval(timer);            // stop countdown immediately
-  overlay.classList.add("hidden"); // hide overlay
-  countEl.textContent = "";        // reset countdown text
-  progressCircle.style.strokeDashoffset = 0; // reset circle
+  clearInterval(timer);
+  overlay.classList.add("hidden");
+  countEl.textContent = "";
+  progressCircle.style.strokeDashoffset = 0;
 };
+
 /* ===============================
    MOBILE LANDSCAPE RECOMMENDATIONS
 ================================ */
@@ -1944,6 +1952,7 @@ function openMobileRecPanel(e){
 
 mobileRecArrow.addEventListener("touchstart", openMobileRecPanel,{passive:false});
 mobileRecArrow.addEventListener("click", openMobileRecPanel);
+
 /* ===============================
    CLOSE MODAL
 ================================ */
