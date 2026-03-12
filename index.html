@@ -1604,37 +1604,12 @@ const drawerClose = document.getElementById("drawerClose");
 const recommendPanel = document.getElementById("recommendPanel");
 
 /* ===============================
-   FULLSCREEN FIX (so overlay works)
-================================ */
-document.addEventListener("fullscreenchange", () => {
-  if(document.fullscreenElement === player){
-    document.exitFullscreen();
-    setTimeout(()=>{
-      if(!document.fullscreenElement){
-        modal.requestFullscreen().catch(()=>{});
-      }
-    },50);
-  }
-});
-
-/* ===============================
-   MOBILE LANDSCAPE ELEMENTS
-================================ */
-const mobileRecArrow = document.getElementById("mobileRecArrow");
-const mobileRecPanel = document.getElementById("mobileRecPanel");
-
-/* ===============================
    STATE
 ================================ */
 let playlist = [];
 let index = 0;
 let timer;
-
-let dragging = false;
-let startY = 0;
-let drawerY = 72;
-
-let arrowIdleTimer;
+let isFullscreen = false;  // Track fullscreen state
 
 /* ===============================
    UTILS
@@ -1643,118 +1618,9 @@ function isMobile(){ return window.innerWidth <= 900; }
 function isLandscape(){ return window.innerWidth > window.innerHeight; }
 
 /* ===============================
-   ARROW VISIBILITY CONTROL (DESKTOP)
-================================ */
-let lastMouseX = 0;
-let lastMouseY = 0;
-let mouseOverVideoOrArrow = false;
-
-recommendArrow.classList.remove("show");
-
-function hideArrow() { recommendArrow.classList.remove("show"); }
-
-function showArrow() {
-  if (!modal.classList.contains("open") || recommendDrawer.classList.contains("show")) return;
-  recommendArrow.classList.add("show");
-}
-
-function resetArrowIdleTimer() {
-  clearTimeout(arrowIdleTimer);
-  arrowIdleTimer = setTimeout(() => {
-    if (!mouseOverVideoOrArrow) hideArrow();
-  }, 2000);
-}
-
-player.addEventListener("mouseenter", () => {
-  mouseOverVideoOrArrow = true;
-  showArrow();
-  resetArrowIdleTimer();
-});
-
-player.addEventListener("mouseleave", () => {
-  mouseOverVideoOrArrow = false;
-  hideArrow();
-  clearTimeout(arrowIdleTimer);
-});
-
-recommendArrow.addEventListener("mouseenter", () => {
-  mouseOverVideoOrArrow = true;
-  showArrow();
-  clearTimeout(arrowIdleTimer);
-});
-
-recommendArrow.addEventListener("mouseleave", () => {
-  mouseOverVideoOrArrow = false;
-  resetArrowIdleTimer();
-});
-
-player.addEventListener("mousemove", (e) => {
-  if (!modal.classList.contains("open") || recommendDrawer.classList.contains("show")) return;
-
-  if (e.clientX !== lastMouseX || e.clientY !== lastMouseY) {
-    lastMouseX = e.clientX;
-    lastMouseY = e.clientY;
-    showArrow();
-    resetArrowIdleTimer();
-  }
-});
-
-/* ===============================
-   MOBILE TAP FIX (Samsung)
-================================ */
-
-player.addEventListener("touchstart", () => {
-
-  if(!isMobile()) return;
-  if(!modal.classList.contains("open")) return;
-  if(recommendDrawer.classList.contains("show")) return;
-
-  showArrow();
-
-},{passive:true});
-
-/* ===============================
-   DRAWER AND MODAL CONTROL
-================================ */
-
-function openRecommendDrawer(e){
-
-  if(!recommendArrow.classList.contains("show")) return;
-
-  e.preventDefault();
-
-  drawerY = 0;
-  recommendDrawer.classList.add("show");
-  recommendDrawer.style.transform = "translateY(0)";
-  hideArrow();
-}
-
-recommendArrow.addEventListener("touchstart", openRecommendDrawer,{passive:false});
-recommendArrow.addEventListener("click", openRecommendDrawer);
-
-drawerClose.onclick = () => {
-  drawerY = 100;
-  recommendDrawer.classList.remove("show","mobile-ready");
-  recommendDrawer.style.transform = "translateY(100%)";
-  hideArrow();
-};
-
-closeBtn.addEventListener("click", () => {
-  clearInterval(timer);
-  modal.classList.remove("open");
-  player.pause();
-  player.removeAttribute("src");
-  player.load();
-  recommendDrawer.classList.remove("show","mobile-ready");
-  hideArrow();
-  hideMobileLandscapeUI();
-});
-
-/* ===============================
    OPEN VIDEO
 ================================ */
 function openModal(v){
-
   clearInterval(timer);
   overlay.classList.add("hidden");
 
@@ -1768,14 +1634,7 @@ function openModal(v){
 
   buildRecommendations();
 
-  drawerY = 72;
-  recommendDrawer.classList.remove("show","mobile-ready");
-
   hideArrow();
-
-  if(isMobile() && isLandscape()){
-    showMobileLandscapeArrow();
-  }
 }
 
 /* ===============================
@@ -1791,39 +1650,25 @@ function playFromList(fullList, vid){
    BUILD RECOMMENDATIONS
 ================================ */
 function buildRecommendations(){
-
   recommendPanel.innerHTML = "";
 
   playlist.forEach((v,i)=>{
-
     if(i===index) return;
 
     const card = document.createElement("div");
     card.className = "recCard";
-
     card.innerHTML = `<img src="${v.thumb}"><div>${v.title}</div>`;
 
     card.onclick = ()=>{
-
       index = i;
-
       player.src = v.file;
       modalTitle.textContent = v.title;
       modalDesc.textContent = v.desc;
-
       player.play().catch(()=>{});
-
-      drawerY = 100;
-      recommendDrawer.classList.remove("show","mobile-ready");
-      recommendDrawer.style.transform = "translateY(100%)";
-
-      hideArrow();
-
       buildRecommendations();
     };
 
     recommendPanel.appendChild(card);
-
   });
 }
 
@@ -1833,18 +1678,26 @@ function buildRecommendations(){
 
 // Show next video overlay when video ends
 player.addEventListener("ended", () => {
-
   const nextIndex = (index + 1) % playlist.length;
   const nextVid = playlist[nextIndex];
 
+  // Update overlay content
   nextThumb.src = nextVid.thumb;
   nextTitle.textContent = nextVid.title;
   overlay.classList.remove("hidden");
 
+  // Reset countdown
   countEl.textContent = 5;
   progressCircle.style.strokeDashoffset = 0;
 
-  startCountdown(nextIndex);
+  // Stop video from automatically skipping if fullscreen
+  if (isFullscreen) {
+    startCountdown(nextIndex);
+  } else {
+    index = nextIndex;  // Skip automatically if not fullscreen
+    overlay.classList.add("hidden");
+    openModal(playlist[index]);
+  }
 });
 
 // Countdown function for next video
@@ -1852,6 +1705,7 @@ function startCountdown(nextIndex){
   let time = 5;
   const circumference = 163;
 
+  // Clear any previous interval
   clearInterval(timer);
 
   timer = setInterval(() => {
@@ -1868,6 +1722,7 @@ function startCountdown(nextIndex){
   }, 1000);
 }
 
+// Play Now button functionality
 playNowBtn.onclick = () => {
   clearInterval(timer);
   index = (index + 1) % playlist.length;
@@ -1875,6 +1730,7 @@ playNowBtn.onclick = () => {
   openModal(playlist[index]);
 };
 
+// Cancel button functionality
 cancelBtn.onclick = () => {
   clearInterval(timer);
   overlay.classList.add("hidden");
@@ -1883,82 +1739,24 @@ cancelBtn.onclick = () => {
 };
 
 /* ===============================
-   MOBILE LANDSCAPE RECOMMENDATIONS
+   FULLSCREEN FIX: Ensure overlay works in fullscreen
 ================================ */
+document.addEventListener("fullscreenchange", () => {
+  isFullscreen = document.fullscreenElement ? true : false;
+});
 
-function showMobileLandscapeArrow(){
-  if(isMobile() && isLandscape()){
-    mobileRecArrow.classList.add("show");
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    player.requestFullscreen().catch((err) => console.error(err));
+  } else {
+    document.exitFullscreen();
   }
 }
-
-function hideMobileLandscapeUI(){
-  mobileRecArrow.classList.remove("show");
-  mobileRecPanel.classList.remove("show");
-}
-
-function openMobileRecPanel(e){
-
-  if(!mobileRecArrow.classList.contains("show")) return;
-
-  e.preventDefault();
-
-  if(!(isMobile() && isLandscape())) return;
-
-  mobileRecPanel.innerHTML = "";
-
-  const closeArrow = document.createElement("div");
-  closeArrow.className = "mobileRecClose";
-  closeArrow.innerHTML = "⌄";
-
-  closeArrow.onclick = () => {
-    mobileRecPanel.classList.remove("show");
-  };
-
-  mobileRecPanel.appendChild(closeArrow);
-
-  playlist.forEach((v,i)=>{
-
-    if(i === index) return;
-
-    const card = document.createElement("div");
-    card.className = "recCard";
-
-    card.innerHTML = `
-      <img src="${v.thumb}">
-      <div>${v.title}</div>
-    `;
-
-    card.onclick = () => {
-
-      index = i;
-
-      player.src = v.file;
-      modalTitle.textContent = v.title;
-      modalDesc.textContent = v.desc;
-
-      player.play().catch(()=>{});
-
-      mobileRecPanel.classList.remove("show");
-
-    };
-
-    mobileRecPanel.appendChild(card);
-
-  });
-
-  mobileRecPanel.classList.add("show");
-
-}
-
-mobileRecArrow.addEventListener("touchstart", openMobileRecPanel,{passive:false});
-mobileRecArrow.addEventListener("click", openMobileRecPanel);
 
 /* ===============================
    CLOSE MODAL
 ================================ */
 closeBtn.onclick = () => {
-
   clearInterval(timer);
   modal.classList.remove("open");
 
@@ -1970,7 +1768,6 @@ closeBtn.onclick = () => {
   recommendArrow.classList.remove("show");
 
   hideMobileLandscapeUI();
-
 };
   /* -----------------------------
       NAVIGATION
