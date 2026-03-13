@@ -921,6 +921,17 @@ svg circle{
   }
 
 }
+  #playerContainer:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  background: black;
+}
+
+#playerContainer:fullscreen video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 </style>
 
 <link rel="manifest" href="/manifest.json">
@@ -1585,6 +1596,7 @@ function buildRow(sectionName, fullList, slice){
 ================================ */
 const modal = document.getElementById("modal");
 const player = document.getElementById("player");
+const playerContainer = document.getElementById("playerContainer"); // added
 const modalTitle = document.getElementById("modalTitle");
 const modalDesc = document.getElementById("modalDesc");
 const closeBtn = document.getElementById("closeBtn");
@@ -1609,7 +1621,7 @@ const recommendPanel = document.getElementById("recommendPanel");
 let playlist = [];
 let index = 0;
 let timer;
-let isFullscreen = false;  // Track fullscreen state
+let isFullscreen = false;
 
 /* ===============================
    UTILS
@@ -1676,39 +1688,31 @@ function buildRecommendations(){
    NEXT VIDEO OVERLAY (Play Now + Cancel)
 ================================ */
 
-// Show next video overlay when video ends
 player.addEventListener("ended", () => {
 
   const nextIndex = (index + 1) % playlist.length;
   const nextVid = playlist[nextIndex];
 
-  // Update overlay content
   nextThumb.src = nextVid.thumb;
   nextTitle.textContent = nextVid.title;
 
-  // If fullscreen, exit it first so overlay can appear
   if (isFullscreen) {
     document.exitFullscreen().catch(()=>{});
   }
 
-  // Show overlay screen
   overlay.classList.remove("hidden");
 
-  // Reset countdown
   countEl.textContent = 5;
   progressCircle.style.strokeDashoffset = 0;
 
-  // Start countdown
   startCountdown(nextIndex);
 
 });
 
-// Countdown function for next video
 function startCountdown(nextIndex){
   let time = 5;
   const circumference = 163;
 
-  // Clear any previous interval
   clearInterval(timer);
 
   timer = setInterval(() => {
@@ -1730,31 +1734,22 @@ function startCountdown(nextIndex){
     }
 
   },1000);
-
 }
 
-// Play Now button functionality
 playNowBtn.onclick = () => {
 
   clearInterval(timer);
-
   index = (index + 1) % playlist.length;
-
   overlay.classList.add("hidden");
-
   openModal(playlist[index]);
 
 };
 
-// Cancel button functionality
 cancelBtn.onclick = () => {
 
   clearInterval(timer);
-
   overlay.classList.add("hidden");
-
   countEl.textContent = "";
-
   progressCircle.style.strokeDashoffset = 0;
 
 };
@@ -1764,22 +1759,39 @@ cancelBtn.onclick = () => {
 ================================ */
 
 document.addEventListener("fullscreenchange", () => {
-
   isFullscreen = !!document.fullscreenElement;
-
 });
 
-// Optional fullscreen toggle helper
-function toggleFullscreen(){
+/* ===============================
+   FORCE FULLSCREEN ON CONTAINER
+================================ */
 
-  if(!document.fullscreenElement){
+player.addEventListener("fullscreenchange", () => {
 
-    player.requestFullscreen().catch(()=>{});
-
-  }else{
+  if (document.fullscreenElement === player) {
 
     document.exitFullscreen().catch(()=>{});
 
+    setTimeout(() => {
+      playerContainer.requestFullscreen().catch(()=>{});
+    },50);
+
+  }
+
+});
+
+/* Safari / iOS fix */
+player.addEventListener("webkitbeginfullscreen", () => {
+  playerContainer.requestFullscreen().catch(()=>{});
+});
+
+/* Optional fullscreen toggle helper */
+function toggleFullscreen(){
+
+  if(!document.fullscreenElement){
+    playerContainer.requestFullscreen().catch(()=>{});
+  }else{
+    document.exitFullscreen().catch(()=>{});
   }
 
 }
