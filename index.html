@@ -1678,26 +1678,29 @@ function buildRecommendations(){
 
 // Show next video overlay when video ends
 player.addEventListener("ended", () => {
+
   const nextIndex = (index + 1) % playlist.length;
   const nextVid = playlist[nextIndex];
 
   // Update overlay content
   nextThumb.src = nextVid.thumb;
   nextTitle.textContent = nextVid.title;
+
+  // If fullscreen, exit it first so overlay can appear
+  if (isFullscreen) {
+    document.exitFullscreen().catch(()=>{});
+  }
+
+  // Show overlay screen
   overlay.classList.remove("hidden");
 
   // Reset countdown
   countEl.textContent = 5;
   progressCircle.style.strokeDashoffset = 0;
 
-  // Stop video from automatically skipping if fullscreen
-  if (isFullscreen) {
-    startCountdown(nextIndex);
-  } else {
-    index = nextIndex;  // Skip automatically if not fullscreen
-    overlay.classList.add("hidden");
-    openModal(playlist[index]);
-  }
+  // Start countdown
+  startCountdown(nextIndex);
+
 });
 
 // Countdown function for next video
@@ -1709,48 +1712,76 @@ function startCountdown(nextIndex){
   clearInterval(timer);
 
   timer = setInterval(() => {
+
     time--;
     countEl.textContent = time;
-    progressCircle.style.strokeDashoffset = circumference * (1 - time / 5);
+
+    progressCircle.style.strokeDashoffset =
+      circumference * (1 - time / 5);
 
     if(time <= 0){
+
       clearInterval(timer);
       index = nextIndex;
+
       overlay.classList.add("hidden");
       openModal(playlist[index]);
+
     }
-  }, 1000);
+
+  },1000);
+
 }
 
 // Play Now button functionality
 playNowBtn.onclick = () => {
+
   clearInterval(timer);
+
   index = (index + 1) % playlist.length;
+
   overlay.classList.add("hidden");
+
   openModal(playlist[index]);
+
 };
 
 // Cancel button functionality
 cancelBtn.onclick = () => {
+
   clearInterval(timer);
+
   overlay.classList.add("hidden");
+
   countEl.textContent = "";
+
   progressCircle.style.strokeDashoffset = 0;
+
 };
 
 /* ===============================
-   FULLSCREEN FIX: Ensure overlay works in fullscreen
+   FULLSCREEN STATE TRACKING
 ================================ */
+
 document.addEventListener("fullscreenchange", () => {
-  isFullscreen = document.fullscreenElement ? true : false;
+
+  isFullscreen = !!document.fullscreenElement;
+
 });
 
-function toggleFullscreen() {
-  if (!document.fullscreenElement) {
-    player.requestFullscreen().catch((err) => console.error(err));
-  } else {
-    document.exitFullscreen();
+// Optional fullscreen toggle helper
+function toggleFullscreen(){
+
+  if(!document.fullscreenElement){
+
+    player.requestFullscreen().catch(()=>{});
+
+  }else{
+
+    document.exitFullscreen().catch(()=>{});
+
   }
+
 }
 
 /* ===============================
