@@ -1536,60 +1536,55 @@ if ("serviceWorker" in navigator) {
     if (e.target === donationModal) closeDonationModal();
   });
 /* =====================================================
-YOUTUBE POLISHED VIDEO PLAYER + RECOMMENDATIONS
-— FULL JS WITH AUTOPLAY AND MOBILE LANDSCAPE
+   YOUTUBE POLISHED VIDEO PLAYER + RECOMMENDATIONS
+   — FULL JS WITH AUTOPLAY AND MOBILE LANDSCAPE
 ===================================================== */
 
 /* ===============================
-VIDEO GRID BUILDER
+   VIDEO GRID BUILDER
 ================================ */
 function buildRow(sectionName, fullList, slice){
-const wrapper = document.createElement("div");
-wrapper.className = "rowWrapper";
+  const wrapper = document.createElement("div");
+  wrapper.className = "rowWrapper";
 
-const row = document.createElement("div");
-row.className = "row";
+  const row = document.createElement("div");
+  row.className = "row";
 
-slice.forEach(v => {
-const tile = document.createElement("div");
-tile.className = "tile";
+  slice.forEach(v => {
+    const tile = document.createElement("div");
+    tile.className = "tile";
 
-```
-const img = document.createElement("img");
-img.src = v.thumb || PLACEHOLDER;
+    const img = document.createElement("img");
+    img.src = v.thumb || PLACEHOLDER;
 
-const title = document.createElement("div");
-title.className = "tile-title";
-title.textContent = v.title;
+    const title = document.createElement("div");
+    title.className = "tile-title";
+    title.textContent = v.title;
 
-tile.append(img, title);
-tile.onclick = () => playFromList(fullList, v);
+    tile.append(img, title);
+    tile.onclick = () => playFromList(fullList, v);
 
-row.appendChild(tile);
-```
+    row.appendChild(tile);
+  });
 
-});
-
-wrapper.appendChild(row);
-const sectionEl = document.getElementById("rows-" + sectionName);
-if(sectionEl) sectionEl.appendChild(wrapper);
+  wrapper.appendChild(row);
+  const sectionEl = document.getElementById("rows-" + sectionName);
+  if(sectionEl) sectionEl.appendChild(wrapper);
 }
 
 /* Build grids for all categories */
 [STORIES, NASHEEDS, DUAS, CARTOONS].forEach((list, i) => {
-const names = ["Stories", "Nasheeds", "Duas", "Cartoons"];
-for(let x = 0; x < list.length; x += 8){
-buildRow(names[i], list, list.slice(x, x + 8));
-}
+  const names = ["Stories", "Nasheeds", "Duas", "Cartoons"];
+  for(let x = 0; x < list.length; x += 8){
+    buildRow(names[i], list, list.slice(x, x + 8));
+  }
 });
 
 /* ===============================
-ELEMENTS
+   ELEMENTS
 ================================ */
 const modal = document.getElementById("modal");
 const player = document.getElementById("player");
-const playerContainer = document.getElementById("playerContainer");
-
 const modalTitle = document.getElementById("modalTitle");
 const modalDesc = document.getElementById("modalDesc");
 const closeBtn = document.getElementById("closeBtn");
@@ -1607,54 +1602,38 @@ const recommendDrawer = document.getElementById("recommendDrawer");
 const recommendArrow = document.getElementById("recommendArrow");
 const drawerClose = document.getElementById("drawerClose");
 const recommendPanel = document.getElementById("recommendPanel");
-
 /* ===============================
-FULLSCREEN FIX (CRITICAL)
-Forces fullscreen to container
-so overlay works
+   FULLSCREEN FIX (so overlay works)
 ================================ */
 
-document.addEventListener("fullscreenchange", () => {
+player.addEventListener("fullscreenchange", () => {
 
-if (document.fullscreenElement === player) {
+  if (document.fullscreenElement === player) {
 
-```
-document.exitFullscreen().catch(()=>{});
+    document.exitFullscreen().catch(()=>{});
 
-setTimeout(() => {
+    setTimeout(() => {
 
-  if (!document.fullscreenElement) {
-    playerContainer.requestFullscreen().catch(()=>{});
+      const container = document.getElementById("playerContainer");
+
+      if (container && !document.fullscreenElement) {
+        container.requestFullscreen().catch(()=>{});
+      }
+
+    }, 50);
+
   }
-
-},40);
-```
-
-}
-
-});
-
-/* Safari / iOS fullscreen */
-player.addEventListener("webkitbeginfullscreen", () => {
-
-setTimeout(() => {
-
-```
-playerContainer.requestFullscreen().catch(()=>{});
-```
-
-},40);
 
 });
 
 /* ===============================
-MOBILE LANDSCAPE ELEMENTS
+   MOBILE LANDSCAPE ELEMENTS
 ================================ */
 const mobileRecArrow = document.getElementById("mobileRecArrow");
 const mobileRecPanel = document.getElementById("mobileRecPanel");
 
 /* ===============================
-STATE
+   STATE
 ================================ */
 let playlist = [];
 let index = 0;
@@ -1667,13 +1646,13 @@ let drawerY = 72;
 let arrowIdleTimer;
 
 /* ===============================
-UTILS
+   UTILS
 ================================ */
 function isMobile(){ return window.innerWidth <= 900; }
 function isLandscape(){ return window.innerWidth > window.innerHeight; }
 
 /* ===============================
-ARROW VISIBILITY CONTROL
+   ARROW VISIBILITY CONTROL (DESKTOP)
 ================================ */
 let lastMouseX = 0;
 let lastMouseY = 0;
@@ -1681,388 +1660,325 @@ let mouseOverVideoOrArrow = false;
 
 recommendArrow.classList.remove("show");
 
-function hideArrow(){ recommendArrow.classList.remove("show"); }
+function hideArrow() { recommendArrow.classList.remove("show"); }
 
-function showArrow(){
-if (!modal.classList.contains("open") || recommendDrawer.classList.contains("show")) return;
-recommendArrow.classList.add("show");
+function showArrow() {
+  if (!modal.classList.contains("open") || recommendDrawer.classList.contains("show")) return;
+  recommendArrow.classList.add("show");
 }
 
-function resetArrowIdleTimer(){
-clearTimeout(arrowIdleTimer);
-arrowIdleTimer = setTimeout(()=>{
-if(!mouseOverVideoOrArrow) hideArrow();
-},2000);
+function resetArrowIdleTimer() {
+  clearTimeout(arrowIdleTimer);
+  arrowIdleTimer = setTimeout(() => {
+    if (!mouseOverVideoOrArrow) hideArrow();
+  }, 2000);
 }
 
-player.addEventListener("mouseenter",()=>{
-mouseOverVideoOrArrow=true;
-showArrow();
-resetArrowIdleTimer();
+player.addEventListener("mouseenter", () => {
+  mouseOverVideoOrArrow = true;
+  showArrow();
+  resetArrowIdleTimer();
 });
 
-player.addEventListener("mouseleave",()=>{
-mouseOverVideoOrArrow=false;
-hideArrow();
-clearTimeout(arrowIdleTimer);
+player.addEventListener("mouseleave", () => {
+  mouseOverVideoOrArrow = false;
+  hideArrow();
+  clearTimeout(arrowIdleTimer);
 });
 
-recommendArrow.addEventListener("mouseenter",()=>{
-mouseOverVideoOrArrow=true;
-showArrow();
-clearTimeout(arrowIdleTimer);
+recommendArrow.addEventListener("mouseenter", () => {
+  mouseOverVideoOrArrow = true;
+  showArrow();
+  clearTimeout(arrowIdleTimer);
 });
 
-recommendArrow.addEventListener("mouseleave",()=>{
-mouseOverVideoOrArrow=false;
-resetArrowIdleTimer();
+recommendArrow.addEventListener("mouseleave", () => {
+  mouseOverVideoOrArrow = false;
+  resetArrowIdleTimer();
 });
 
-player.addEventListener("mousemove",(e)=>{
+player.addEventListener("mousemove", (e) => {
+  if (!modal.classList.contains("open") || recommendDrawer.classList.contains("show")) return;
 
-if(!modal.classList.contains("open") || recommendDrawer.classList.contains("show")) return;
-
-if(e.clientX !== lastMouseX || e.clientY !== lastMouseY){
-
-```
-lastMouseX = e.clientX;
-lastMouseY = e.clientY;
-
-showArrow();
-resetArrowIdleTimer();
-```
-
-}
-
+  if (e.clientX !== lastMouseX || e.clientY !== lastMouseY) {
+    lastMouseX = e.clientX;
+    lastMouseY = e.clientY;
+    showArrow();
+    resetArrowIdleTimer();
+  }
 });
 
 /* ===============================
-MOBILE TAP FIX
+   MOBILE TAP FIX (Samsung)
 ================================ */
 
-player.addEventListener("touchstart",()=>{
+player.addEventListener("touchstart", () => {
 
-if(!isMobile()) return;
-if(!modal.classList.contains("open")) return;
-if(recommendDrawer.classList.contains("show")) return;
+  if(!isMobile()) return;
+  if(!modal.classList.contains("open")) return;
+  if(recommendDrawer.classList.contains("show")) return;
 
-showArrow();
+  showArrow();
 
 },{passive:true});
 
 /* ===============================
-DRAWER CONTROL
+   DRAWER AND MODAL CONTROL
 ================================ */
 
 function openRecommendDrawer(e){
 
-if(!recommendArrow.classList.contains("show")) return;
+  if(!recommendArrow.classList.contains("show")) return;
 
-e.preventDefault();
+  e.preventDefault();
 
-drawerY = 0;
-
-recommendDrawer.classList.add("show");
-recommendDrawer.style.transform = "translateY(0)";
-
-hideArrow();
-
+  drawerY = 0;
+  recommendDrawer.classList.add("show");
+  recommendDrawer.style.transform = "translateY(0)";
+  hideArrow();
 }
 
-recommendArrow.addEventListener("touchstart",openRecommendDrawer,{passive:false});
-recommendArrow.addEventListener("click",openRecommendDrawer);
+recommendArrow.addEventListener("touchstart", openRecommendDrawer,{passive:false});
+recommendArrow.addEventListener("click", openRecommendDrawer);
 
-drawerClose.onclick = ()=>{
-drawerY = 100;
-recommendDrawer.classList.remove("show","mobile-ready");
-recommendDrawer.style.transform="translateY(100%)";
-hideArrow();
+drawerClose.onclick = () => {
+  drawerY = 100;
+  recommendDrawer.classList.remove("show","mobile-ready");
+  recommendDrawer.style.transform = "translateY(100%)";
+  hideArrow();
 };
 
-closeBtn.addEventListener("click",()=>{
-
-clearInterval(timer);
-
-modal.classList.remove("open");
-
-player.pause();
-player.removeAttribute("src");
-player.load();
-
-recommendDrawer.classList.remove("show","mobile-ready");
-
-hideArrow();
-hideMobileLandscapeUI();
-
+closeBtn.addEventListener("click", () => {
+  clearInterval(timer);
+  modal.classList.remove("open");
+  player.pause();
+  player.removeAttribute("src");
+  player.load();
+  recommendDrawer.classList.remove("show","mobile-ready");
+  hideArrow();
+  hideMobileLandscapeUI();
 });
 
 /* ===============================
-OPEN VIDEO
+   OPEN VIDEO
 ================================ */
-
 function openModal(v){
 
-clearInterval(timer);
-overlay.classList.add("hidden");
+  clearInterval(timer);
+  overlay.classList.add("hidden");
 
-player.src = v.file;
-
-modalTitle.textContent = v.title;
-modalDesc.textContent = v.desc;
-
-player.play().catch(()=>{});
-
-modal.classList.add("open");
-
-buildRecommendations();
-
-drawerY = 72;
-
-recommendDrawer.classList.remove("show","mobile-ready");
-
-hideArrow();
-
-if(isMobile() && isLandscape()){
-showMobileLandscapeArrow();
-}
-
-}
-
-/* ===============================
-PLAY VIDEO FROM LIST
-================================ */
-
-function playFromList(fullList,vid){
-
-playlist = fullList;
-index = fullList.indexOf(vid);
-
-openModal(vid);
-
-}
-
-/* ===============================
-BUILD RECOMMENDATIONS
-================================ */
-
-function buildRecommendations(){
-
-recommendPanel.innerHTML="";
-
-playlist.forEach((v,i)=>{
-
-```
-if(i===index) return;
-
-const card=document.createElement("div");
-card.className="recCard";
-
-card.innerHTML=`<img src="${v.thumb}"><div>${v.title}</div>`;
-
-card.onclick=()=>{
-
-  index=i;
-
-  player.src=v.file;
-
-  modalTitle.textContent=v.title;
-  modalDesc.textContent=v.desc;
+  player.src = v.file;
+  modalTitle.textContent = v.title;
+  modalDesc.textContent = v.desc;
 
   player.play().catch(()=>{});
 
-  drawerY=100;
-
-  recommendDrawer.classList.remove("show","mobile-ready");
-  recommendDrawer.style.transform="translateY(100%)";
-
-  hideArrow();
+  modal.classList.add("open");
 
   buildRecommendations();
 
-};
+  drawerY = 72;
+  recommendDrawer.classList.remove("show","mobile-ready");
 
-recommendPanel.appendChild(card);
-```
+  hideArrow();
 
-});
-
+  if(isMobile() && isLandscape()){
+    showMobileLandscapeArrow();
+  }
 }
 
 /* ===============================
-NEXT VIDEO OVERLAY
+   PLAY VIDEO FROM LIST
+================================ */
+function playFromList(fullList, vid){
+  playlist = fullList;
+  index = fullList.indexOf(vid);
+  openModal(vid);
+}
+
+/* ===============================
+   BUILD RECOMMENDATIONS
+================================ */
+function buildRecommendations(){
+
+  recommendPanel.innerHTML = "";
+
+  playlist.forEach((v,i)=>{
+
+    if(i===index) return;
+
+    const card = document.createElement("div");
+    card.className = "recCard";
+
+    card.innerHTML = `<img src="${v.thumb}"><div>${v.title}</div>`;
+
+    card.onclick = ()=>{
+
+      index = i;
+
+      player.src = v.file;
+      modalTitle.textContent = v.title;
+      modalDesc.textContent = v.desc;
+
+      player.play().catch(()=>{});
+
+      drawerY = 100;
+      recommendDrawer.classList.remove("show","mobile-ready");
+      recommendDrawer.style.transform = "translateY(100%)";
+
+      hideArrow();
+
+      buildRecommendations();
+    };
+
+    recommendPanel.appendChild(card);
+
+  });
+}
+
+/* ===============================
+   NEXT VIDEO OVERLAY (Play Now + Cancel)
 ================================ */
 
-player.addEventListener("ended",()=>{
+player.addEventListener("ended", () => {
 
-const nextIndex=(index+1)%playlist.length;
-const nextVid=playlist[nextIndex];
+  const nextIndex = (index + 1) % playlist.length;
+  const nextVid = playlist[nextIndex];
 
-nextThumb.src=nextVid.thumb;
-nextTitle.textContent=nextVid.title;
+  nextThumb.src = nextVid.thumb;
+  nextTitle.textContent = nextVid.title;
+  overlay.classList.remove("hidden");
 
-overlay.classList.remove("hidden");
+  countEl.textContent = 5;
+  progressCircle.style.strokeDashoffset = 0;
 
-countEl.textContent=5;
-progressCircle.style.strokeDashoffset=0;
-
-startCountdown(nextIndex);
-
+  startCountdown(nextIndex);
 });
 
 function startCountdown(nextIndex){
-
-let time=5;
-const circumference=163;
-
-clearInterval(timer);
-
-timer=setInterval(()=>{
-
-```
-time--;
-
-countEl.textContent=time;
-
-progressCircle.style.strokeDashoffset =
-  circumference*(1-time/5);
-
-if(time<=0){
+  let time = 5;
+  const circumference = 163;
 
   clearInterval(timer);
 
-  index=nextIndex;
+  timer = setInterval(() => {
+    time--;
+    countEl.textContent = time;
+    progressCircle.style.strokeDashoffset = circumference * (1 - time / 5);
 
+    if(time <= 0){
+      clearInterval(timer);
+      index = nextIndex;
+      overlay.classList.add("hidden");
+      openModal(playlist[index]);
+    }
+  }, 1000);
+}
+
+playNowBtn.onclick = () => {
+  clearInterval(timer);
+  index = (index + 1) % playlist.length;
   overlay.classList.add("hidden");
-
   openModal(playlist[index]);
-
-}
-```
-
-},1000);
-
-}
-
-playNowBtn.onclick=()=>{
-
-clearInterval(timer);
-
-index=(index+1)%playlist.length;
-
-overlay.classList.add("hidden");
-
-openModal(playlist[index]);
-
 };
 
-cancelBtn.onclick=()=>{
-
-clearInterval(timer);
-
-overlay.classList.add("hidden");
-
-countEl.textContent="";
-progressCircle.style.strokeDashoffset=0;
-
+cancelBtn.onclick = () => {
+  clearInterval(timer);
+  overlay.classList.add("hidden");
+  countEl.textContent = "";
+  progressCircle.style.strokeDashoffset = 0;
 };
 
 /* ===============================
-MOBILE LANDSCAPE RECOMMENDATIONS
+   MOBILE LANDSCAPE RECOMMENDATIONS
 ================================ */
 
 function showMobileLandscapeArrow(){
-
-if(isMobile() && isLandscape()){
-mobileRecArrow.classList.add("show");
-}
-
+  if(isMobile() && isLandscape()){
+    mobileRecArrow.classList.add("show");
+  }
 }
 
 function hideMobileLandscapeUI(){
-
-mobileRecArrow.classList.remove("show");
-mobileRecPanel.classList.remove("show");
-
+  mobileRecArrow.classList.remove("show");
+  mobileRecPanel.classList.remove("show");
 }
 
 function openMobileRecPanel(e){
 
-if(!mobileRecArrow.classList.contains("show")) return;
+  if(!mobileRecArrow.classList.contains("show")) return;
 
-e.preventDefault();
+  e.preventDefault();
 
-if(!(isMobile() && isLandscape())) return;
+  if(!(isMobile() && isLandscape())) return;
 
-mobileRecPanel.innerHTML="";
+  mobileRecPanel.innerHTML = "";
 
-const closeArrow=document.createElement("div");
-closeArrow.className="mobileRecClose";
-closeArrow.innerHTML="⌄";
+  const closeArrow = document.createElement("div");
+  closeArrow.className = "mobileRecClose";
+  closeArrow.innerHTML = "⌄";
 
-closeArrow.onclick=()=>{
-mobileRecPanel.classList.remove("show");
-};
+  closeArrow.onclick = () => {
+    mobileRecPanel.classList.remove("show");
+  };
 
-mobileRecPanel.appendChild(closeArrow);
+  mobileRecPanel.appendChild(closeArrow);
 
-playlist.forEach((v,i)=>{
+  playlist.forEach((v,i)=>{
 
-```
-if(i===index) return;
+    if(i === index) return;
 
-const card=document.createElement("div");
-card.className="recCard";
+    const card = document.createElement("div");
+    card.className = "recCard";
 
-card.innerHTML=`<img src="${v.thumb}"><div>${v.title}</div>`;
+    card.innerHTML = `
+      <img src="${v.thumb}">
+      <div>${v.title}</div>
+    `;
 
-card.onclick=()=>{
+    card.onclick = () => {
 
-  index=i;
+      index = i;
 
-  player.src=v.file;
+      player.src = v.file;
+      modalTitle.textContent = v.title;
+      modalDesc.textContent = v.desc;
 
-  modalTitle.textContent=v.title;
-  modalDesc.textContent=v.desc;
+      player.play().catch(()=>{});
 
-  player.play().catch(()=>{});
+      mobileRecPanel.classList.remove("show");
 
-  mobileRecPanel.classList.remove("show");
+    };
 
-};
+    mobileRecPanel.appendChild(card);
 
-mobileRecPanel.appendChild(card);
-```
+  });
 
-});
-
-mobileRecPanel.classList.add("show");
+  mobileRecPanel.classList.add("show");
 
 }
 
-mobileRecArrow.addEventListener("touchstart",openMobileRecPanel,{passive:false});
-mobileRecArrow.addEventListener("click",openMobileRecPanel);
+mobileRecArrow.addEventListener("touchstart", openMobileRecPanel,{passive:false});
+mobileRecArrow.addEventListener("click", openMobileRecPanel);
 
 /* ===============================
-CLOSE MODAL
+   CLOSE MODAL
 ================================ */
+closeBtn.onclick = () => {
 
-closeBtn.onclick=()=>{
+  clearInterval(timer);
+  modal.classList.remove("open");
 
-clearInterval(timer);
+  player.pause();
+  player.removeAttribute("src");
+  player.load();
 
-modal.classList.remove("open");
+  recommendDrawer.classList.remove("show","mobile-ready");
+  recommendArrow.classList.remove("show");
 
-player.pause();
-player.removeAttribute("src");
-player.load();
-
-recommendDrawer.classList.remove("show","mobile-ready");
-recommendArrow.classList.remove("show");
-
-hideMobileLandscapeUI();
+  hideMobileLandscapeUI();
 
 };
-
   /* -----------------------------
       NAVIGATION
   ----------------------------- */
