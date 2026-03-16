@@ -1602,25 +1602,21 @@ const recommendDrawer = document.getElementById("recommendDrawer");
 const recommendArrow = document.getElementById("recommendArrow");
 const drawerClose = document.getElementById("drawerClose");
 const recommendPanel = document.getElementById("recommendPanel");
+
 /* ===============================
    FULLSCREEN FIX (so overlay works)
 ================================ */
+document.addEventListener("fullscreenchange", () => {
 
-player.addEventListener("fullscreenchange", () => {
+  if(document.fullscreenElement === player){
 
-  if (document.fullscreenElement === player) {
+    document.exitFullscreen();
 
-    document.exitFullscreen().catch(()=>{});
-
-    setTimeout(() => {
-
-      const container = document.getElementById("playerContainer");
-
-      if (container && !document.fullscreenElement) {
-        container.requestFullscreen().catch(()=>{});
+    setTimeout(()=>{
+      if(!document.fullscreenElement){
+        modal.requestFullscreen().catch(()=>{});
       }
-
-    }, 50);
+    },50);
 
   }
 
