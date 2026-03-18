@@ -1604,23 +1604,6 @@ const drawerClose = document.getElementById("drawerClose");
 const recommendPanel = document.getElementById("recommendPanel");
 
 /* ===============================
-   FULLSCREEN FUNCTION (FIXED)
-================================ */
-function enterFullscreen(){
-  if(playerContainer.requestFullscreen){
-    playerContainer.requestFullscreen();
-  } else if(playerContainer.webkitRequestFullscreen){
-    playerContainer.webkitRequestFullscreen();
-  }
-}
-
-/* ===============================
-   MOBILE ELEMENTS
-================================ */
-const mobileRecArrow = document.getElementById("mobileRecArrow");
-const mobileRecPanel = document.getElementById("mobileRecPanel");
-
-/* ===============================
    STATE
 ================================ */
 let playlist = [];
@@ -1634,36 +1617,64 @@ function isMobile(){ return window.innerWidth <= 900; }
 function isLandscape(){ return window.innerWidth > window.innerHeight; }
 
 /* ===============================
-   CLOSE MODAL
+   FULLSCREEN (WORKING)
 ================================ */
-closeBtn.onclick = () => {
-  clearInterval(timer);
-  modal.classList.remove("open");
-
-  player.pause();
-  player.removeAttribute("src");
-  player.load();
-
-  recommendDrawer.classList.remove("show","mobile-ready");
-};
+function enterFullscreen(){
+  if(playerContainer.requestFullscreen){
+    playerContainer.requestFullscreen();
+  } else if(playerContainer.webkitRequestFullscreen){
+    playerContainer.webkitRequestFullscreen();
+  }
+}
 
 /* ===============================
-   OPEN VIDEO
+   ARROW FIX (RESTORED)
+================================ */
+let arrowIdleTimer;
+
+function showArrow(){
+  if(!modal.classList.contains("open")) return;
+  if(recommendDrawer.classList.contains("show")) return;
+
+  recommendArrow.classList.add("show");
+
+  clearTimeout(arrowIdleTimer);
+  arrowIdleTimer = setTimeout(()=>{
+    recommendArrow.classList.remove("show");
+  },2000);
+}
+
+function hideArrow(){
+  recommendArrow.classList.remove("show");
+}
+
+/* Desktop mouse movement */
+player.addEventListener("mousemove", showArrow);
+
+/* Mobile tap */
+player.addEventListener("touchstart", showArrow, {passive:true});
+
+/* ===============================
+   OPEN VIDEO (FIXED BLACK SCREEN)
 ================================ */
 function openModal(v){
 
   clearInterval(timer);
   overlay.classList.add("hidden");
 
+  modal.classList.add("open"); // ✅ open FIRST
+
   player.src = v.file;
   modalTitle.textContent = v.title;
   modalDesc.textContent = v.desc;
 
-  modal.classList.add("open");
-
-  player.play().catch(()=>{});
+  // ✅ wait for video to be ready (fix black flash)
+  player.onloadeddata = () => {
+    player.play().catch(()=>{});
+  };
 
   buildRecommendations();
+  hideArrow();
 }
 
 /* ===============================
@@ -1707,7 +1718,7 @@ function buildRecommendations(){
 }
 
 /* ===============================
-   NEXT VIDEO (FIXED — NO GLITCH)
+   NEXT VIDEO (FIXED AUTOPLAY)
 ================================ */
 player.addEventListener("ended", () => {
 
@@ -1716,7 +1727,6 @@ player.addEventListener("ended", () => {
 
   index = nextIndex;
 
-  // ✅ NO modal reload (fixes iPhone glitch)
   player.src = nextVid.file;
   modalTitle.textContent = nextVid.title;
   modalDesc.textContent = nextVid.desc;
@@ -1727,50 +1737,22 @@ player.addEventListener("ended", () => {
 });
 
 /* ===============================
-   COUNTDOWN FIXED
+   CLOSE MODAL (FULL FIX)
 ================================ */
-function startCountdown(nextIndex){
-  let time = 5;
+closeBtn.onclick = () => {
+
   clearInterval(timer);
 
-  timer = setInterval(() => {
-    time--;
+  modal.classList.remove("open");
 
-    if(time <= 0){
-      clearInterval(timer);
+  player.pause();
+  player.removeAttribute("src");
+  player.load();
 
-      index = nextIndex;
-      const nextVid = playlist[index];
+  recommendDrawer.classList.remove("show","mobile-ready");
+  recommendArrow.classList.remove("show");
 
-      player.src = nextVid.file;
-      modalTitle.textContent = nextVid.title;
-      modalDesc.textContent = nextVid.desc;
-
-      player.play().catch(()=>{});
-      buildRecommendations();
-    }
-  }, 1000);
-}
-
-/* ===============================
-   PLAY NOW FIXED
-================================ */
-playNowBtn.onclick = () => {
-  clearInterval(timer);
-
-  index = (index + 1) % playlist.length;
-  const nextVid = playlist[index];
-
-  player.src = nextVid.file;
-  modalTitle.textContent = nextVid.title;
-  modalDesc.textContent = nextVid.desc;
-
-  player.play().catch(()=>{});
-  buildRecommendations();
-};
-
-cancelBtn.onclick = () => {
-  clearInterval(timer);
+  hideArrow();
 };
   /* -----------------------------
       NAVIGATION
