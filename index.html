@@ -921,17 +921,6 @@ svg circle{
   }
 
 }
-  #playerContainer:fullscreen {
-  width: 100vw;
-  height: 100vh;
-  background: black;
-}
-
-#playerContainer:fullscreen video {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
 </style>
 
 <link rel="manifest" href="/manifest.json">
@@ -1062,48 +1051,42 @@ if ("serviceWorker" in navigator) {
     <!-- VIDEO -->
     <video id="player"
            controls
-           controlsList="nofullscreen"
-           disablePictureInPicture
            playsinline
            webkit-playsinline
            preload="metadata">
     </video>
 
-    <!-- AUTOPLAY OVERLAY -->
-    <div id="nextOverlay" class="nextOverlay hidden">
+    
+ <!-- AUTOPLAY OVERLAY -->
+<div id="nextOverlay" class="nextOverlay hidden">
 
-      <div class="upNextCard">
+  <div class="upNextCard">
 
-        <img id="nextThumb">
+    <img id="nextThumb">
 
-        <div class="upNextInfo">
+    <div class="upNextInfo">
 
-          <div class="upNextLabel">Up Next</div>
+      <div class="upNextLabel">Up Next</div>
 
-          <div id="nextTitle"></div>
+      <div id="nextTitle"></div>
 
-          <div class="countdownWrap">
-            <svg width="60" height="60">
-              <circle class="bg" cx="30" cy="30" r="26"></circle>
-              <circle id="progressCircle" class="progress" cx="30" cy="30" r="26"></circle>
-            </svg>
-            <span id="count">5</span>
-          </div>
+      <div class="countdownWrap">
+        <svg width="60" height="60">
+          <circle class="bg" cx="30" cy="30" r="26"></circle>
+          <circle id="progressCircle" class="progress" cx="30" cy="30" r="26"></circle>
+        </svg>
+        <span id="count">5</span>
+      </div>
 
-          <div class="buttonRow">
-            <button id="playNowBtn">Play Now</button>
-            <button id="cancelBtn">Cancel</button>
-          </div>
-
-        </div>
-
+      <div class="buttonRow">
+        <button id="playNowBtn">Play Now</button>
+        <button id="cancelBtn">Cancel</button>
       </div>
 
     </div>
-
   </div>
-
 </div>
+
     <!-- VIDEO INFO -->
     <div class="modal-info">
 
@@ -1554,6 +1537,7 @@ if ("serviceWorker" in navigator) {
   });
 /* =====================================================
    YOUTUBE POLISHED VIDEO PLAYER + RECOMMENDATIONS
+   — FULL JS WITH AUTOPLAY AND MOBILE LANDSCAPE
 ===================================================== */
 
 /* ===============================
@@ -1588,22 +1572,19 @@ function buildRow(sectionName, fullList, slice){
   if(sectionEl) sectionEl.appendChild(wrapper);
 }
 
-/* Build grids */
+/* Build grids for all categories */
 [STORIES, NASHEEDS, DUAS, CARTOONS].forEach((list, i) => {
-  const names = ["Stories","Nasheeds","Duas","Cartoons"];
+  const names = ["Stories", "Nasheeds", "Duas", "Cartoons"];
   for(let x = 0; x < list.length; x += 8){
-    buildRow(names[i], list, list.slice(x,x+8));
+    buildRow(names[i], list, list.slice(x, x + 8));
   }
 });
 
 /* ===============================
    ELEMENTS
 ================================ */
-
 const modal = document.getElementById("modal");
 const player = document.getElementById("player");
-const playerContainer = document.getElementById("playerContainer");
-
 const modalTitle = document.getElementById("modalTitle");
 const modalDesc = document.getElementById("modalDesc");
 const closeBtn = document.getElementById("closeBtn");
@@ -1611,12 +1592,10 @@ const closeBtn = document.getElementById("closeBtn");
 const overlay = document.getElementById("nextOverlay");
 const nextThumb = document.getElementById("nextThumb");
 const nextTitle = document.getElementById("nextTitle");
-
 const countEl = document.getElementById("count");
 const progressCircle = document.getElementById("progressCircle");
-
 const playNowBtn = document.getElementById("playNowBtn");
-const cancelBtn = document.getElementById("cancelBtn");
+const autoplayToggle = document.getElementById("autoplayToggle");
 
 const recommendDrawer = document.getElementById("recommendDrawer");
 const recommendArrow = document.getElementById("recommendArrow");
@@ -1624,209 +1603,363 @@ const drawerClose = document.getElementById("drawerClose");
 const recommendPanel = document.getElementById("recommendPanel");
 
 /* ===============================
+   MOBILE LANDSCAPE ELEMENTS
+================================ */
+const mobileRecArrow = document.getElementById("mobileRecArrow");
+const mobileRecPanel = document.getElementById("mobileRecPanel");
+
+/* ===============================
    STATE
 ================================ */
-
 let playlist = [];
 let index = 0;
 let timer;
 
+let dragging = false;
+let startY = 0;
+let drawerY = 72;
+
+let arrowIdleTimer;
+
 /* ===============================
    UTILS
 ================================ */
-
 function isMobile(){ return window.innerWidth <= 900; }
 function isLandscape(){ return window.innerWidth > window.innerHeight; }
 
 /* ===============================
-   OPEN VIDEO
+   ARROW VISIBILITY CONTROL (DESKTOP)
+================================ */
+let lastMouseX = 0;
+let lastMouseY = 0;
+let mouseOverVideoOrArrow = false;
+
+recommendArrow.classList.remove("show");
+
+function hideArrow() { recommendArrow.classList.remove("show"); }
+
+function showArrow() {
+  if (!modal.classList.contains("open") || recommendDrawer.classList.contains("show")) return;
+  recommendArrow.classList.add("show");
+}
+
+function resetArrowIdleTimer() {
+  clearTimeout(arrowIdleTimer);
+  arrowIdleTimer = setTimeout(() => {
+    if (!mouseOverVideoOrArrow) hideArrow();
+  }, 2000);
+}
+
+player.addEventListener("mouseenter", () => {
+  mouseOverVideoOrArrow = true;
+  showArrow();
+  resetArrowIdleTimer();
+});
+
+player.addEventListener("mouseleave", () => {
+  mouseOverVideoOrArrow = false;
+  hideArrow();
+  clearTimeout(arrowIdleTimer);
+});
+
+recommendArrow.addEventListener("mouseenter", () => {
+  mouseOverVideoOrArrow = true;
+  showArrow();
+  clearTimeout(arrowIdleTimer);
+});
+
+recommendArrow.addEventListener("mouseleave", () => {
+  mouseOverVideoOrArrow = false;
+  resetArrowIdleTimer();
+});
+
+player.addEventListener("mousemove", (e) => {
+  if (!modal.classList.contains("open") || recommendDrawer.classList.contains("show")) return;
+
+  if (e.clientX !== lastMouseX || e.clientY !== lastMouseY) {
+    lastMouseX = e.clientX;
+    lastMouseY = e.clientY;
+    showArrow();
+    resetArrowIdleTimer();
+  }
+});
+
+/* ===============================
+   MOBILE TAP FIX (Samsung)
 ================================ */
 
+player.addEventListener("touchstart", () => {
+
+  if(!isMobile()) return;
+  if(!modal.classList.contains("open")) return;
+  if(recommendDrawer.classList.contains("show")) return;
+
+  showArrow();
+
+},{passive:true});
+
+/* ===============================
+   DRAWER AND MODAL CONTROL
+================================ */
+
+function openRecommendDrawer(e){
+
+  if(!recommendArrow.classList.contains("show")) return;
+
+  e.preventDefault();
+
+  drawerY = 0;
+  recommendDrawer.classList.add("show");
+  recommendDrawer.style.transform = "translateY(0)";
+  hideArrow();
+}
+
+/* fast touch for samsung */
+recommendArrow.addEventListener("touchstart", openRecommendDrawer,{passive:false});
+recommendArrow.addEventListener("click", openRecommendDrawer);
+
+drawerClose.onclick = () => {
+  drawerY = 100;
+  recommendDrawer.classList.remove("show","mobile-ready");
+  recommendDrawer.style.transform = "translateY(100%)";
+  hideArrow();
+};
+
+closeBtn.addEventListener("click", () => {
+  clearInterval(timer);
+  modal.classList.remove("open");
+  player.pause();
+  player.removeAttribute("src");
+  player.load();
+  recommendDrawer.classList.remove("show","mobile-ready");
+  hideArrow();
+  hideMobileLandscapeUI();
+});
+
+/* ===============================
+   OPEN VIDEO
+================================ */
 function openModal(v){
 
   clearInterval(timer);
   overlay.classList.add("hidden");
 
   player.src = v.file;
-
   modalTitle.textContent = v.title;
   modalDesc.textContent = v.desc;
 
-  modal.classList.add("open");
-
   player.play().catch(()=>{});
 
+  modal.classList.add("open");
+
   buildRecommendations();
+
+  drawerY = 72;
+  recommendDrawer.classList.remove("show","mobile-ready");
+
+  hideArrow();
+
+  if(isMobile() && isLandscape()){
+    showMobileLandscapeArrow();
+  }
 }
 
 /* ===============================
    PLAY VIDEO FROM LIST
 ================================ */
-
 function playFromList(fullList, vid){
-
   playlist = fullList;
   index = fullList.indexOf(vid);
-
   openModal(vid);
-
 }
 
 /* ===============================
    BUILD RECOMMENDATIONS
 ================================ */
-
 function buildRecommendations(){
 
-  if(!recommendPanel) return;
-
-  recommendPanel.innerHTML="";
+  recommendPanel.innerHTML = "";
 
   playlist.forEach((v,i)=>{
 
     if(i===index) return;
 
-    const card=document.createElement("div");
-    card.className="recCard";
+    const card = document.createElement("div");
+    card.className = "recCard";
 
-    card.innerHTML=`
-      <img src="${v.thumb}">
-      <div>${v.title}</div>
-    `;
+    card.innerHTML = `<img src="${v.thumb}"><div>${v.title}</div>`;
 
-    card.onclick=()=>{
-      index=i;
-      openModal(v);
+    card.onclick = ()=>{
+
+      index = i;
+
+      player.src = v.file;
+      modalTitle.textContent = v.title;
+      modalDesc.textContent = v.desc;
+
+      player.play().catch(()=>{});
+
+      drawerY = 100;
+      recommendDrawer.classList.remove("show","mobile-ready");
+      recommendDrawer.style.transform = "translateY(100%)";
+
+      hideArrow();
+
+      buildRecommendations();
     };
 
     recommendPanel.appendChild(card);
 
   });
-
 }
-
 /* ===============================
-   NEXT VIDEO OVERLAY
+   NEXT VIDEO OVERLAY (Play Now + Cancel)
 ================================ */
 
-player.addEventListener("ended", ()=>{
+// Show next video overlay when video ends
+player.addEventListener("ended", () => {
 
-  if(!playlist.length) return;
+  // Determine next video in playlist
+  const nextIndex = (index + 1) % playlist.length;
+  const nextVid = playlist[nextIndex];
 
-  const nextIndex=(index+1)%playlist.length;
-  const nextVid=playlist[nextIndex];
-
-  nextThumb.src=nextVid.thumb;
-  nextTitle.textContent=nextVid.title;
-
+  // Update overlay content
+  nextThumb.src = nextVid.thumb;
+  nextTitle.textContent = nextVid.title;
   overlay.classList.remove("hidden");
 
-  countEl.textContent=5;
-  progressCircle.style.strokeDashoffset=0;
+  // Reset countdown
+  countEl.textContent = 5;
+  progressCircle.style.strokeDashoffset = 0;
 
+  // Start countdown
   startCountdown(nextIndex);
-
 });
 
-/* ===============================
-   COUNTDOWN
-================================ */
-
+// Countdown function for next video
 function startCountdown(nextIndex){
+  let time = 5;
+  const circumference = 163;
 
-  let time=5;
-  const circumference=163;
-
+  // Clear any previous interval
   clearInterval(timer);
 
-  timer=setInterval(()=>{
-
+  timer = setInterval(() => {
     time--;
-    countEl.textContent=time;
+    countEl.textContent = time;
+    progressCircle.style.strokeDashoffset = circumference * (1 - time / 5);
 
-    progressCircle.style.strokeDashoffset=
-      circumference*(1-time/5);
-
-    if(time<=0){
-
+    if(time <= 0){
       clearInterval(timer);
-
-      index=nextIndex;
+      index = nextIndex;
       overlay.classList.add("hidden");
-
       openModal(playlist[index]);
-
     }
-
-  },1000);
-
+  }, 1000);
 }
 
-/* ===============================
-   PLAY NOW BUTTON
-================================ */
-
-playNowBtn.onclick=()=>{
-
+// Play Now button functionality
+playNowBtn.onclick = () => {
   clearInterval(timer);
-
-  index=(index+1)%playlist.length;
-
+  index = (index + 1) % playlist.length;
   overlay.classList.add("hidden");
-
   openModal(playlist[index]);
-
 };
 
-/* ===============================
-   CANCEL BUTTON
-================================ */
-
-cancelBtn.onclick=()=>{
-
-  clearInterval(timer);
-
-  overlay.classList.add("hidden");
-
-  countEl.textContent="";
-  progressCircle.style.strokeDashoffset=0;
-
+// Cancel button functionality
+cancelBtn.onclick = () => {
+  clearInterval(timer);            // stop countdown immediately
+  overlay.classList.add("hidden"); // hide overlay
+  countEl.textContent = "";        // reset countdown text
+  progressCircle.style.strokeDashoffset = 0; // reset circle
 };
-
 /* ===============================
-   FULLSCREEN (CONTAINER)
+   MOBILE LANDSCAPE RECOMMENDATIONS
 ================================ */
 
-function toggleFullscreen(){
-
-  if(!document.fullscreenElement){
-
-    playerContainer.requestFullscreen().catch(()=>{});
-
-  }else{
-
-    document.exitFullscreen().catch(()=>{});
-
+function showMobileLandscapeArrow(){
+  if(isMobile() && isLandscape()){
+    mobileRecArrow.classList.add("show");
   }
+}
+
+function hideMobileLandscapeUI(){
+  mobileRecArrow.classList.remove("show");
+  mobileRecPanel.classList.remove("show");
+}
+
+function openMobileRecPanel(e){
+
+  if(!mobileRecArrow.classList.contains("show")) return;
+
+  e.preventDefault();
+
+  if(!(isMobile() && isLandscape())) return;
+
+  mobileRecPanel.innerHTML = "";
+
+  const closeArrow = document.createElement("div");
+  closeArrow.className = "mobileRecClose";
+  closeArrow.innerHTML = "⌄";
+
+  closeArrow.onclick = () => {
+    mobileRecPanel.classList.remove("show");
+  };
+
+  mobileRecPanel.appendChild(closeArrow);
+
+  playlist.forEach((v,i)=>{
+
+    if(i === index) return;
+
+    const card = document.createElement("div");
+    card.className = "recCard";
+
+    card.innerHTML = `
+      <img src="${v.thumb}">
+      <div>${v.title}</div>
+    `;
+
+    card.onclick = () => {
+
+      index = i;
+
+      player.src = v.file;
+      modalTitle.textContent = v.title;
+      modalDesc.textContent = v.desc;
+
+      player.play().catch(()=>{});
+
+      mobileRecPanel.classList.remove("show");
+
+    };
+
+    mobileRecPanel.appendChild(card);
+
+  });
+
+  mobileRecPanel.classList.add("show");
 
 }
 
+mobileRecArrow.addEventListener("touchstart", openMobileRecPanel,{passive:false});
+mobileRecArrow.addEventListener("click", openMobileRecPanel);
 /* ===============================
    CLOSE MODAL
 ================================ */
-
-closeBtn.onclick=()=>{
+closeBtn.onclick = () => {
 
   clearInterval(timer);
-
   modal.classList.remove("open");
 
   player.pause();
   player.removeAttribute("src");
   player.load();
 
-  if(recommendDrawer) recommendDrawer.classList.remove("show","mobile-ready");
-  if(recommendArrow) recommendArrow.classList.remove("show");
+  recommendDrawer.classList.remove("show","mobile-ready");
+  recommendArrow.classList.remove("show");
+
+  hideMobileLandscapeUI();
 
 };
   /* -----------------------------
