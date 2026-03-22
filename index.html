@@ -921,35 +921,17 @@ svg circle{
   }
 
 }
-  .fsBtn{
-  background:#00e5ff;
-  color:#111;
-  border:none;
-  padding:8px 14px;
-  border-radius:8px;
-  font-weight:600;
-  cursor:pointer;
+  #playerContainer:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  background: black;
 }
-  .playerBox:fullscreen {
-  position: relative;
+
+#playerContainer:fullscreen video {
   width: 100%;
   height: 100%;
-  max-width: none;
-  border-radius: 0;
+  object-fit: contain;
 }
-
-.playerBox:fullscreen video {
-  max-height: 100%;
-  height: 100%;
-}
-
-.playerBox:fullscreen .nextOverlay {
-  position: absolute;
-  inset: 0;
-  display: flex !important;
-  z-index: 9999;
-}
-  
 </style>
 
 <link rel="manifest" href="/manifest.json">
@@ -1078,58 +1060,69 @@ if ("serviceWorker" in navigator) {
        aria-modal="true">
 
     <!-- VIDEO -->
-<video
-  id="player"
-  controls
-  playsinline
-  webkit-playsinline
-  x5-playsinline
-  preload="metadata">
-</video>
-    
- <!-- AUTOPLAY OVERLAY -->
-<div id="nextOverlay" class="nextOverlay hidden">
+    <video id="player"
+           controls
+           controlsList="nofullscreen"
+           disablePictureInPicture
+           playsinline
+           webkit-playsinline
+           preload="metadata">
+    </video>
 
-  <div class="upNextCard">
+    <!-- AUTOPLAY OVERLAY -->
+    <div id="nextOverlay" class="nextOverlay hidden">
 
-    <img id="nextThumb">
+      <div class="upNextCard">
 
-    <div class="upNextInfo">
+        <img id="nextThumb">
 
-      <div class="upNextLabel">Up Next</div>
+        <div class="upNextInfo">
 
-      <div id="nextTitle"></div>
+          <div class="upNextLabel">Up Next</div>
 
-      <div class="countdownWrap">
-        <svg width="60" height="60">
-          <circle class="bg" cx="30" cy="30" r="26"></circle>
-          <circle id="progressCircle" class="progress" cx="30" cy="30" r="26"></circle>
-        </svg>
-        <span id="count">5</span>
-      </div>
+          <div id="nextTitle"></div>
 
-      <div class="buttonRow">
-        <button id="playNowBtn">Play Now</button>
-        <button id="cancelBtn">Cancel</button>
+          <div class="countdownWrap">
+            <svg width="60" height="60">
+              <circle class="bg" cx="30" cy="30" r="26"></circle>
+              <circle id="progressCircle" class="progress" cx="30" cy="30" r="26"></circle>
+            </svg>
+            <span id="count">5</span>
+          </div>
+
+          <div class="buttonRow">
+            <button id="playNowBtn">Play Now</button>
+            <button id="cancelBtn">Cancel</button>
+          </div>
+
+        </div>
+
       </div>
 
     </div>
-  </div>
-</div>
 
+  </div>
+
+</div>
     <!-- VIDEO INFO -->
     <div class="modal-info">
 
-  <div>
-    <div id="modalTitle" class="modal-title"></div>
-    <div id="modalDesc" class="modal-desc"></div>
-  </div>
+      <div>
+        <div id="modalTitle"
+             class="modal-title"></div>
 
-  <div class="modal-controls">
-    <button id="fullscreenBtn" class="fsBtn">Fullscreen</button>
-    <button id="closeBtn" class="closeBtn">Close</button>
-  </div>
+        <div id="modalDesc"
+             class="modal-desc"></div>
+      </div>
 
+      <button id="closeBtn"
+              class="closeBtn">
+        Close
+      </button>
+
+    </div>
+
+  </div>
 </div>
 
 
@@ -1597,29 +1590,31 @@ function buildRow(sectionName, fullList, slice){
 
 /* Build grids */
 [STORIES, NASHEEDS, DUAS, CARTOONS].forEach((list, i) => {
-  const names = ["Stories", "Nasheeds", "Duas", "Cartoons"];
+  const names = ["Stories","Nasheeds","Duas","Cartoons"];
   for(let x = 0; x < list.length; x += 8){
-    buildRow(names[i], list, list.slice(x, x + 8));
+    buildRow(names[i], list, list.slice(x,x+8));
   }
 });
 
 /* ===============================
    ELEMENTS
 ================================ */
+
 const modal = document.getElementById("modal");
 const player = document.getElementById("player");
+const playerContainer = document.getElementById("playerContainer");
+
 const modalTitle = document.getElementById("modalTitle");
 const modalDesc = document.getElementById("modalDesc");
 const closeBtn = document.getElementById("closeBtn");
 
-const playerContainer = document.getElementById("playerContainer");
-const fullscreenBtn = document.getElementById("fullscreenBtn");
-
 const overlay = document.getElementById("nextOverlay");
 const nextThumb = document.getElementById("nextThumb");
 const nextTitle = document.getElementById("nextTitle");
+
 const countEl = document.getElementById("count");
 const progressCircle = document.getElementById("progressCircle");
+
 const playNowBtn = document.getElementById("playNowBtn");
 const cancelBtn = document.getElementById("cancelBtn");
 
@@ -1628,270 +1623,199 @@ const recommendArrow = document.getElementById("recommendArrow");
 const drawerClose = document.getElementById("drawerClose");
 const recommendPanel = document.getElementById("recommendPanel");
 
-const mobileRecArrow = document.getElementById("mobileRecArrow");
-const mobileRecPanel = document.getElementById("mobileRecPanel");
-
 /* ===============================
    STATE
 ================================ */
+
 let playlist = [];
 let index = 0;
 let timer;
-let arrowIdleTimer;
 
 /* ===============================
    UTILS
 ================================ */
+
 function isMobile(){ return window.innerWidth <= 900; }
 function isLandscape(){ return window.innerWidth > window.innerHeight; }
 
 /* ===============================
-   FULLSCREEN (FIXED)
-================================ */
-
-/* Custom fullscreen button */
-if(fullscreenBtn){
-  fullscreenBtn.onclick = () => {
-    if (!document.fullscreenElement) {
-      playerContainer.requestFullscreen().catch(()=>{});
-    } else {
-      document.exitFullscreen();
-    }
-  };
-}
-
-/* Prevent video taking fullscreen */
-player.addEventListener("webkitbeginfullscreen", (e) => {
-  e.preventDefault();
-});
-
-/* If browser tries fullscreen video → force container */
-document.addEventListener("fullscreenchange", () => {
-  if(document.fullscreenElement === player){
-    document.exitFullscreen().then(()=>{
-      playerContainer.requestFullscreen().catch(()=>{});
-    });
-  }
-});
-
-/* ===============================
-   ARROW CONTROL
-================================ */
-let lastMouseX = 0;
-let lastMouseY = 0;
-let mouseOverVideoOrArrow = false;
-
-function hideArrow(){ recommendArrow.classList.remove("show"); }
-
-function showArrow(){
-  if (!modal.classList.contains("open") || recommendDrawer.classList.contains("show")) return;
-  recommendArrow.classList.add("show");
-}
-
-function resetArrowIdleTimer(){
-  clearTimeout(arrowIdleTimer);
-  arrowIdleTimer = setTimeout(() => {
-    if (!mouseOverVideoOrArrow) hideArrow();
-  }, 2000);
-}
-
-player.addEventListener("mousemove", (e) => {
-  if (!modal.classList.contains("open") || recommendDrawer.classList.contains("show")) return;
-
-  if (e.clientX !== lastMouseX || e.clientY !== lastMouseY) {
-    lastMouseX = e.clientX;
-    lastMouseY = e.clientY;
-    showArrow();
-    resetArrowIdleTimer();
-  }
-});
-
-player.addEventListener("mouseenter", () => {
-  mouseOverVideoOrArrow = true;
-  showArrow();
-  resetArrowIdleTimer();
-});
-
-player.addEventListener("mouseleave", () => {
-  mouseOverVideoOrArrow = false;
-  hideArrow();
-});
-
-/* ===============================
-   DRAWER
-================================ */
-function openRecommendDrawer(e){
-  if(!recommendArrow.classList.contains("show")) return;
-  e.preventDefault();
-
-  recommendDrawer.classList.add("show");
-  recommendDrawer.style.transform = "translateY(0)";
-  hideArrow();
-}
-
-recommendArrow.addEventListener("click", openRecommendDrawer);
-
-drawerClose.onclick = () => {
-  recommendDrawer.classList.remove("show");
-  recommendDrawer.style.transform = "translateY(100%)";
-  hideArrow();
-};
-
-/* ===============================
    OPEN VIDEO
 ================================ */
+
 function openModal(v){
 
   clearInterval(timer);
   overlay.classList.add("hidden");
 
   player.src = v.file;
+
   modalTitle.textContent = v.title;
   modalDesc.textContent = v.desc;
 
-  player.play().catch(()=>{});
-
   modal.classList.add("open");
+
+  player.play().catch(()=>{});
 
   buildRecommendations();
 }
 
 /* ===============================
-   PLAY FROM LIST
+   PLAY VIDEO FROM LIST
 ================================ */
+
 function playFromList(fullList, vid){
+
   playlist = fullList;
   index = fullList.indexOf(vid);
+
   openModal(vid);
+
 }
 
 /* ===============================
-   RECOMMENDATIONS
+   BUILD RECOMMENDATIONS
 ================================ */
+
 function buildRecommendations(){
 
-  recommendPanel.innerHTML = "";
+  if(!recommendPanel) return;
+
+  recommendPanel.innerHTML="";
 
   playlist.forEach((v,i)=>{
+
     if(i===index) return;
 
-    const card = document.createElement("div");
-    card.className = "recCard";
+    const card=document.createElement("div");
+    card.className="recCard";
 
-    card.innerHTML = `<img src="${v.thumb}"><div>${v.title}</div>`;
+    card.innerHTML=`
+      <img src="${v.thumb}">
+      <div>${v.title}</div>
+    `;
 
-    card.onclick = ()=>{
-      index = i;
-
-      player.src = v.file;
-      modalTitle.textContent = v.title;
-      modalDesc.textContent = v.desc;
-
-      player.play().catch(()=>{});
-
-      recommendDrawer.classList.remove("show");
-      recommendDrawer.style.transform = "translateY(100%)";
-
-      buildRecommendations();
+    card.onclick=()=>{
+      index=i;
+      openModal(v);
     };
 
     recommendPanel.appendChild(card);
+
   });
+
 }
 
 /* ===============================
-   NEXT VIDEO OVERLAY (FIXED)
+   NEXT VIDEO OVERLAY
 ================================ */
-player.addEventListener("ended", (e) => {
 
-  e.stopPropagation();
+player.addEventListener("ended", ()=>{
 
-  const nextIndex = (index + 1) % playlist.length;
-  const nextVid = playlist[nextIndex];
+  if(!playlist.length) return;
 
-  nextThumb.src = nextVid.thumb;
-  nextTitle.textContent = nextVid.title;
+  const nextIndex=(index+1)%playlist.length;
+  const nextVid=playlist[nextIndex];
+
+  nextThumb.src=nextVid.thumb;
+  nextTitle.textContent=nextVid.title;
 
   overlay.classList.remove("hidden");
 
-  countEl.textContent = 5;
-  progressCircle.style.strokeDashoffset = 0;
+  countEl.textContent=5;
+  progressCircle.style.strokeDashoffset=0;
 
   startCountdown(nextIndex);
+
 });
+
+/* ===============================
+   COUNTDOWN
+================================ */
 
 function startCountdown(nextIndex){
 
-  let time = 5;
-  const circumference = 163;
+  let time=5;
+  const circumference=163;
 
   clearInterval(timer);
 
-  timer = setInterval(() => {
+  timer=setInterval(()=>{
 
     time--;
-    countEl.textContent = time;
+    countEl.textContent=time;
 
-    progressCircle.style.strokeDashoffset =
-      circumference * (1 - time / 5);
+    progressCircle.style.strokeDashoffset=
+      circumference*(1-time/5);
 
-    if(time <= 0){
+    if(time<=0){
 
       clearInterval(timer);
 
-      index = nextIndex;
+      index=nextIndex;
       overlay.classList.add("hidden");
 
-      const nextVid = playlist[index];
+      openModal(playlist[index]);
 
-      player.src = nextVid.file;
-      modalTitle.textContent = nextVid.title;
-      modalDesc.textContent = nextVid.desc;
-
-      player.play().catch(()=>{});
-
-      buildRecommendations();
     }
 
-  }, 1000);
+  },1000);
+
 }
 
 /* ===============================
-   BUTTONS
+   PLAY NOW BUTTON
 ================================ */
-playNowBtn.onclick = () => {
+
+playNowBtn.onclick=()=>{
 
   clearInterval(timer);
 
-  index = (index + 1) % playlist.length;
+  index=(index+1)%playlist.length;
 
   overlay.classList.add("hidden");
 
-  const nextVid = playlist[index];
+  openModal(playlist[index]);
 
-  player.src = nextVid.file;
-  modalTitle.textContent = nextVid.title;
-  modalDesc.textContent = nextVid.desc;
-
-  player.play().catch(()=>{});
-
-  buildRecommendations();
 };
 
-cancelBtn.onclick = () => {
+/* ===============================
+   CANCEL BUTTON
+================================ */
+
+cancelBtn.onclick=()=>{
 
   clearInterval(timer);
 
   overlay.classList.add("hidden");
 
-  countEl.textContent = "";
-  progressCircle.style.strokeDashoffset = 0;
+  countEl.textContent="";
+  progressCircle.style.strokeDashoffset=0;
+
 };
+
+/* ===============================
+   FULLSCREEN (CONTAINER)
+================================ */
+
+function toggleFullscreen(){
+
+  if(!document.fullscreenElement){
+
+    playerContainer.requestFullscreen().catch(()=>{});
+
+  }else{
+
+    document.exitFullscreen().catch(()=>{});
+
+  }
+
+}
 
 /* ===============================
    CLOSE MODAL
 ================================ */
-closeBtn.onclick = () => {
+
+closeBtn.onclick=()=>{
 
   clearInterval(timer);
 
@@ -1901,7 +1825,9 @@ closeBtn.onclick = () => {
   player.removeAttribute("src");
   player.load();
 
-  recommendDrawer.classList.remove("show");
+  if(recommendDrawer) recommendDrawer.classList.remove("show","mobile-ready");
+  if(recommendArrow) recommendArrow.classList.remove("show");
+
 };
   /* -----------------------------
       NAVIGATION
