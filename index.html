@@ -467,85 +467,6 @@ body[data-theme="dark"] #donationModal.open .donation-box {
     transform: translateY(-1px);
   }
 }
-#ios-install-banner {
-  position: fixed;
-  bottom: 20px;
-  left: 15px;
-  right: 15px;
-  display: none;
-  justify-content: center;
-  z-index: 9999;
-  animation: slideUp 0.4s ease;
-}
-
-@keyframes slideUp {
-  from { transform: translateY(40px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-.ios-install-card {
-  width: 100%;
-  max-width: 420px;
-  background: linear-gradient(135deg, #6b4ba3, #8a6fd1);
-  color: white;
-  padding: 20px;
-  border-radius: 20px;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.25);
-  backdrop-filter: blur(10px);
-}
-
-.ios-title {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 14px;
-  text-align: center;
-}
-
-.ios-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  font-size: 14px;
-}
-
-.step {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  line-height: 1.4;
-}
-
-.number {
-  background: white;
-  color: #6b4ba3;
-  width: 22px;
-  height: 22px;
-  font-size: 12px;
-  font-weight: bold;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-#close-ios-banner {
-  margin-top: 16px;
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 12px;
-  background: white;
-  color: #6b4ba3;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-#close-ios-banner:hover {
-  background: #f2f2f2;
-}
-
 
 /* ---------- overlay ---------- */
 
@@ -588,7 +509,6 @@ body[data-theme="dark"] #donationModal.open .donation-box {
 }
 
 /* ---------- countdown circle ---------- */
-
 .countdownWrap{
   position:relative;
   width:60px;
@@ -629,10 +549,17 @@ svg circle{
   font-size:14px;
   margin-top:8px;
 }
+
+/* ===============================
+   BUTTON ROW (UPDATED)
+================================ */
 .buttonRow {
   display: flex;
-  gap: 12px; /* space between buttons */
+  gap: 12px;
   margin-top: 12px;
+
+  justify-content: flex-start;   /* ✅ move left */
+  margin-left: -6px;             /* ✅ slight left shift */
 }
 
 /* Play Now button style */
@@ -647,15 +574,15 @@ svg circle{
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  flex: 1; /* expands equally in row */
+  flex: 1;
 }
 
 #playNowBtn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.35); }
 #playNowBtn:active { transform: translateY(0); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
-/* Cancel button style (same as Play Now for consistency) */
+/* Cancel button */
 #cancelBtn {
-  background: linear-gradient(135deg, #ff4d4f, #ff1a1a); /* red gradient */
+  background: linear-gradient(135deg, #ff4d4f, #ff1a1a);
   color: #fff;
   font-weight: 600;
   font-size: 16px;
@@ -669,6 +596,22 @@ svg circle{
 
 #cancelBtn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.35); }
 #cancelBtn:active { transform: translateY(0); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
+/* ===============================
+   MOBILE VERTICAL FIX (STACK)
+================================ */
+@media(max-width:480px){
+  .buttonRow{
+    flex-direction: column;   /* ✅ stack vertically */
+    gap: 10px;
+    margin-left: 0;           /* reset shift */
+  }
+
+  #playNowBtn,
+  #cancelBtn{
+    width: 100%;              /* full width */
+  }
+}
 /* =====================================================
    YOUTUBE POLISHED RECOMMENDATIONS — MERGED CSS
 ===================================================== */
