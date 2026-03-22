@@ -1445,7 +1445,7 @@ if ("serviceWorker" in navigator) {
   });
 /* =====================================================
    YOUTUBE POLISHED VIDEO PLAYER + RECOMMENDATIONS
-   — FULL JS WITH AUTOPLAY, MOBILE LANDSCAPE & IPHONE FIX
+   — FULL JS WITH AUTOPLAY, MOBILE LANDSCAPE, IPHONE FIX
 ===================================================== */
 
 /* ===============================
@@ -1673,6 +1673,7 @@ function buildRecommendations(){
   recommendPanel.innerHTML = "";
   playlist.forEach((v,i)=>{
     if(i===index) return;
+
     const card = document.createElement("div");
     card.className = "recCard";
     card.innerHTML = `<img src="${v.thumb}"><div>${v.title}</div>`;
@@ -1693,7 +1694,7 @@ function buildRecommendations(){
 }
 
 /* ===============================
-   NEXT VIDEO HANDLING (iPhone FIX + NORMAL)
+   NEXT VIDEO HANDLER WITH IPHONE FULLSCREEN FIX
 ================================ */
 player.addEventListener("ended", () => {
   const nextIndex = (index + 1) % playlist.length;
@@ -1702,12 +1703,12 @@ player.addEventListener("ended", () => {
   if(isFullscreen()){
     index = nextIndex;
 
-    // reset player properly
+    // reset player
     player.pause();
     player.removeAttribute("src");
     player.load();
 
-    // iPhone fullscreen fix
+    // force layout before playing next video
     setTimeout(() => {
       player.src = nextVid.file;
       modalTitle.textContent = nextVid.title;
@@ -1718,11 +1719,13 @@ player.addEventListener("ended", () => {
       player.style.objectFit = "contain";
 
       requestAnimationFrame(() => {
-        player.play().catch(()=>{});
-        buildRecommendations();
+        requestAnimationFrame(() => {
+          player.play().catch(()=>{});
+          buildRecommendations();
+        });
       });
-    }, 50);
 
+    }, 10);
     return;
   }
 
@@ -1741,10 +1744,12 @@ function startCountdown(nextIndex){
   let time = 5;
   const circumference = 163;
   clearInterval(timer);
+
   timer = setInterval(() => {
     time--;
     countEl.textContent = time;
     progressCircle.style.strokeDashoffset = circumference * (1 - time / 5);
+
     if(time <= 0){
       clearInterval(timer);
       index = nextIndex;
@@ -1776,20 +1781,24 @@ function showMobileLandscapeArrow(){
     mobileRecArrow.classList.add("show");
   }
 }
+
 function hideMobileLandscapeUI(){
   mobileRecArrow.classList.remove("show");
   mobileRecPanel.classList.remove("show");
 }
+
 function openMobileRecPanel(e){
   if(!mobileRecArrow.classList.contains("show")) return;
   e.preventDefault();
   if(!(isMobile() && isLandscape())) return;
+
   mobileRecPanel.innerHTML = "";
   const closeArrow = document.createElement("div");
   closeArrow.className = "mobileRecClose";
   closeArrow.innerHTML = "⌄";
   closeArrow.onclick = () => { mobileRecPanel.classList.remove("show"); };
   mobileRecPanel.appendChild(closeArrow);
+
   playlist.forEach((v,i)=>{
     if(i === index) return;
     const card = document.createElement("div");
@@ -1805,8 +1814,10 @@ function openMobileRecPanel(e){
     };
     mobileRecPanel.appendChild(card);
   });
+
   mobileRecPanel.classList.add("show");
 }
+
 mobileRecArrow.addEventListener("touchstart", openMobileRecPanel,{passive:false});
 mobileRecArrow.addEventListener("click", openMobileRecPanel);
 
