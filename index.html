@@ -629,46 +629,52 @@ svg circle{
   font-size:14px;
   margin-top:8px;
 }
-.buttonRow {
-  display: flex;
-  gap: 12px; /* space between buttons */
-  margin-top: 12px;
+.buttonRow{
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+  margin-left:-6px;   /* moves both buttons slightly left */
 }
 
-/* Play Now button style */
-#playNowBtn {
-  background: linear-gradient(135deg, #00e5ff, #00aaff);
-  color: #111;
-  font-weight: 600;
-  font-size: 16px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  flex: 1; /* expands equally in row */
+/* BOTH BUTTONS */
+#playNowBtn,
+#cancelBtn{
+  flex:0 0 140px;        /* fixed width so text fits */
+  white-space:nowrap;    /* prevents "Play Now" wrapping */
+  padding:8px 16px;      /* less vertical height */
+  font-size:15px;
+  font-weight:600;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  transition:transform .2s ease, box-shadow .2s ease;
 }
 
-#playNowBtn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.35); }
-#playNowBtn:active { transform: translateY(0); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-
-/* Cancel button style (same as Play Now for consistency) */
-#cancelBtn {
-  background: linear-gradient(135deg, #ff4d4f, #ff1a1a); /* red gradient */
-  color: #fff;
-  font-weight: 600;
-  font-size: 16px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  flex: 1;
+/* Play Now */
+#playNowBtn{
+  background:linear-gradient(135deg,#00e5ff,#00aaff);
+  color:#111;
+  box-shadow:0 4px 10px rgba(0,0,0,.3);
 }
 
-#cancelBtn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.35); }
-#cancelBtn:active { transform: translateY(0); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+/* Cancel */
+#cancelBtn{
+  background:linear-gradient(135deg,#ff4d4f,#ff1a1a);
+  color:#fff;
+}
+
+/* Hover effects */
+#playNowBtn:hover,
+#cancelBtn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 14px rgba(0,0,0,.35);
+}
+
+#playNowBtn:active,
+#cancelBtn:active{
+  transform:translateY(0);
+  box-shadow:0 4px 10px rgba(0,0,0,.3);
+}
 /* =====================================================
    YOUTUBE POLISHED RECOMMENDATIONS — MERGED CSS
 ===================================================== */
