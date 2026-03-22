@@ -1087,41 +1087,6 @@ if ("serviceWorker" in navigator) {
 <div id="mobileRecPanel" class="mobileRecPanel hidden"></div>
 
 <div class="footer">© IlmPlay — Safe Islamic Videos for Kids</div> 
-
-<div id="ios-install-banner">
-  <div class="ios-install-card">
-    <div class="ios-title">Install IlmPlay</div>
-
-    <div class="ios-steps">
-      <div class="step">
-        <span class="number">1</span>
-        Press the <b>3 dots</b> in the bottom right
-      </div>
-
-      <div class="step">
-        <span class="number">2</span>
-        Tap the <b>Share</b> button ⬆︎
-      </div>
-
-      <div class="step">
-        <span class="number">3</span>
-        Scroll down
-      </div>
-
-      <div class="step">
-        <span class="number">4</span>
-        Tap <b>"Add to Home Screen"</b>
-      </div>
-
-      <div class="step">
-        <span class="number">5</span>
-        Tap <b>"Add"</b>
-      </div>
-    </div>
-
-    <button id="close-ios-banner">Got it</button>
-  </div>
-</div>
   
 <script>
 const BASE='https://pub-34add490d32a4fbc9886affb7dc6b47d.r2.dev';
@@ -1480,7 +1445,6 @@ if ("serviceWorker" in navigator) {
   });
 /* =====================================================
    YOUTUBE POLISHED VIDEO PLAYER + RECOMMENDATIONS
-   — FULL JS WITH AUTOPLAY AND MOBILE LANDSCAPE
 ===================================================== */
 
 /* ===============================
@@ -1515,7 +1479,7 @@ function buildRow(sectionName, fullList, slice){
   if(sectionEl) sectionEl.appendChild(wrapper);
 }
 
-/* Build grids for all categories */
+/* Build grids */
 [STORIES, NASHEEDS, DUAS, CARTOONS].forEach((list, i) => {
   const names = ["Stories", "Nasheeds", "Duas", "Cartoons"];
   for(let x = 0; x < list.length; x += 8){
@@ -1569,6 +1533,13 @@ let arrowIdleTimer;
 ================================ */
 function isMobile(){ return window.innerWidth <= 900; }
 function isLandscape(){ return window.innerWidth > window.innerHeight; }
+
+/* 🔥 STEP 1 — ADDED */
+function isFullscreen(){
+  return document.fullscreenElement ||
+         document.webkitFullscreenElement ||
+         player.webkitDisplayingFullscreen;
+}
 
 /* ===============================
    ARROW VISIBILITY CONTROL (DESKTOP)
@@ -1628,36 +1599,28 @@ player.addEventListener("mousemove", (e) => {
 });
 
 /* ===============================
-   MOBILE TAP FIX (Samsung)
+   MOBILE TAP FIX
 ================================ */
-
 player.addEventListener("touchstart", () => {
-
   if(!isMobile()) return;
   if(!modal.classList.contains("open")) return;
   if(recommendDrawer.classList.contains("show")) return;
-
   showArrow();
-
 },{passive:true});
 
 /* ===============================
-   DRAWER AND MODAL CONTROL
+   DRAWER CONTROL
 ================================ */
-
 function openRecommendDrawer(e){
-
   if(!recommendArrow.classList.contains("show")) return;
 
   e.preventDefault();
-
   drawerY = 0;
   recommendDrawer.classList.add("show");
   recommendDrawer.style.transform = "translateY(0)";
   hideArrow();
 }
 
-/* fast touch for samsung */
 recommendArrow.addEventListener("touchstart", openRecommendDrawer,{passive:false});
 recommendArrow.addEventListener("click", openRecommendDrawer);
 
@@ -1667,17 +1630,6 @@ drawerClose.onclick = () => {
   recommendDrawer.style.transform = "translateY(100%)";
   hideArrow();
 };
-
-closeBtn.addEventListener("click", () => {
-  clearInterval(timer);
-  modal.classList.remove("open");
-  player.pause();
-  player.removeAttribute("src");
-  player.load();
-  recommendDrawer.classList.remove("show","mobile-ready");
-  hideArrow();
-  hideMobileLandscapeUI();
-});
 
 /* ===============================
    OPEN VIDEO
@@ -1692,7 +1644,6 @@ function openModal(v){
   modalDesc.textContent = v.desc;
 
   player.play().catch(()=>{});
-
   modal.classList.add("open");
 
   buildRecommendations();
@@ -1708,7 +1659,7 @@ function openModal(v){
 }
 
 /* ===============================
-   PLAY VIDEO FROM LIST
+   PLAY VIDEO
 ================================ */
 function playFromList(fullList, vid){
   playlist = fullList;
@@ -1724,7 +1675,6 @@ function buildRecommendations(){
   recommendPanel.innerHTML = "";
 
   playlist.forEach((v,i)=>{
-
     if(i===index) return;
 
     const card = document.createElement("div");
@@ -1733,7 +1683,6 @@ function buildRecommendations(){
     card.innerHTML = `<img src="${v.thumb}"><div>${v.title}</div>`;
 
     card.onclick = ()=>{
-
       index = i;
 
       player.src = v.file;
@@ -1747,44 +1696,60 @@ function buildRecommendations(){
       recommendDrawer.style.transform = "translateY(100%)";
 
       hideArrow();
-
       buildRecommendations();
     };
 
     recommendPanel.appendChild(card);
-
   });
 }
-/* ===============================
-   NEXT VIDEO OVERLAY (Play Now + Cancel)
-================================ */
 
-// Show next video overlay when video ends
+/* ===============================
+   🔥 STEP 2 — FIXED ENDED EVENT
+================================ */
 player.addEventListener("ended", () => {
 
-  // Determine next video in playlist
   const nextIndex = (index + 1) % playlist.length;
   const nextVid = playlist[nextIndex];
 
-  // Update overlay content
+  if(isFullscreen()){
+
+    index = nextIndex;
+
+    player.pause();
+    player.removeAttribute("src");
+    player.load();
+
+    setTimeout(() => {
+
+      player.src = nextVid.file;
+      modalTitle.textContent = nextVid.title;
+      modalDesc.textContent = nextVid.desc;
+
+      player.play().catch(()=>{});
+      buildRecommendations();
+
+    }, 50);
+
+    return;
+  }
+
   nextThumb.src = nextVid.thumb;
   nextTitle.textContent = nextVid.title;
   overlay.classList.remove("hidden");
 
-  // Reset countdown
   countEl.textContent = 5;
   progressCircle.style.strokeDashoffset = 0;
 
-  // Start countdown
   startCountdown(nextIndex);
 });
 
-// Countdown function for next video
+/* ===============================
+   COUNTDOWN
+================================ */
 function startCountdown(nextIndex){
   let time = 5;
   const circumference = 163;
 
-  // Clear any previous interval
   clearInterval(timer);
 
   timer = setInterval(() => {
@@ -1801,7 +1766,9 @@ function startCountdown(nextIndex){
   }, 1000);
 }
 
-// Play Now button functionality
+/* ===============================
+   PLAY NOW / CANCEL
+================================ */
 playNowBtn.onclick = () => {
   clearInterval(timer);
   index = (index + 1) % playlist.length;
@@ -1809,17 +1776,16 @@ playNowBtn.onclick = () => {
   openModal(playlist[index]);
 };
 
-// Cancel button functionality
 cancelBtn.onclick = () => {
-  clearInterval(timer);            // stop countdown immediately
-  overlay.classList.add("hidden"); // hide overlay
-  countEl.textContent = "";        // reset countdown text
-  progressCircle.style.strokeDashoffset = 0; // reset circle
+  clearInterval(timer);
+  overlay.classList.add("hidden");
+  countEl.textContent = "";
+  progressCircle.style.strokeDashoffset = 0;
 };
-/* ===============================
-   MOBILE LANDSCAPE RECOMMENDATIONS
-================================ */
 
+/* ===============================
+   MOBILE LANDSCAPE
+================================ */
 function showMobileLandscapeArrow(){
   if(isMobile() && isLandscape()){
     mobileRecArrow.classList.add("show");
@@ -1831,62 +1797,9 @@ function hideMobileLandscapeUI(){
   mobileRecPanel.classList.remove("show");
 }
 
-function openMobileRecPanel(e){
-
-  if(!mobileRecArrow.classList.contains("show")) return;
-
-  e.preventDefault();
-
-  if(!(isMobile() && isLandscape())) return;
-
-  mobileRecPanel.innerHTML = "";
-
-  const closeArrow = document.createElement("div");
-  closeArrow.className = "mobileRecClose";
-  closeArrow.innerHTML = "⌄";
-
-  closeArrow.onclick = () => {
-    mobileRecPanel.classList.remove("show");
-  };
-
-  mobileRecPanel.appendChild(closeArrow);
-
-  playlist.forEach((v,i)=>{
-
-    if(i === index) return;
-
-    const card = document.createElement("div");
-    card.className = "recCard";
-
-    card.innerHTML = `
-      <img src="${v.thumb}">
-      <div>${v.title}</div>
-    `;
-
-    card.onclick = () => {
-
-      index = i;
-
-      player.src = v.file;
-      modalTitle.textContent = v.title;
-      modalDesc.textContent = v.desc;
-
-      player.play().catch(()=>{});
-
-      mobileRecPanel.classList.remove("show");
-
-    };
-
-    mobileRecPanel.appendChild(card);
-
-  });
-
-  mobileRecPanel.classList.add("show");
-
-}
-
 mobileRecArrow.addEventListener("touchstart", openMobileRecPanel,{passive:false});
 mobileRecArrow.addEventListener("click", openMobileRecPanel);
+
 /* ===============================
    CLOSE MODAL
 ================================ */
@@ -1903,7 +1816,6 @@ closeBtn.onclick = () => {
   recommendArrow.classList.remove("show");
 
   hideMobileLandscapeUI();
-
 };
   /* -----------------------------
       NAVIGATION
