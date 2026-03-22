@@ -1445,7 +1445,7 @@ if ("serviceWorker" in navigator) {
   });
 /* =====================================================
    YOUTUBE POLISHED VIDEO PLAYER + RECOMMENDATIONS
-   — FULL JS WITH AUTOPLAY AND MOBILE LANDSCAPE
+   — FULL JS WITH AUTOPLAY, MOBILE LANDSCAPE & IPHONE FIX
 ===================================================== */
 
 /* ===============================
@@ -1535,8 +1535,6 @@ let arrowIdleTimer;
 ================================ */
 function isMobile(){ return window.innerWidth <= 900; }
 function isLandscape(){ return window.innerWidth > window.innerHeight; }
-
-// Detect fullscreen including iPhone
 function isFullscreen(){
   return document.fullscreenElement ||
          document.webkitFullscreenElement ||
@@ -1553,10 +1551,12 @@ let mouseOverVideoOrArrow = false;
 recommendArrow.classList.remove("show");
 
 function hideArrow() { recommendArrow.classList.remove("show"); }
+
 function showArrow() {
   if (!modal.classList.contains("open") || recommendDrawer.classList.contains("show")) return;
   recommendArrow.classList.add("show");
 }
+
 function resetArrowIdleTimer() {
   clearTimeout(arrowIdleTimer);
   arrowIdleTimer = setTimeout(() => {
@@ -1569,22 +1569,27 @@ player.addEventListener("mouseenter", () => {
   showArrow();
   resetArrowIdleTimer();
 });
+
 player.addEventListener("mouseleave", () => {
   mouseOverVideoOrArrow = false;
   hideArrow();
   clearTimeout(arrowIdleTimer);
 });
+
 recommendArrow.addEventListener("mouseenter", () => {
   mouseOverVideoOrArrow = true;
   showArrow();
   clearTimeout(arrowIdleTimer);
 });
+
 recommendArrow.addEventListener("mouseleave", () => {
   mouseOverVideoOrArrow = false;
   resetArrowIdleTimer();
 });
+
 player.addEventListener("mousemove", (e) => {
   if (!modal.classList.contains("open") || recommendDrawer.classList.contains("show")) return;
+
   if (e.clientX !== lastMouseX || e.clientY !== lastMouseY) {
     lastMouseX = e.clientX;
     lastMouseY = e.clientY;
@@ -1597,7 +1602,9 @@ player.addEventListener("mousemove", (e) => {
    MOBILE TAP FIX (Samsung)
 ================================ */
 player.addEventListener("touchstart", () => {
-  if(!isMobile() || !modal.classList.contains("open") || recommendDrawer.classList.contains("show")) return;
+  if(!isMobile()) return;
+  if(!modal.classList.contains("open")) return;
+  if(recommendDrawer.classList.contains("show")) return;
   showArrow();
 },{passive:true});
 
@@ -1612,6 +1619,7 @@ function openRecommendDrawer(e){
   recommendDrawer.style.transform = "translateY(0)";
   hideArrow();
 }
+
 recommendArrow.addEventListener("touchstart", openRecommendDrawer,{passive:false});
 recommendArrow.addEventListener("click", openRecommendDrawer);
 
@@ -1665,11 +1673,9 @@ function buildRecommendations(){
   recommendPanel.innerHTML = "";
   playlist.forEach((v,i)=>{
     if(i===index) return;
-
     const card = document.createElement("div");
     card.className = "recCard";
     card.innerHTML = `<img src="${v.thumb}"><div>${v.title}</div>`;
-
     card.onclick = ()=>{
       index = i;
       player.src = v.file;
@@ -1682,33 +1688,39 @@ function buildRecommendations(){
       hideArrow();
       buildRecommendations();
     };
-
     recommendPanel.appendChild(card);
   });
 }
 
 /* ===============================
-   NEXT VIDEO (IMMEDIATE IN FULLSCREEN, NORMAL OVERLAY OTHERWISE)
+   NEXT VIDEO HANDLING (iPhone FIX + NORMAL)
 ================================ */
 player.addEventListener("ended", () => {
   const nextIndex = (index + 1) % playlist.length;
   const nextVid = playlist[nextIndex];
 
   if(isFullscreen()){
-    // iPhone and fullscreen fix: instant next video
     index = nextIndex;
 
-    // reset video properly
+    // reset player properly
     player.pause();
     player.removeAttribute("src");
     player.load();
 
+    // iPhone fullscreen fix
     setTimeout(() => {
       player.src = nextVid.file;
       modalTitle.textContent = nextVid.title;
       modalDesc.textContent = nextVid.desc;
-      player.play().catch(()=>{});
-      buildRecommendations();
+
+      player.style.width = "100%";
+      player.style.height = "100%";
+      player.style.objectFit = "contain";
+
+      requestAnimationFrame(() => {
+        player.play().catch(()=>{});
+        buildRecommendations();
+      });
     }, 50);
 
     return;
@@ -1728,14 +1740,11 @@ player.addEventListener("ended", () => {
 function startCountdown(nextIndex){
   let time = 5;
   const circumference = 163;
-
   clearInterval(timer);
-
   timer = setInterval(() => {
     time--;
     countEl.textContent = time;
     progressCircle.style.strokeDashoffset = circumference * (1 - time / 5);
-
     if(time <= 0){
       clearInterval(timer);
       index = nextIndex;
@@ -1745,9 +1754,6 @@ function startCountdown(nextIndex){
   }, 1000);
 }
 
-/* ===============================
-   PLAY NOW / CANCEL BUTTONS
-================================ */
 playNowBtn.onclick = () => {
   clearInterval(timer);
   index = (index + 1) % playlist.length;
@@ -1774,27 +1780,21 @@ function hideMobileLandscapeUI(){
   mobileRecArrow.classList.remove("show");
   mobileRecPanel.classList.remove("show");
 }
-
 function openMobileRecPanel(e){
   if(!mobileRecArrow.classList.contains("show")) return;
   e.preventDefault();
   if(!(isMobile() && isLandscape())) return;
-
   mobileRecPanel.innerHTML = "";
-
   const closeArrow = document.createElement("div");
   closeArrow.className = "mobileRecClose";
   closeArrow.innerHTML = "⌄";
   closeArrow.onclick = () => { mobileRecPanel.classList.remove("show"); };
   mobileRecPanel.appendChild(closeArrow);
-
   playlist.forEach((v,i)=>{
     if(i === index) return;
-
     const card = document.createElement("div");
     card.className = "recCard";
     card.innerHTML = `<img src="${v.thumb}"><div>${v.title}</div>`;
-
     card.onclick = () => {
       index = i;
       player.src = v.file;
@@ -1803,13 +1803,10 @@ function openMobileRecPanel(e){
       player.play().catch(()=>{});
       mobileRecPanel.classList.remove("show");
     };
-
     mobileRecPanel.appendChild(card);
   });
-
   mobileRecPanel.classList.add("show");
 }
-
 mobileRecArrow.addEventListener("touchstart", openMobileRecPanel,{passive:false});
 mobileRecArrow.addEventListener("click", openMobileRecPanel);
 
