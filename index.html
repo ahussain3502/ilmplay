@@ -1479,7 +1479,6 @@ function buildRow(sectionName, fullList, slice){
   if(sectionEl) sectionEl.appendChild(wrapper);
 }
 
-/* Build grids */
 [STORIES, NASHEEDS, DUAS, CARTOONS].forEach((list, i) => {
   const names = ["Stories", "Nasheeds", "Duas", "Cartoons"];
   for(let x = 0; x < list.length; x += 8){
@@ -1522,19 +1521,13 @@ let playlist = [];
 let index = 0;
 let timer;
 
-let dragging = false;
-let startY = 0;
-let drawerY = 72;
-
-let arrowIdleTimer;
-
 /* ===============================
    UTILS
 ================================ */
 function isMobile(){ return window.innerWidth <= 900; }
 function isLandscape(){ return window.innerWidth > window.innerHeight; }
 
-/* 🔥 STEP 1 — ADDED */
+/* 🔥 STEP 1 — FULLSCREEN DETECTION */
 function isFullscreen(){
   return document.fullscreenElement ||
          document.webkitFullscreenElement ||
@@ -1542,90 +1535,61 @@ function isFullscreen(){
 }
 
 /* ===============================
-   ARROW VISIBILITY CONTROL (DESKTOP)
+   ARROW VISIBILITY
 ================================ */
-let lastMouseX = 0;
-let lastMouseY = 0;
+let arrowIdleTimer;
 let mouseOverVideoOrArrow = false;
 
-recommendArrow.classList.remove("show");
+function hideArrow(){ recommendArrow.classList.remove("show"); }
 
-function hideArrow() { recommendArrow.classList.remove("show"); }
-
-function showArrow() {
+function showArrow(){
   if (!modal.classList.contains("open") || recommendDrawer.classList.contains("show")) return;
   recommendArrow.classList.add("show");
 }
 
-function resetArrowIdleTimer() {
+function resetArrowIdleTimer(){
   clearTimeout(arrowIdleTimer);
-  arrowIdleTimer = setTimeout(() => {
+  arrowIdleTimer = setTimeout(()=>{
     if (!mouseOverVideoOrArrow) hideArrow();
-  }, 2000);
+  },2000);
 }
 
-player.addEventListener("mouseenter", () => {
+player.addEventListener("mouseenter", ()=>{
   mouseOverVideoOrArrow = true;
   showArrow();
   resetArrowIdleTimer();
 });
 
-player.addEventListener("mouseleave", () => {
+player.addEventListener("mouseleave", ()=>{
   mouseOverVideoOrArrow = false;
   hideArrow();
-  clearTimeout(arrowIdleTimer);
 });
 
-recommendArrow.addEventListener("mouseenter", () => {
+recommendArrow.addEventListener("mouseenter", ()=>{
   mouseOverVideoOrArrow = true;
   showArrow();
-  clearTimeout(arrowIdleTimer);
 });
 
-recommendArrow.addEventListener("mouseleave", () => {
+recommendArrow.addEventListener("mouseleave", ()=>{
   mouseOverVideoOrArrow = false;
   resetArrowIdleTimer();
 });
 
-player.addEventListener("mousemove", (e) => {
-  if (!modal.classList.contains("open") || recommendDrawer.classList.contains("show")) return;
-
-  if (e.clientX !== lastMouseX || e.clientY !== lastMouseY) {
-    lastMouseX = e.clientX;
-    lastMouseY = e.clientY;
-    showArrow();
-    resetArrowIdleTimer();
-  }
-});
-
 /* ===============================
-   MOBILE TAP FIX
-================================ */
-player.addEventListener("touchstart", () => {
-  if(!isMobile()) return;
-  if(!modal.classList.contains("open")) return;
-  if(recommendDrawer.classList.contains("show")) return;
-  showArrow();
-},{passive:true});
-
-/* ===============================
-   DRAWER CONTROL
+   DRAWER
 ================================ */
 function openRecommendDrawer(e){
   if(!recommendArrow.classList.contains("show")) return;
-
   e.preventDefault();
-  drawerY = 0;
   recommendDrawer.classList.add("show");
   recommendDrawer.style.transform = "translateY(0)";
   hideArrow();
 }
 
-recommendArrow.addEventListener("touchstart", openRecommendDrawer,{passive:false});
 recommendArrow.addEventListener("click", openRecommendDrawer);
+recommendArrow.addEventListener("touchstart", openRecommendDrawer,{passive:false});
 
 drawerClose.onclick = () => {
-  drawerY = 100;
   recommendDrawer.classList.remove("show","mobile-ready");
   recommendDrawer.style.transform = "translateY(100%)";
   hideArrow();
@@ -1644,22 +1608,18 @@ function openModal(v){
   modalDesc.textContent = v.desc;
 
   player.play().catch(()=>{});
+
   modal.classList.add("open");
 
   buildRecommendations();
 
-  drawerY = 72;
-  recommendDrawer.classList.remove("show","mobile-ready");
-
-  hideArrow();
-
   if(isMobile() && isLandscape()){
-    showMobileLandscapeArrow();
+    mobileRecArrow.classList.add("show");
   }
 }
 
 /* ===============================
-   PLAY VIDEO
+   PLAY VIDEO FROM LIST
 ================================ */
 function playFromList(fullList, vid){
   playlist = fullList;
@@ -1668,10 +1628,9 @@ function playFromList(fullList, vid){
 }
 
 /* ===============================
-   BUILD RECOMMENDATIONS
+   RECOMMENDATIONS
 ================================ */
 function buildRecommendations(){
-
   recommendPanel.innerHTML = "";
 
   playlist.forEach((v,i)=>{
@@ -1684,19 +1643,7 @@ function buildRecommendations(){
 
     card.onclick = ()=>{
       index = i;
-
-      player.src = v.file;
-      modalTitle.textContent = v.title;
-      modalDesc.textContent = v.desc;
-
-      player.play().catch(()=>{});
-
-      drawerY = 100;
-      recommendDrawer.classList.remove("show","mobile-ready");
-      recommendDrawer.style.transform = "translateY(100%)";
-
-      hideArrow();
-      buildRecommendations();
+      openModal(v);
     };
 
     recommendPanel.appendChild(card);
@@ -1704,34 +1651,44 @@ function buildRecommendations(){
 }
 
 /* ===============================
-   🔥 STEP 2 — FIXED ENDED EVENT
+   🔥 FIXED ENDED EVENT
 ================================ */
 player.addEventListener("ended", () => {
 
   const nextIndex = (index + 1) % playlist.length;
-  const nextVid = playlist[nextIndex];
 
+  // ✅ FULLSCREEN → INSTANT + FIXED
   if(isFullscreen()){
 
     index = nextIndex;
+    const nextVid = playlist[index];
 
     player.pause();
+
+    const newSrc = nextVid.file;
+
     player.removeAttribute("src");
     player.load();
 
     setTimeout(() => {
 
-      player.src = nextVid.file;
+      player.src = newSrc;
+      player.load();
+
       modalTitle.textContent = nextVid.title;
       modalDesc.textContent = nextVid.desc;
 
       player.play().catch(()=>{});
+
       buildRecommendations();
 
-    }, 50);
+    }, 80);
 
     return;
   }
+
+  // ✅ NORMAL MODE
+  const nextVid = playlist[nextIndex];
 
   nextThumb.src = nextVid.thumb;
   nextTitle.textContent = nextVid.title;
@@ -1752,10 +1709,10 @@ function startCountdown(nextIndex){
 
   clearInterval(timer);
 
-  timer = setInterval(() => {
+  timer = setInterval(()=>{
     time--;
     countEl.textContent = time;
-    progressCircle.style.strokeDashoffset = circumference * (1 - time / 5);
+    progressCircle.style.strokeDashoffset = circumference * (1 - time/5);
 
     if(time <= 0){
       clearInterval(timer);
@@ -1763,49 +1720,65 @@ function startCountdown(nextIndex){
       overlay.classList.add("hidden");
       openModal(playlist[index]);
     }
-  }, 1000);
+  },1000);
 }
 
-/* ===============================
-   PLAY NOW / CANCEL
-================================ */
-playNowBtn.onclick = () => {
+playNowBtn.onclick = ()=>{
   clearInterval(timer);
   index = (index + 1) % playlist.length;
   overlay.classList.add("hidden");
   openModal(playlist[index]);
 };
 
-cancelBtn.onclick = () => {
+cancelBtn.onclick = ()=>{
   clearInterval(timer);
   overlay.classList.add("hidden");
-  countEl.textContent = "";
-  progressCircle.style.strokeDashoffset = 0;
 };
 
 /* ===============================
-   MOBILE LANDSCAPE
+   MOBILE RECOMMENDATIONS
 ================================ */
-function showMobileLandscapeArrow(){
-  if(isMobile() && isLandscape()){
-    mobileRecArrow.classList.add("show");
-  }
-}
-
 function hideMobileLandscapeUI(){
   mobileRecArrow.classList.remove("show");
   mobileRecPanel.classList.remove("show");
 }
 
-mobileRecArrow.addEventListener("touchstart", openMobileRecPanel,{passive:false});
+function openMobileRecPanel(e){
+  if(!mobileRecArrow.classList.contains("show")) return;
+  e.preventDefault();
+
+  mobileRecPanel.innerHTML = "";
+
+  playlist.forEach((v,i)=>{
+    if(i===index) return;
+
+    const card = document.createElement("div");
+    card.className = "recCard";
+
+    card.innerHTML = `<img src="${v.thumb}"><div>${v.title}</div>`;
+
+    card.onclick = ()=>{
+      index = i;
+      openModal(v);
+      mobileRecPanel.classList.remove("show");
+    };
+
+    mobileRecPanel.appendChild(card);
+  });
+
+  mobileRecPanel.classList.add("show");
+}
+
 mobileRecArrow.addEventListener("click", openMobileRecPanel);
+mobileRecArrow.addEventListener("touchstart", openMobileRecPanel,{passive:false});
 
 /* ===============================
-   CLOSE MODAL
+   ✅ FIXED CLOSE MODAL (ONLY ONE)
 ================================ */
 closeBtn.onclick = () => {
 
   clearInterval(timer);
+
   modal.classList.remove("open");
 
   player.pause();
