@@ -1738,30 +1738,46 @@ player.addEventListener("ended", () => {
   const nextIndex = (index + 1) % playlist.length;
   const nextVid = playlist[nextIndex];
 
-  // ✅ FULLSCREEN → seamless swap (NO reload, NO glitch)
   if(isFullscreen()){
 
     index = nextIndex;
 
-    // 🔥 KEY FIX (do NOT remove src anymore)
-    player.src = nextVid.file;
-    player.currentTime = 0;
+    // 🔥 STEP 1 — Exit fullscreen (REQUIRED for iPhone)
+    if(document.fullscreenElement){
+      document.exitFullscreen().catch(()=>{});
+    }
 
-    modalTitle.textContent = nextVid.title;
-    modalDesc.textContent = nextVid.desc;
+    // iOS fallback
+    if(player.webkitDisplayingFullscreen){
+      try { player.webkitExitFullscreen(); } catch(e){}
+    }
 
-    // Force layout refresh (fixes iPhone positioning bug)
-    player.style.display = "none";
-    player.offsetHeight; // reflow trigger
-    player.style.display = "";
+    // 🔥 STEP 2 — small delay so iOS resets properly
+    setTimeout(() => {
 
-    player.play().catch(()=>{});
-    buildRecommendations();
+      // 🔥 STEP 3 — switch video cleanly
+      player.src = nextVid.file;
+      modalTitle.textContent = nextVid.title;
+      modalDesc.textContent = nextVid.desc;
+
+      player.play().catch(()=>{});
+      buildRecommendations();
+
+      // 🔥 STEP 4 — re-enter fullscreen automatically
+      setTimeout(() => {
+        if(player.requestFullscreen){
+          player.requestFullscreen().catch(()=>{});
+        } else if(player.webkitEnterFullscreen){
+          player.webkitEnterFullscreen();
+        }
+      }, 150);
+
+    }, 150);
 
     return;
   }
 
-  // ✅ NORMAL MODE (unchanged)
+  // ✅ Normal mode (unchanged)
   nextThumb.src = nextVid.thumb;
   nextTitle.textContent = nextVid.title;
   overlay.classList.remove("hidden");
@@ -1770,7 +1786,6 @@ player.addEventListener("ended", () => {
   progressCircle.style.strokeDashoffset = 0;
 
   startCountdown(nextIndex);
-
 });
 
 /* ===============================
