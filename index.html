@@ -1716,26 +1716,53 @@ player.addEventListener("ended", () => {
   const nextIndex = (index + 1) % playlist.length;
   const nextVid = playlist[nextIndex];
 
-  // Fullscreen → play instantly (iPhone fix included)
+  // ✅ iPhone / fullscreen fix
   if(isFullscreen()){
+
     index = nextIndex;
 
+    const isIphoneFullscreen = player.webkitDisplayingFullscreen;
+
+    // 🔥 STEP 1: EXIT fullscreen (IMPORTANT)
+    if(isIphoneFullscreen && document.webkitExitFullscreen){
+      document.webkitExitFullscreen();
+    } else if(document.exitFullscreen){
+      document.exitFullscreen();
+    }
+
+    // 🔥 STEP 2: reset video
     player.pause();
     player.removeAttribute("src");
     player.load();
 
+    // 🔥 STEP 3: load next video AFTER exit
     setTimeout(() => {
+
       player.src = nextVid.file;
       modalTitle.textContent = nextVid.title;
       modalDesc.textContent = nextVid.desc;
+
       player.play().catch(()=>{});
       buildRecommendations();
-    }, 50);
+
+      // 🔥 STEP 4: RE-ENTER fullscreen
+      setTimeout(() => {
+
+        if(player.requestFullscreen){
+          player.requestFullscreen().catch(()=>{});
+        } else if(player.webkitEnterFullscreen){
+          // iPhone native fullscreen
+          player.webkitEnterFullscreen();
+        }
+
+      }, 100);
+
+    }, 120); // slightly longer for iOS stability
 
     return;
   }
 
-  // Normal mode → show overlay
+  // ✅ NORMAL MODE (unchanged)
   nextThumb.src = nextVid.thumb;
   nextTitle.textContent = nextVid.title;
   overlay.classList.remove("hidden");
@@ -1745,41 +1772,6 @@ player.addEventListener("ended", () => {
 
   startCountdown(nextIndex);
 });
-
-function startCountdown(nextIndex){
-  let time = 5;
-  const circumference = 163;
-
-  clearInterval(timer);
-
-  timer = setInterval(() => {
-    time--;
-    countEl.textContent = time;
-    progressCircle.style.strokeDashoffset = circumference * (1 - time / 5);
-
-    if(time <= 0){
-      clearInterval(timer);
-      index = nextIndex;
-      overlay.classList.add("hidden");
-      openModal(playlist[index]);
-    }
-  }, 1000);
-}
-
-// Play Now / Cancel buttons
-playNowBtn.onclick = () => {
-  clearInterval(timer);
-  index = (index + 1) % playlist.length;
-  overlay.classList.add("hidden");
-  openModal(playlist[index]);
-};
-
-cancelBtn.onclick = () => {
-  clearInterval(timer);
-  overlay.classList.add("hidden");
-  countEl.textContent = "";
-  progressCircle.style.strokeDashoffset = 0;
-};
 
 /* ===============================
    MOBILE LANDSCAPE RECOMMENDATIONS
