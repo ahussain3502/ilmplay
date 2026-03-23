@@ -864,11 +864,32 @@ svg circle{
   }
 
 }
-  /* iPhone fullscreen video fix */
-video:-webkit-full-screen {
-  width: 100% !important;
-  height: 100% !important;
+/* ===============================
+   iPHONE FULLSCREEN PERFECT FIX
+================================ */
+
+/* Standard fullscreen */
+video:fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
   object-fit: contain !important;
+  background: black !important;
+}
+
+/* Safari fullscreen */
+video:-webkit-full-screen {
+  width: 100vw !important;
+  height: 100vh !important;
+  object-fit: contain !important;
+  background: black !important;
+}
+
+/* iOS inline fullscreen container fix */
+video {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  background: black;
 }
 </style>
 
@@ -1710,54 +1731,32 @@ function buildRecommendations(){
 }
 
 /* ===============================
-   NEXT VIDEO HANDLER (iPHONE FIX)
+   NEXT VIDEO HANDLER (PERFECT iPHONE FIX)
 ================================ */
 player.addEventListener("ended", () => {
+
   const nextIndex = (index + 1) % playlist.length;
   const nextVid = playlist[nextIndex];
 
-  // ✅ iPhone / fullscreen fix
+  // ✅ FULLSCREEN → seamless swap (NO reload, NO glitch)
   if(isFullscreen()){
 
     index = nextIndex;
 
-    const isIphoneFullscreen = player.webkitDisplayingFullscreen;
+    // 🔥 KEY FIX (do NOT remove src anymore)
+    player.src = nextVid.file;
+    player.currentTime = 0;
 
-    // 🔥 STEP 1: EXIT fullscreen (IMPORTANT)
-    if(isIphoneFullscreen && document.webkitExitFullscreen){
-      document.webkitExitFullscreen();
-    } else if(document.exitFullscreen){
-      document.exitFullscreen();
-    }
+    modalTitle.textContent = nextVid.title;
+    modalDesc.textContent = nextVid.desc;
 
-    // 🔥 STEP 2: reset video
-    player.pause();
-    player.removeAttribute("src");
-    player.load();
+    // Force layout refresh (fixes iPhone positioning bug)
+    player.style.display = "none";
+    player.offsetHeight; // reflow trigger
+    player.style.display = "";
 
-    // 🔥 STEP 3: load next video AFTER exit
-    setTimeout(() => {
-
-      player.src = nextVid.file;
-      modalTitle.textContent = nextVid.title;
-      modalDesc.textContent = nextVid.desc;
-
-      player.play().catch(()=>{});
-      buildRecommendations();
-
-      // 🔥 STEP 4: RE-ENTER fullscreen
-      setTimeout(() => {
-
-        if(player.requestFullscreen){
-          player.requestFullscreen().catch(()=>{});
-        } else if(player.webkitEnterFullscreen){
-          // iPhone native fullscreen
-          player.webkitEnterFullscreen();
-        }
-
-      }, 100);
-
-    }, 120); // slightly longer for iOS stability
+    player.play().catch(()=>{});
+    buildRecommendations();
 
     return;
   }
@@ -1771,6 +1770,7 @@ player.addEventListener("ended", () => {
   progressCircle.style.strokeDashoffset = 0;
 
   startCountdown(nextIndex);
+
 });
 
 /* ===============================
