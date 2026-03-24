@@ -891,6 +891,58 @@ video {
   object-fit: contain;
   background: black;
 }
+  /* ===============================
+   FIX OVERLAY LAYOUT (MOBILE PORTRAIT ONLY)
+================================ */
+@media (max-width:900px) and (orientation:portrait){
+
+  /* stack thumbnail + info vertically */
+  .upNextCard{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  /* thumbnail full width */
+  .upNextCard img{
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+    margin-bottom: 12px;
+  }
+
+  /* center all info */
+  .upNextInfo{
+    width: 100%;
+    max-width: 320px;
+    align-items: center;
+  }
+
+  /* center title */
+  #nextTitle{
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  /* center countdown */
+  .countdownWrap{
+    margin: 10px auto;
+  }
+
+  /* stack buttons vertically */
+  .buttonRow{
+    flex-direction: column;
+    width: 100%;
+    margin-left: 0; /* remove left shift */
+  }
+
+  #playNowBtn,
+  #cancelBtn{
+    width: 100%;
+  }
+
+}
 </style>
 
 <link rel="manifest" href="/manifest.json">
