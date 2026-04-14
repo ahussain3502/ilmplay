@@ -3,7 +3,7 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "com.ilmplay.app",
+      "package_name": "com.ilmplay.app2016",
       "sha256_cert_fingerprints": ["2A:2A:66:37:FF:34:4D:00:2D:F9:D2:29:46:CD:E4:F1:B2:0C:D3:36:B3:48:4A:58:3B:FA:F6:37:9D:2F:C8:BD"]
     }
   }
