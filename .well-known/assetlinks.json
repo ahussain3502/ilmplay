@@ -3,8 +3,8 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "com.ilmplay.app2019",
-      "sha256_cert_fingerprints": ["77:4F:DE:29:25:E9:2A:B1:2A:D8:E2:CA:68:F9:78:A7:2F:F9:DC:A9:A8:D9:1D:2E:29:6F:1F:FD:84:B9:A0:C3"]
+      "package_name": "com.ilmplay.app2020",
+      "sha256_cert_fingerprints": ["8D:06:13:78:C8:08:53:7F:B2:09:71:9A:85:3B:FA:0E:40:A5:68:6A:EE:1B:69:D6:BF:43:47:D3:B6:08:5F:31"]
     }
   }
 ]
